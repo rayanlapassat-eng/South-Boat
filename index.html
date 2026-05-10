@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>South Boat — Location de bateaux Côte d'Azur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+<script type="text/babel" src="pages.jsx"></script>
+<script type="text/babel" src="planning.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect } = React;
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  const [page, setPage] = useState({ name: "home" });
+  const [query, setQuery] = useState({
+    port: "",
+    from: new Date().toISOString().slice(0,10),
+    to: new Date(Date.now() + 7*86400000).toISOString().slice(0,10),
+    people: 4,
+  });
+  const [favs, setFavs] = useState([]);
+
+  const toggleFav = (id) => setFavs((f) => f.includes(id) ? f.filter((x) => x !== id) : [...f, id]);
+
+  // apply theme + radius
+  useEffect(() => {
+    applyTheme(tweaks.darkMode);
+    document.documentElement.setAttribute("data-theme", tweaks.darkMode ? "dark" : "light");
+    document.documentElement.style.setProperty("--radius", tweaks.radius + "px");
+  }, [tweaks.darkMode, tweaks.radius]);
+
+  // scroll up on page change
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [page.name, page.id]);
+
+  const favCount = favs.length;
+
+  return (
+    <>
+      <Nav page={page} setPage={setPage} favCount={favCount} />
+      {page.name === "home" && <HomePage setPage={setPage} query={query} setQuery={setQuery} toggleFav={toggleFav} favs={favs} />}
+      {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} toggleFav={toggleFav} favs={favs} />}
+      {page.name === "planning" && <PlanningPage setPage={setPage} />}
+      {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} toggleFav={toggleFav} favs={favs} />}
+      {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} />}
+      {page.name === "favorites" && <FavoritesPage favs={favs} setPage={setPage} toggleFav={toggleFav} />}
+      {page.name === "about" && <AboutPage setPage={setPage} />}
+      {page.name === "contact" && <ContactPage />}
+
+      <TweaksPanel>
+        <TweakSection title="Style des boutons">
+          <TweakRadio
+            label="Arrondi"
+            value={tweaks.radius}
+            onChange={(v) => setTweak("radius", v)}
+            options={[
+              { value: 6, label: "Net" },
+              { value: 16, label: "Doux" },
+              { value: 999, label: "Rond" },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection title="Apparence">
+          <TweakToggle
+            label="Mode sombre"
+            value={tweaks.darkMode}
+            onChange={(v) => setTweak("darkMode", v)}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
