@@ -16,7 +16,6 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<script src="articles.js"></script>
 <script type="text/babel" src="tweaks-panel.jsx"></script>
 <script type="text/babel" src="app.jsx"></script>
 <script type="text/babel" src="pages.jsx"></script>
@@ -35,6 +34,10 @@ function App() {
     to: new Date(Date.now() + 7*86400000).toISOString().slice(0,10),
     people: 4,
   });
+  const [favs, setFavs] = useState([]);
+
+  const toggleFav = (id) => setFavs((f) => f.includes(id) ? f.filter((x) => x !== id) : [...f, id]);
+
   // apply theme + radius
   useEffect(() => {
     applyTheme(tweaks.darkMode);
@@ -45,18 +48,19 @@ function App() {
   // scroll up on page change
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [page.name, page.id]);
 
+  const favCount = favs.length;
+
   return (
     <>
-      <Nav page={page} setPage={setPage} />
-      {page.name === "home" && <HomePage setPage={setPage} query={query} setQuery={setQuery} />}
-      {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} />}
+      <Nav page={page} setPage={setPage} favCount={favCount} />
+      {page.name === "home" && <HomePage setPage={setPage} query={query} setQuery={setQuery} toggleFav={toggleFav} favs={favs} />}
+      {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} toggleFav={toggleFav} favs={favs} />}
       {page.name === "planning" && <PlanningPage setPage={setPage} />}
-      {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
-      {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} />}
+      {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} toggleFav={toggleFav} favs={favs} />}
+      {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} />}
+      {page.name === "favorites" && <FavoritesPage favs={favs} setPage={setPage} toggleFav={toggleFav} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}
       {page.name === "contact" && <ContactPage />}
-      {page.name === "capsud" && <CapSudListPage setPage={setPage} />}
-      {page.name === "capsud-article" && <CapSudArticlePage id={page.id} setPage={setPage} />}
 
       <TweaksPanel>
         <TweakSection title="Style des boutons">

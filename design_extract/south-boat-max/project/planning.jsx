@@ -270,10 +270,7 @@ function PlanningPage({ setPage }) {
                 </button>
                 <div className="pg-row">
                   {monthDays.map((d) => (
-                    <div key={d} className={"pg-cell" + (isWeekend(d) ? " weekend" : "")} onClick={() => {
-                      const iso = new Date(view.y, view.m, d).toISOString().slice(0, 10);
-                      setPage({ name: "booking", id: boat.id, date: iso });
-                    }} />
+                    <div key={d} className={"pg-cell" + (isWeekend(d) ? " weekend" : "")} onClick={() => setPage({ name: "booking", id: boat.id })} />
                   ))}
                   {filteredMonthRes(boat.id).map((r, i) => (
                     <div key={i} className="pg-block" style={{
@@ -337,7 +334,7 @@ function PlanningPage({ setPage }) {
                     const iso = d.toISOString().slice(0, 10);
                     const dayRes = filteredWeekRes(boat.id).filter((r) => r.date === iso);
                     return (
-                      <div key={di} className="wk-day-col" onClick={() => setPage({ name: "booking", id: boat.id, date: iso })}>
+                      <div key={di} className="wk-day-col" onClick={() => setPage({ name: "booking", id: boat.id })}>
                         {/* hour grid lines */}
                         <div className="wk-hour-lines">
                           {HOURS.map((h) => <span key={h} className={h === 12 ? "noon" : ""} />)}

@@ -215,22 +215,18 @@ function applyTheme(dark) {
 }
 
 // ============ NAV ============
-function Nav({ page, setPage, dark }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+function Nav({ page, setPage, favCount, dark }) {
   const items = [
   { id: "home", label: "Accueil" },
   { id: "catalog", label: "Catalogue" },
   { id: "planning", label: "Disponibilités" },
-  { id: "capsud", label: "Cap Sud" },
   { id: "about", label: "À propos" },
   { id: "contact", label: "Contact" }];
-
-  const navigate = (id) => { setPage({ name: id }); setMobileOpen(false); };
 
   return (
     <header className="nav">
       <div className="nav-inner" style={{ opacity: "10", color: "rgb(255, 255, 255)" }}>
-        <button className="logo" onClick={() => navigate("home")}>
+        <button className="logo" onClick={() => setPage({ name: "home" })}>
           <span className="logo-mark">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 17l9-12 9 12M5 17h14l-2 4H7z" />
@@ -243,54 +239,22 @@ function Nav({ page, setPage, dark }) {
           <button
             key={it.id}
             className={"nav-link" + (page.name === it.id ? " active" : "")}
-            onClick={() => navigate(it.id)}>
+            onClick={() => setPage({ name: it.id })}>
+            
               {it.label}
             </button>
           )}
-          <a
-            className="nav-link nav-link-ext"
-            href="https://marine.meteoconsult.fr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Météo Marine (ouvre dans un nouvel onglet)">
-            Météo Marine
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: "middle" }}>
-              <path d="M7 17L17 7M9 7h8v8" />
-            </svg>
-          </a>
         </nav>
         <div className="nav-actions">
+          <button className="icon-btn" onClick={() => setPage({ name: "favorites" })} aria-label="Favoris" style={{ borderRadius: "20px" }}>
+            <Heart size={18} filled={favCount > 0} />
+            {favCount > 0 && <span className="badge">{favCount}</span>}
+          </button>
           <button className="btn btn-primary nav-cta" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: "20px" }}>
             Réserver
           </button>
-          <button className="hamburger-btn" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu" aria-expanded={mobileOpen}>
-            {mobileOpen
-              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-            }
-          </button>
         </div>
       </div>
-      {mobileOpen && (
-        <div className="mobile-menu">
-          {items.map((it) =>
-          <button
-            key={it.id}
-            className={"mobile-menu-link" + (page.name === it.id ? " active" : "")}
-            onClick={() => navigate(it.id)}>
-              {it.label}
-            </button>
-          )}
-          <a
-            className="mobile-menu-link"
-            href="https://marine.meteoconsult.fr/"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileOpen(false)}>
-            Météo Marine ↗
-          </a>
-        </div>
-      )}
     </header>);
 
 }
