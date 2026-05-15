@@ -1084,20 +1084,69 @@ const fmtArticleDate = (s) => {
 
 function CapSudListPage({ setPage }) {
   const articles = window.ARTICLES || [];
+  const highlight = articles[0];
+  const rest = articles.slice(1);
+
   return (
     <main className="capsud">
-      <section className="capsud-hero">
-        <p className="eyebrow">Carnet de bord</p>
-        <h1>Cap Sud</h1>
-        <p className="lead">Récits de mer, itinéraires et conseils de l'équipage South Boat — pour bien préparer vos sorties depuis Mandelieu.</p>
+      <section className="hero">
+        <div className="hero-bg">
+          <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=2400&q=80" alt="Bateau en mer" />
+          <div className="hero-overlay hero-overlay-grad" />
+        </div>
+        <div className="hero-content">
+          <div className="hero-eyebrow">
+            <span className="dot" /> Carnet de bord · Saison 2026
+          </div>
+          <h1 className="hero-title">Cap Sud</h1>
+          <p className="hero-sub">
+            Récits de mer, itinéraires et conseils de l'équipage South Boat — pour bien préparer vos sorties depuis Mandelieu.
+          </p>
+        </div>
       </section>
 
+      {highlight && (
+        <section className="section departure">
+          <div className="section-head">
+            <div>
+              <p className="eyebrow">À la une</p>
+              <h2>L'article du moment</h2>
+            </div>
+          </div>
+          <div className="departure-card" onClick={() => setPage({ name: "capsud-article", id: highlight.id })} style={{ cursor: "pointer" }}>
+            <div className="departure-map" style={{ minHeight: 320 }}>
+              <img src={highlight.cover} alt={highlight.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            </div>
+            <div className="departure-text">
+              <p className="eyebrow">{fmtArticleDate(highlight.date)}</p>
+              <h2>{highlight.title}</h2>
+              <p className="lead">{highlight.excerpt}</p>
+              <div className="departure-actions">
+                <button className="btn btn-primary" onClick={(e) => { e.stopPropagation(); setPage({ name: "capsud-article", id: highlight.id }); }}>
+                  Lire l'article <Icon name="arrow" size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="section">
-        {articles.length === 0 ? (
-          <div className="empty"><p>Aucun article pour le moment. Revenez bientôt !</p></div>
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">Tous les articles</p>
+            <h2>Le journal de l'équipage</h2>
+          </div>
+          <span className="muted">{rest.length} article{rest.length > 1 ? "s" : ""}</span>
+        </div>
+
+        {rest.length === 0 ? (
+          <div className="empty">
+            <p>{articles.length === 0 ? "Aucun article pour le moment. Revenez bientôt !" : "Aucun autre article pour l'instant."}</p>
+          </div>
         ) : (
           <div className="capsud-grid">
-            {articles.map((a) =>
+            {rest.map((a) => (
               <article key={a.id} className="capsud-card" onClick={() => setPage({ name: "capsud-article", id: a.id })}>
                 <div className="capsud-card-img">
                   <img src={a.cover} alt={a.title} />
@@ -1109,10 +1158,39 @@ function CapSudListPage({ setPage }) {
                   <span className="capsud-cta">Lire l'article <Icon name="arrow" size={15} /></span>
                 </div>
               </article>
-            )}
+            ))}
           </div>
         )}
       </section>
+
+      <section className="section departure">
+        <div
+          className="departure-card"
+          style={{ gridTemplateColumns: "1fr", background: "var(--navy)", border: "none", color: "white" }}
+        >
+          <div className="departure-text">
+            <p className="eyebrow" style={{ color: "rgba(255,255,255,0.7)" }}>Lettre du large</p>
+            <h2 style={{ color: "white" }}>Recevez Cap Sud dans votre boîte mail</h2>
+            <p className="lead" style={{ color: "rgba(255,255,255,0.85)" }}>
+              Un récit, un itinéraire et une astuce de skipper, une fois par mois. Pas de spam, juste de la mer.
+            </p>
+            <form
+              className="departure-actions"
+              style={{ flexDirection: "row", gap: 10, flexWrap: "wrap", marginTop: 24 }}
+              onSubmit={(e) => { e.preventDefault(); alert("Merci ! Vous êtes inscrit·e."); }}
+            >
+              <input
+                type="email"
+                placeholder="votre@email.fr"
+                required
+                style={{ flex: "1 1 220px", padding: "13px 18px", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "var(--radius)", fontSize: 14, background: "rgba(255,255,255,0.08)", color: "white" }}
+              />
+              <button className="btn" type="submit" style={{ background: "white", color: "var(--navy)" }}>S'inscrire</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </main>
   );
