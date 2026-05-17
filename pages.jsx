@@ -983,46 +983,155 @@ function Calendar({ selected, onSelect }) {
 // ============ ABOUT ============
 function AboutPage({ setPage }) {
   return (
-    <main className="about">
-      <section className="about-hero">
-        <div>
+    <main className="about-v2">
+
+      {/* HERO */}
+      <section className="ab-hero">
+        <div className="ab-hero-text">
           <p className="eyebrow">Notre maison</p>
           <h1>Le sur-mesure,<br />au rythme de la mer.</h1>
-          <p className="lead">South Boat est née sur les pontons Mandelieu La Napoule
-. Nous sélectionnons à la main des bateaux familiaux entretenus avec soin, et accompagnons chacun de nos clients comme un proche.</p>
-          <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })}>Découvrir la flotte</button>
+          <p className="lead">South Boat est née sur les pontons de Mandelieu-la-Napoule. Nous sélectionnons à la main des bateaux familiaux entretenus avec soin, et accompagnons chacun de nos clients comme un proche.</p>
+          <div className="ab-hero-cta">
+            <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })}>Découvrir la flotte</button>
+            <button className="btn btn-outline" onClick={() => setPage({ name: "contact" })}>Nous rencontrer</button>
+          </div>
         </div>
-        <div className="about-img">
-          <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&q=80" alt="" />
+        <div className="ab-hero-art">
+          <div className="ab-img main">
+            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&q=80" alt="Marina de Mandelieu" />
+          </div>
+          <div className="ab-img stack">
+            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&q=80" alt="Bateau au mouillage" />
+          </div>
+          <div className="ab-badge">
+            <strong>Depuis 2018</strong>
+            <span>Mandelieu-la-Napoule</span>
+          </div>
         </div>
       </section>
 
-      <section className="section">
-        <div className="manifesto">
-          <div>
-            <span className="big-num">01</span>
+      {/* STATS */}
+      <section className="ab-stats">
+        <div className="ab-stat"><strong>+12 000</strong><span>Journées en mer organisées</span></div>
+        <div className="ab-stat"><strong>40</strong><span>Bateaux dans la flotte</span></div>
+        <div className="ab-stat"><strong>4,9 / 5</strong><span>Note moyenne des clients</span></div>
+        <div className="ab-stat"><strong>6</strong><span>Ports azuréens couverts</span></div>
+      </section>
+
+      {/* STORY */}
+      <section className="ab-story">
+        <div className="ab-story-head">
+          <p className="eyebrow">Notre histoire</p>
+          <h2>Huit ans sur la même ligne d'horizon.</h2>
+        </div>
+        <div className="ab-timeline">
+          <div className="ab-step">
+            <span className="ab-year">2018</span>
+            <h3>Les débuts</h3>
+            <p>Marine quitte la Marine Marchande et lance South Boat avec un seul bateau, un Cap Camarat 6.5, amarré à Mandelieu.</p>
+          </div>
+          <div className="ab-step">
+            <span className="ab-year">2020</span>
+            <h3>L'équipage s'étoffe</h3>
+            <p>Trois skippers rejoignent l'aventure. La flotte grandit, mais la promesse reste la même : un seul interlocuteur, une attention sur-mesure.</p>
+          </div>
+          <div className="ab-step">
+            <span className="ab-year">2023</span>
+            <h3>Cap sur l'Azur</h3>
+            <p>Ouverture des bases de Cannes, Antibes et Nice. South Boat couvre désormais l'ensemble de la côte, du Cap Roux à Monaco.</p>
+          </div>
+          <div className="ab-step">
+            <span className="ab-year">2026</span>
+            <h3>Aujourd'hui</h3>
+            <p>40 bateaux, une équipe de quinze passionnés, et la même obsession : que chaque sortie soit un souvenir précieux.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* PILLARS */}
+      <section className="ab-pillars">
+        <div className="ab-pillars-head">
+          <p className="eyebrow">Notre engagement</p>
+          <h2>Trois principes, jamais négociés.</h2>
+        </div>
+        <div className="ab-pillars-grid">
+          <article className="ab-pillar">
+            <span className="ab-num">01</span>
             <h3>Une flotte choisie</h3>
             <p>Pas de catalogue infini. Quelques dizaines de bateaux, tous inspectés, tous adoptés par notre équipe avant d'être proposés.</p>
-          </div>
-          <div>
-            <span className="big-num">02</span>
+            <span className="ab-tag">Sélection</span>
+          </article>
+          <article className="ab-pillar">
+            <span className="ab-num">02</span>
             <h3>Un seul interlocuteur</h3>
             <p>De la première question au retour au port, vous échangez avec un conseiller dédié qui connaît chaque bateau de la flotte.</p>
-          </div>
-          <div>
-            <span className="big-num">03</span>
+            <span className="ab-tag">Accompagnement</span>
+          </article>
+          <article className="ab-pillar">
+            <span className="ab-num">03</span>
             <h3>Le respect du large</h3>
-            <p>Nos skippers privilégient les mouillages écologiques et nous reversons 1% de notre chiffre à la protection des fonds marins.</p>
+            <p>Nos skippers privilégient les mouillages écologiques. Nous reversons 1% de notre chiffre à la protection des fonds marins.</p>
+            <span className="ab-tag">Engagement</span>
+          </article>
+        </div>
+      </section>
+
+      {/* TEAM */}
+      <section className="ab-team">
+        <div className="ab-team-head">
+          <p className="eyebrow">L'équipage</p>
+          <h2>Les visages derrière chaque sortie.</h2>
+        </div>
+        <div className="ab-team-grid">
+          <article className="ab-member">
+            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt="Marine Caron" /></div>
+            <h4>Marine Caron</h4>
+            <span>Fondatrice &amp; capitaine</span>
+            <p>Vingt ans en mer, dont huit à South Boat. Marine connaît chaque amer de la côte par son prénom.</p>
+          </article>
+          <article className="ab-member">
+            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" alt="Théo Vidal" /></div>
+            <h4>Théo Vidal</h4>
+            <span>Skipper en chef</span>
+            <p>Brevet 200 UMS, formé à La Rochelle. Théo a une passion : les couchers de soleil au large de l'Estérel.</p>
+          </article>
+          <article className="ab-member">
+            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" alt="Léa Bertrand" /></div>
+            <h4>Léa Bertrand</h4>
+            <span>Conciergerie &amp; relations clients</span>
+            <p>Le sourire au bout du fil, sept jours sur sept. Léa orchestre vos sorties dans le moindre détail.</p>
+          </article>
+        </div>
+      </section>
+
+      {/* QUOTE */}
+      <section className="ab-quote">
+        <div className="ab-quote-inner">
+          <span className="ab-quote-mark">&ldquo;</span>
+          <blockquote>
+            <p>La meilleure journée en mer est celle dont on ne se souvient que de l'horizon.</p>
+            <footer>
+              <strong>Marine Caron</strong>
+              <span>Fondatrice</span>
+            </footer>
+          </blockquote>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="ab-cta">
+        <div className="ab-cta-inner">
+          <div>
+            <h2>Une question, une envie de large ?</h2>
+            <p>Notre équipe vous répond du lundi au dimanche, de 8h à 21h. Conseil gratuit, sans engagement.</p>
+          </div>
+          <div className="ab-cta-actions">
+            <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })}>Réserver un bateau</button>
+            <button className="btn btn-outline" onClick={() => setPage({ name: "contact" })}>Parler à un conseiller</button>
           </div>
         </div>
       </section>
 
-      <section className="section quote">
-        <blockquote>
-          <p>« La meilleure journée en mer est celle dont on ne se souvient que de l'horizon. »</p>
-          <span>— Marine, fondatrice</span>
-        </blockquote>
-      </section>
       <Footer />
     </main>);
 }
