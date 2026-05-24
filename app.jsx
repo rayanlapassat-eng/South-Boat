@@ -11,12 +11,12 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 const BOATS = [
 {
   id: 1,
-  name: "Azur 32",
+  name: "Mochi",
   type: "Day cruiser",
   capacity: 8,
   length: "9,8 m",
   year: 2023,
-  port: "Saint-Tropez",
+  port: "Mandelieu",
   price: 890,
   rating: 4.9,
   reviews: 47,
@@ -24,7 +24,7 @@ const BOATS = [
   images: [
   "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
   "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1600&q=80",
-  "https://images.unsplash.com/photo-1588401667987-e3a25fbe2d6f?w=1600&q=80",
+  "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=1600&q=80",
   "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80"],
 
   description: "Élégance méditerranéenne et confort à bord. Idéal pour une journée en famille au large des calanques.",
@@ -32,108 +32,41 @@ const BOATS = [
 },
 {
   id: 2,
-  name: "Riva Mistral",
+  name: "Bateau à venir",
   type: "Open premium",
-  capacity: 10,
-  length: "11,2 m",
-  year: 2024,
-  port: "Cannes",
-  price: 1450,
-  rating: 5.0,
-  reviews: 32,
-  crew: "Skipper inclus",
-  images: [
-  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80",
-  "https://images.unsplash.com/photo-1542902093-d55926049754?w=1600&q=80",
-  "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=1600&q=80",
-  "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=1600&q=80"],
-
-  description: "Référence du luxe à l'italienne. Lignes sculptées, finitions bois précieux, performance et raffinement.",
-  features: ["Cuisine équipée", "Cabine double", "WC marin", "Sono premium", "Tender", "Plage arrière teck"]
+  capacity: 8,
+  length: "—",
+  year: 2026,
+  port: "Mandelieu",
+  price: 0,
+  rating: 0,
+  reviews: 0,
+  crew: "—",
+  comingSoon: true,
+  images: ["https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80"],
+  description: "",
+  features: []
 },
 {
   id: 3,
-  name: "Cap Camarat 7.5",
+  name: "Bateau à venir",
   type: "Familial",
-  capacity: 7,
-  length: "7,5 m",
-  year: 2022,
-  port: "Antibes",
-  price: 520,
-  rating: 4.8,
-  reviews: 89,
-  crew: "Sans permis disponible",
-  images: [
-  "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1600&q=80",
-  "https://images.unsplash.com/photo-1588401667987-e3a25fbe2d6f?w=1600&q=80",
-  "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80"],
-
-  description: "Polyvalent et accessible. Le compagnon parfait pour découvrir la côte en toute simplicité.",
-  features: ["Bimini", "Échelle de bain", "GPS", "Coffres de rangement", "Douchette de pont"]
-},
-{
-  id: 4,
-  name: "Sundeck 40",
-  type: "Yacht familial",
-  capacity: 12,
-  length: "12,4 m",
-  year: 2023,
-  port: "Nice",
-  price: 2100,
-  rating: 4.9,
-  reviews: 21,
-  crew: "Skipper + hôtesse",
-  images: [
-  "https://images.unsplash.com/photo-1542902093-d55926049754?w=1600&q=80",
-  "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=1600&q=80",
-  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80"],
-
-  description: "Espace, élégance et grand confort. Le yacht idéal pour une croisière mémorable entre Nice et l'Île de Lérins.",
-  features: ["Flybridge", "2 cabines doubles", "Salon extérieur", "Cuisine pro", "Jet-ski en option"]
-},
-{
-  id: 5,
-  name: "Bayliner VR5",
-  type: "Day cruiser",
-  capacity: 6,
-  length: "5,6 m",
-  year: 2022,
-  port: "Saint-Raphaël",
-  price: 380,
-  rating: 4.7,
-  reviews: 64,
-  crew: "Sans permis disponible",
-  images: [
-  "https://images.unsplash.com/photo-1588401667987-e3a25fbe2d6f?w=1600&q=80",
-  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80",
-  "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1600&q=80"],
-
-  description: "Compact et joueur. Parfait pour une demi-journée de baignade et de farniente.",
-  features: ["Bain de soleil", "Sono", "Échelle de bain", "Coffres", "Tableau intuitif"]
-},
-{
-  id: 6,
-  name: "Quicksilver 605",
-  type: "Familial",
-  capacity: 6,
-  length: "6,1 m",
-  year: 2024,
-  port: "Cannes",
-  price: 420,
-  rating: 4.8,
-  reviews: 38,
-  crew: "Sans permis disponible",
-  images: [
-  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80",
-  "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
-  "https://images.unsplash.com/photo-1588401667987-e3a25fbe2d6f?w=1600&q=80"],
-
-  description: "Robuste, agile et économique. Une valeur sûre pour les amateurs comme les confirmés.",
-  features: ["Bimini", "GPS", "Échelle de bain", "Console centrale", "Frigo glacière"]
+  capacity: 8,
+  length: "—",
+  year: 2026,
+  port: "Mandelieu",
+  price: 0,
+  rating: 0,
+  reviews: 0,
+  crew: "—",
+  comingSoon: true,
+  images: ["https://images.unsplash.com/photo-1542902093-d55926049754?w=1600&q=80"],
+  description: "",
+  features: []
 }];
 
 
-const PORTS = ["Saint-Tropez", "Cannes", "Nice", "Antibes", "Saint-Raphaël", "Monaco"];
+const PORTS = ["Mandelieu"];
 
 // ============ HELPERS ============
 const fmtPrice = (n) => `${n.toLocaleString("fr-FR")} €`;
@@ -302,17 +235,6 @@ function SearchBar({ query, setQuery, onSubmit, compact }) {
   return (
     <form className={"searchbar" + (compact ? " compact" : "")} onSubmit={(e) => {e.preventDefault();onSubmit && onSubmit();}} style={{ borderRadius: "15px" }}>
       <div className="search-field">
-        <Icon name="pin" />
-        <div className="search-col">
-          <label>Lieu</label>
-          <select value={query.port} onChange={(e) => setQuery({ ...query, port: e.target.value })}>
-            <option value="">Tous les ports</option>
-            {PORTS.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </div>
-      </div>
-      <div className="search-divider" />
-      <div className="search-field">
         <Icon name="cal" />
         <div className="search-col">
           <label>Du</label>
@@ -333,7 +255,7 @@ function SearchBar({ query, setQuery, onSubmit, compact }) {
         <div className="search-col">
           <label>Personnes</label>
           <select value={query.people} onChange={(e) => setQuery({ ...query, people: +e.target.value })}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12].map((n) => <option key={n} value={n}>{n} {n > 1 ? "personnes" : "personne"}</option>)}
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{n} {n > 1 ? "personnes" : "personne"}</option>)}
           </select>
         </div>
       </div>
@@ -345,4 +267,27 @@ function SearchBar({ query, setQuery, onSubmit, compact }) {
 
 }
 
-Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, SearchBar, TWEAK_DEFAULTS });
+// ============ BREADCRUMB ============
+function Breadcrumb({ trail, setPage }) {
+  return (
+    <nav className="breadcrumb" aria-label="Fil d'Ariane">
+      <div className="breadcrumb-inner">
+        {trail.map((item, i) => {
+          const isLast = i === trail.length - 1;
+          return (
+            <React.Fragment key={i}>
+              {i > 0 && <span className="bc-sep" aria-hidden="true">›</span>}
+              {item.page && !isLast ? (
+                <button className="bc-link" onClick={() => setPage(item.page)}>{item.label}</button>
+              ) : (
+                <span className="bc-current" aria-current={isLast ? "page" : undefined}>{item.label}</span>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, SearchBar, Breadcrumb, TWEAK_DEFAULTS });

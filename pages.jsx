@@ -20,15 +20,17 @@ function HomePage({ setPage, query, setQuery }) {
             Le large,<br />en toute simplicité.
           </h1>
           <p className="hero-sub">
-            Une sélection rigoureuse de bateaux familiaux, de Saint-Tropez à Monaco. Réservation transparente, équipage à la demande.
+            Une sélection rigoureuse de bateaux familiaux au départ de Mandelieu. Réservation transparente, équipage à la demande.
           </p>
-          <div className="hero-search">
-            <SearchBar query={query} setQuery={setQuery} onSubmit={() => setPage({ name: "catalog" })} />
+          <div className="hero-cta-row">
+            <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: 20 }}>
+              Découvrir nos bateaux <Icon name="arrow" size={16} />
+            </button>
           </div>
         </div>
         <div className="hero-stats">
-          <div><strong>40+</strong><span>Bateaux sélectionnés</span></div>
-          <div><strong>6</strong><span>Ports azuréens</span></div>
+          <div><strong>1</strong><span>Bateau disponible</span></div>
+          <div><strong>Mandelieu</strong><span>Port de départ</span></div>
           <div><strong>4,9<Star size={12} /></strong><span>Note moyenne</span></div>
         </div>
       </section>
@@ -133,16 +135,16 @@ function HomePage({ setPage, query, setQuery }) {
         </div>
         <div className="dest-grid">
           {[
-          { n: "Îles de Lérins", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: 8 },
-          { n: "Cannes", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80", c: 11 },
-          { n: "Estérel", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: 9 }].
+          { n: "Îles de Lérins", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: "Baignade & déjeuner en mer" },
+          { n: "Cannes", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80", c: "Baie & Croisette" },
+          { n: "Estérel", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: "Calanques & roches rouges" }].
           map((d) =>
-          <button key={d.n} className="dest-card" onClick={() => {setQuery({ ...query, port: d.n });setPage({ name: "catalog" });}}>
+          <button key={d.n} className="dest-card" onClick={() => setPage({ name: "catalog" })}>
               <img src={d.img} alt={d.n} />
               <div className="dest-overlay" />
               <div className="dest-info">
                 <h4>{d.n}</h4>
-                <span>{d.c} bateaux</span>
+                <span>{d.c}</span>
               </div>
             </button>
           )}
@@ -156,6 +158,29 @@ function HomePage({ setPage, query, setQuery }) {
 
 // ============ BOAT CARD ============
 function BoatCard({ boat, onClick }) {
+  if (boat.comingSoon) {
+    return (
+      <article className="boat-card coming-soon" aria-disabled="true">
+        <div className="boat-img">
+          <img src={boat.images[0]} alt="" style={{ filter: "blur(14px)", transform: "scale(1.1)" }} />
+          <div className="coming-soon-overlay">
+            <span className="coming-soon-badge">Coming Soon</span>
+            <span className="coming-soon-sub">Bientôt dans la flotte</span>
+          </div>
+        </div>
+        <div className="boat-body">
+          <div className="boat-row">
+            <h3 style={{ opacity: 0.6 }}>Nouveau bateau</h3>
+          </div>
+          <p className="boat-meta">
+            <span><Icon name="pin" size={14} /> Mandelieu</span>
+            <span className="dot-sep">·</span>
+            <span>Disponible prochainement</span>
+          </p>
+        </div>
+      </article>
+    );
+  }
   return (
     <article className="boat-card" onClick={onClick}>
       <div className="boat-img">
@@ -191,7 +216,6 @@ function BoatCard({ boat, onClick }) {
 // ============ CATALOG ============
 function CatalogPage({ setPage, query, setQuery }) {
   const [filters, setFilters] = useState({
-    type: "all",
     minPrice: 0,
     maxPrice: 2500,
     minCap: 1,
@@ -199,41 +223,30 @@ function CatalogPage({ setPage, query, setQuery }) {
   });
   const [showFilters, setShowFilters] = useState(true);
 
+  const available = BOATS.filter((b) => !b.comingSoon);
+  const teasers = BOATS.filter((b) => b.comingSoon);
+
   const filtered = useMemo(() => {
-    let list = BOATS.slice();
-    if (query.port) list = list.filter((b) => b.port === query.port);
-    if (filters.type !== "all") list = list.filter((b) => b.type === filters.type);
+    let list = available.slice();
     list = list.filter((b) => b.price >= filters.minPrice && b.price <= filters.maxPrice && b.capacity >= filters.minCap);
     if (filters.sort === "price-asc") list.sort((a, b) => a.price - b.price);
     if (filters.sort === "price-desc") list.sort((a, b) => b.price - a.price);
     if (filters.sort === "rating") list.sort((a, b) => b.rating - a.rating);
     return list;
-  }, [query, filters]);
-
-  const types = ["all", ...Array.from(new Set(BOATS.map((b) => b.type)))];
+  }, [filters]);
 
   return (
     <main className="catalog">
-      <div className="catalog-bar">
-        <SearchBar query={query} setQuery={setQuery} compact onSubmit={() => {}} />
-      </div>
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Catalogue" },
+      ]} />
 
       <div className="catalog-body">
         <aside className={"filters" + (showFilters ? "" : " hidden")}>
           <div className="filters-head">
             <h3>Filtres</h3>
-            <button className="link" onClick={() => setFilters({ type: "all", minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>Réinitialiser</button>
-          </div>
-
-          <div className="filter-block">
-            <h4>Type de bateau</h4>
-            <div className="chips">
-              {types.map((t) =>
-              <button key={t} className={"chip" + (filters.type === t ? " active" : "")} onClick={() => setFilters({ ...filters, type: t })}>
-                  {t === "all" ? "Tous" : t}
-                </button>
-              )}
-            </div>
+            <button className="link" onClick={() => setFilters({ minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>Réinitialiser</button>
           </div>
 
           <div className="filter-block">
@@ -250,7 +263,7 @@ function CatalogPage({ setPage, query, setQuery }) {
             <div className="stepper">
               <button onClick={() => setFilters({ ...filters, minCap: Math.max(1, filters.minCap - 1) })}><Icon name="minus" size={14} /></button>
               <span>{filters.minCap} personnes</span>
-              <button onClick={() => setFilters({ ...filters, minCap: Math.min(12, filters.minCap + 1) })}><Icon name="plus" size={14} /></button>
+              <button onClick={() => setFilters({ ...filters, minCap: Math.min(8, filters.minCap + 1) })}><Icon name="plus" size={14} /></button>
             </div>
           </div>
 
@@ -275,8 +288,8 @@ function CatalogPage({ setPage, query, setQuery }) {
         <section className="catalog-results">
           <div className="catalog-head">
             <div>
-              <h2>{filtered.length} bateaux disponibles</h2>
-              <p className="muted">{query.port || "Toute la Côte d'Azur"} · du {fmtDate(query.from)} au {fmtDate(query.to)}</p>
+              <h2>{filtered.length} bateau{filtered.length > 1 ? "x" : ""} disponible{filtered.length > 1 ? "s" : ""}</h2>
+              <p className="muted">Port de Mandelieu · du {fmtDate(query.from)} au {fmtDate(query.to)}</p>
             </div>
             <button className="btn btn-ghost mobile-filters" onClick={() => setShowFilters(!showFilters)}>
               {showFilters ? "Masquer" : "Afficher"} les filtres
@@ -286,10 +299,13 @@ function CatalogPage({ setPage, query, setQuery }) {
             {filtered.map((b) =>
             <BoatCard key={b.id} boat={b} onClick={() => setPage({ name: "detail", id: b.id })} />
             )}
-            {filtered.length === 0 &&
+            {teasers.map((b) =>
+            <BoatCard key={b.id} boat={b} />
+            )}
+            {filtered.length === 0 && teasers.length === 0 &&
             <div className="empty">
                 <p>Aucun bateau ne correspond à vos critères.</p>
-                <button className="btn btn-ghost" onClick={() => setFilters({ type: "all", minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>Réinitialiser</button>
+                <button className="btn btn-ghost" onClick={() => setFilters({ minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>Réinitialiser</button>
               </div>
             }
           </div>
@@ -314,6 +330,11 @@ function DetailPage({ id, setPage }) {
 
   return (
     <main className="detail">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Catalogue", page: { name: "catalog" } },
+        { label: boat.name },
+      ]} />
       <div className="detail-top">
         <button className="back" onClick={() => setPage({ name: "catalog" })}>
           <Icon name="arrowL" size={16} /> Retour au catalogue
@@ -536,8 +557,13 @@ function BookingPage({ id, setPage, initialDate }) {
     return true;
   };
 
-  const goNext = () => { if (validateStep()) { setStep((s) => Math.min(6, s + 1)); setErrorMsg(""); } };
-  const goPrev = () => { setErrorMsg(""); setStep((s) => Math.max(1, s - 1)); };
+  const goNext = () => { if (validateStep()) { setStep((s) => Math.min(6, s + 1)); setErrorMsg(""); setFieldErrors({}); } };
+  const goPrev = () => { setErrorMsg(""); setFieldErrors({}); setStep((s) => Math.max(1, s - 1)); };
+
+  // Scroll back to top whenever we change step (fixes "Options" not scrolling up)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step]);
 
   const setBilling = (k, v) => setData((d) => ({ ...d, billing: { ...d.billing, [k]: v } }));
   const setPermit = (k, v) => setData((d) => ({ ...d, permit: { ...d.permit, [k]: v } }));
@@ -565,6 +591,12 @@ function BookingPage({ id, setPage, initialDate }) {
 
   return (
     <main className="booking">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Catalogue", page: { name: "catalog" } },
+        { label: boat.name, page: { name: "detail", id: boat.id } },
+        { label: "Réservation" },
+      ]} />
       <div className="detail-top">
         <button className="back" onClick={() => setPage({ name: "detail", id: boat.id })}>
           <Icon name="arrowL" size={16} /> Retour à la fiche bateau
@@ -574,12 +606,23 @@ function BookingPage({ id, setPage, initialDate }) {
       <div className="booking-grid">
         <div className="booking-main">
           <div className="tunnel-stepper">
-            {steps.map((s, i) => (
-              <div key={i} className={"step" + (step > i + 1 ? " done" : "") + (step === i + 1 ? " active" : "")}>
-                <span className="step-num">{step > i + 1 ? <Icon name="check" size={14} /> : i + 1}</span>
-                <span className="step-label">{s}</span>
-              </div>
-            ))}
+            {steps.map((s, i) => {
+              const stepNum = i + 1;
+              const canJump = stepNum < step && stepNum < 5; // can revisit prior, but not after payment
+              const cls = "step" + (step > stepNum ? " done" : "") + (step === stepNum ? " active" : "") + (canJump ? " clickable" : "");
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={cls}
+                  onClick={canJump ? () => { setErrorMsg(""); setFieldErrors({}); setStep(stepNum); } : undefined}
+                  disabled={!canJump}
+                  aria-current={step === stepNum ? "step" : undefined}>
+                  <span className="step-num">{step > stepNum ? <Icon name="check" size={14} /> : stepNum}</span>
+                  <span className="step-label">{s}</span>
+                </button>
+              );
+            })}
           </div>
 
           {step === 1 && (
@@ -984,6 +1027,10 @@ function Calendar({ selected, onSelect }) {
 function AboutPage({ setPage }) {
   return (
     <main className="about-v2">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "À propos" },
+      ]} />
 
       {/* HERO */}
       <section className="ab-hero">
@@ -1013,9 +1060,9 @@ function AboutPage({ setPage }) {
       {/* STATS */}
       <section className="ab-stats">
         <div className="ab-stat"><strong>+12 000</strong><span>Journées en mer organisées</span></div>
-        <div className="ab-stat"><strong>40</strong><span>Bateaux dans la flotte</span></div>
+        <div className="ab-stat"><strong>1</strong><span>Bateau au catalogue</span></div>
         <div className="ab-stat"><strong>4,9 / 5</strong><span>Note moyenne des clients</span></div>
-        <div className="ab-stat"><strong>6</strong><span>Ports azuréens couverts</span></div>
+        <div className="ab-stat"><strong>Mandelieu</strong><span>Port de départ</span></div>
       </section>
 
       {/* STORY */}
@@ -1043,7 +1090,7 @@ function AboutPage({ setPage }) {
           <div className="ab-step">
             <span className="ab-year">2026</span>
             <h3>Aujourd'hui</h3>
-            <p>40 bateaux, une équipe de quinze passionnés, et la même obsession : que chaque sortie soit un souvenir précieux.</p>
+            <p>Mochi, notre bateau familial au départ de Mandelieu, et la même obsession qu'au premier jour : que chaque sortie soit un souvenir précieux.</p>
           </div>
         </div>
       </section>
@@ -1058,7 +1105,7 @@ function AboutPage({ setPage }) {
           <article className="ab-pillar">
             <span className="ab-num">01</span>
             <h3>Une flotte choisie</h3>
-            <p>Pas de catalogue infini. Quelques dizaines de bateaux, tous inspectés, tous adoptés par notre équipe avant d'être proposés.</p>
+            <p>Pas de catalogue infini. Un bateau soigneusement sélectionné, inspecté et adopté par notre équipe avant d'être proposé.</p>
             <span className="ab-tag">Sélection</span>
           </article>
           <article className="ab-pillar">
@@ -1137,10 +1184,14 @@ function AboutPage({ setPage }) {
 }
 
 // ============ CONTACT ============
-function ContactPage() {
+function ContactPage({ setPage }) {
   const [sent, setSent] = useState(false);
   return (
     <main className="contact">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Contact" },
+      ]} />
       <section className="contact-grid">
         <div className="contact-info">
           <p className="eyebrow">Contact</p>
@@ -1149,8 +1200,6 @@ function ContactPage() {
           <ul className="contact-list">
             <li><Icon name="phone" /> <div><strong>+33 4 93 00 00 00</strong><span>Conciergerie 7j/7</span></div></li>
             <li><Icon name="mail" /> <div><strong>contact@southboat.fr</strong><span>Réponse sous 2 heures</span></div></li>
-            <li><Icon name="pin" /> <div><strong>Av. Henry Clews,
-06210 Mandelieu-la-Napoule</strong><span>Sur rendez-vous</span></div></li>
           </ul>
         </div>
         <form className="contact-form" onSubmit={(e) => {e.preventDefault();setSent(true);}}>
@@ -1198,6 +1247,10 @@ function CapSudListPage({ setPage }) {
 
   return (
     <main className="capsud">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Cap Sud" },
+      ]} />
       <section className="hero">
         <div className="hero-bg">
           <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=2400&q=80" alt="Bateau en mer" />
@@ -1321,6 +1374,11 @@ function CapSudArticlePage({ id, setPage }) {
   }
   return (
     <main className="capsud-article">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "Accueil", page: { name: "home" } },
+        { label: "Cap Sud", page: { name: "capsud" } },
+        { label: article.title },
+      ]} />
       <div className="detail-top">
         <button className="back" onClick={() => setPage({ name: "capsud" })}>
           <Icon name="arrowL" size={16} /> Retour à Cap Sud

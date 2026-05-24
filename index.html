@@ -54,7 +54,7 @@ function App() {
       {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
       {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}
-      {page.name === "contact" && <ContactPage />}
+      {page.name === "contact" && <ContactPage setPage={setPage} />}
       {page.name === "capsud" && <CapSudListPage setPage={setPage} />}
       {page.name === "capsud-article" && <CapSudArticlePage id={page.id} setPage={setPage} />}
 
