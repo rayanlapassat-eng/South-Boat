@@ -1199,7 +1199,6 @@ function ContactPage({ setPage }) {
           <p className="lead">Notre conciergerie vous répond du lundi au dimanche, de 8h à 19h.</p>
           <ul className="contact-list">
             <li><Icon name="phone" /> <div><strong>+33 4 93 00 00 00</strong><span>Conciergerie 7j/7</span></div></li>
-            <li><Icon name="mail" /> <div><strong>contact@southboat.fr</strong><span>Réponse sous 2 heures</span></div></li>
           </ul>
         </div>
         <form className="contact-form" onSubmit={(e) => {e.preventDefault();setSent(true);}}>
