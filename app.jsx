@@ -22,10 +22,10 @@ const BOATS = [
   reviews: 47,
   crew: "Avec ou sans skipper",
   images: [
-  "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
-  "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1600&q=80",
-  "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=1600&q=80",
-  "https://images.unsplash.com/photo-1540946485063-a40da27545f8?w=1600&q=80"],
+  "images/mochi/01-cover.jpg",
+  "images/mochi/02-port.jpg",
+  "images/mochi/04-arriere.jpg",
+  "images/mochi/03-moteur.jpg"],
 
   description: "Élégance méditerranéenne et confort à bord. Idéal pour une journée en famille au large des calanques.",
   features: ["Bain de soleil avant", "Sono Bluetooth", "Bimini", "GPS", "Échelle de bain", "Frigo"]
