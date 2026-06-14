@@ -3,46 +3,48 @@ const { useState, useEffect, useMemo, useRef } = React;
 
 // ============ HOME ============
 function HomePage({ setPage, query, setQuery }) {
+  const t = window.useT();
   const featured = BOATS.slice(0, 3);
   const latestArticle = (window.ARTICLES && window.ARTICLES.length > 0) ? window.ARTICLES[0] : null;
   return (
     <main className="home">
       <section className="hero">
         <div className="hero-bg">
-          <img src="https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=2400&q=80" alt="Bateau en mer" />
+          <img src="https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=2400&q=80" alt={t("Bateau en mer", "Boat at sea")} />
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
           <div className="hero-eyebrow">
-            <span className="dot" /> Côte d'Azur · Saison 2026
+            <span className="dot" /> {t("Côte d'Azur · Saison 2026", "French Riviera · 2026 Season")}
           </div>
           <h1 className="hero-title">
-            Le large,<br />en toute simplicité.
+            {t("Le large,", "The open sea,")}<br />{t("en toute simplicité.", "made simple.")}
           </h1>
           <p className="hero-sub">
-            Une sélection rigoureuse de bateaux familiaux au départ de Mandelieu. Réservation transparente, équipage à la demande.
+            {t("Une sélection rigoureuse de bateaux familiaux au départ de Mandelieu. Réservation transparente, équipage à la demande.",
+               "A carefully curated selection of family boats departing from Mandelieu. Transparent booking, crew on demand.")}
           </p>
           <div className="hero-cta-row">
             <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: 20 }}>
-              Découvrir nos bateaux <Icon name="arrow" size={16} />
+              {t("Découvrir nos bateaux", "Discover our boats")} <Icon name="arrow" size={16} />
             </button>
           </div>
         </div>
         <div className="hero-stats">
-          <div><strong>1</strong><span>Bateau disponible</span></div>
-          <div><strong>Mandelieu</strong><span>Port de départ</span></div>
-          <div><strong>4,9<Star size={12} /></strong><span>Note moyenne</span></div>
+          <div><strong>1</strong><span>{t("Bateau disponible", "Boat available")}</span></div>
+          <div><strong>Mandelieu</strong><span>{t("Port de départ", "Departure port")}</span></div>
+          <div><strong>4,9<Star size={12} /></strong><span>{t("Note moyenne", "Average rating")}</span></div>
         </div>
       </section>
 
       <section className="section">
         <div className="section-head" style={{ color: "rgb(58, 141, 222)", borderRadius: "0px", fontFamily: "-apple-system" }}>
           <div>
-            <p className="eyebrow">Notre flotte</p>
-            <h2>Sélection du moment</h2>
+            <p className="eyebrow">{t("Notre flotte", "Our fleet")}</p>
+            <h2>{t("Sélection du moment", "Current selection")}</h2>
           </div>
           <button className="btn btn-ghost" onClick={() => setPage({ name: "catalog" })}>
-            Voir tous les bateaux <Icon name="arrow" size={16} />
+            {t("Voir tous les bateaux", "View all boats")} <Icon name="arrow" size={16} />
           </button>
         </div>
         <div className="grid-3">
@@ -56,18 +58,21 @@ function HomePage({ setPage, query, setQuery }) {
         <div className="value-grid">
           <div className="value-card">
             <span className="value-icon"><Icon name="shield" /></span>
-            <h3>Bateaux vérifiés</h3>
-            <p>Chaque embarcation est inspectée et certifiée par notre équipe avant toute mise en location.</p>
+            <h3>{t("Bateaux vérifiés", "Verified boats")}</h3>
+            <p>{t("Chaque embarcation est inspectée et certifiée par notre équipe avant toute mise en location.",
+                  "Each boat is inspected and certified by our team before being offered for rental.")}</p>
           </div>
           <div className="value-card">
             <span className="value-icon"><Icon name="anchor" /></span>
-            <h3>Skippers expérimentés</h3>
-            <p>Optez pour un skipper local qui connaît chaque crique, chaque calanque, chaque coucher de soleil.</p>
+            <h3>{t("Skippers expérimentés", "Experienced skippers")}</h3>
+            <p>{t("Optez pour un skipper local qui connaît chaque crique, chaque calanque, chaque coucher de soleil.",
+                  "Choose a local skipper who knows every cove, every calanque, every sunset.")}</p>
           </div>
           <div className="value-card">
             <span className="value-icon"><Icon name="sparkle" /></span>
-            <h3>Sans mauvaise surprise</h3>
-            <p>Carburant inclus jusqu'à un certain seuil, annulation flexible, conciergerie disponible 7j/7.</p>
+            <h3>{t("Sans mauvaise surprise", "No nasty surprises")}</h3>
+            <p>{t("Carburant inclus jusqu'à un certain seuil, annulation flexible, conciergerie disponible 7j/7.",
+                  "Fuel included up to a certain threshold, flexible cancellation, concierge available 7 days a week.")}</p>
           </div>
         </div>
       </section>
@@ -75,17 +80,17 @@ function HomePage({ setPage, query, setQuery }) {
       <section className="section departure">
         <div className="departure-card">
           <div className="departure-text">
-            <p className="eyebrow">Point de départ</p>
-            <h2>Quai visiteur de Mandelieu</h2>
+            <p className="eyebrow">{t("Point de départ", "Departure point")}</p>
+            <h2>{t("Quai visiteur de Mandelieu", "Mandelieu visitor dock")}</h2>
             <p className="lead">
-              Le départ de toutes les locations se fait depuis le quai visiteur de Mandelieu — Port de Mandelieu.
-              Notre équipe vous y accueille pour le briefing avant chaque sortie.
+              {t("Le départ de toutes les locations se fait depuis le quai visiteur de Mandelieu — Port de Mandelieu. Notre équipe vous y accueille pour le briefing avant chaque sortie.",
+                 "All rentals depart from the Mandelieu visitor dock — Port de Mandelieu. Our team welcomes you there for a briefing before each outing.")}
             </p>
             <div className="departure-actions">
               <a className="btn btn-primary"
                  href="https://www.google.com/maps/search/?api=1&query=Port+de+Mandelieu+quai+visiteur"
                  target="_blank" rel="noopener noreferrer">
-                <Icon name="pin" size={16} /> Ouvrir dans Google Maps
+                <Icon name="pin" size={16} /> {t("Ouvrir dans Google Maps", "Open in Google Maps")}
               </a>
               <span className="departure-addr"><Icon name="pin" size={14} /> Port de Mandelieu, 06210 Mandelieu-la-Napoule</span>
             </div>
@@ -105,11 +110,11 @@ function HomePage({ setPage, query, setQuery }) {
         <section className="section capsud-feature">
           <div className="section-head">
             <div>
-              <p className="eyebrow">Cap Sud · Carnet de bord</p>
-              <h2>Dernier article</h2>
+              <p className="eyebrow">{t("Cap Sud · Carnet de bord", "Cap Sud · Logbook")}</p>
+              <h2>{t("Dernier article", "Latest article")}</h2>
             </div>
             <button className="btn btn-ghost" onClick={() => setPage({ name: "capsud" })}>
-              Tous les articles <Icon name="arrow" size={16} />
+              {t("Tous les articles", "All articles")} <Icon name="arrow" size={16} />
             </button>
           </div>
           <article className="capsud-feature-card" onClick={() => setPage({ name: "capsud-article", id: latestArticle.id })}>
@@ -120,7 +125,7 @@ function HomePage({ setPage, query, setQuery }) {
               <span className="capsud-date">{fmtArticleDate(latestArticle.date)}</span>
               <h3>{latestArticle.title}</h3>
               <p>{latestArticle.excerpt}</p>
-              <span className="capsud-cta">Lire l'article <Icon name="arrow" size={15} /></span>
+              <span className="capsud-cta">{t("Lire l'article", "Read the article")} <Icon name="arrow" size={15} /></span>
             </div>
           </article>
         </section>
@@ -129,15 +134,15 @@ function HomePage({ setPage, query, setQuery }) {
       <section className="section dest">
         <div className="section-head">
           <div>
-            <p className="eyebrow">Destinations</p>
-            <h2>Du port aux îles</h2>
+            <p className="eyebrow">{t("Destinations", "Destinations")}</p>
+            <h2>{t("Du port aux îles", "From port to islands")}</h2>
           </div>
         </div>
         <div className="dest-grid">
           {[
-          { n: "Îles de Lérins", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: "Baignade & déjeuner en mer" },
-          { n: "Cannes", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80", c: "Baie & Croisette" },
-          { n: "Estérel", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: "Calanques & roches rouges" }].
+          { n: t("Îles de Lérins", "Lérins Islands"), img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: t("Baignade & déjeuner en mer", "Swimming & lunch at sea") },
+          { n: "Cannes", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80", c: t("Baie & Croisette", "Bay & Croisette") },
+          { n: "Estérel", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: t("Calanques & roches rouges", "Coves & red rocks") }].
           map((d) =>
           <button key={d.n} className="dest-card" onClick={() => setPage({ name: "catalog" })}>
               <img src={d.img} alt={d.n} />
@@ -158,24 +163,25 @@ function HomePage({ setPage, query, setQuery }) {
 
 // ============ BOAT CARD ============
 function BoatCard({ boat, onClick }) {
+  const t = window.useT();
   if (boat.comingSoon) {
     return (
       <article className="boat-card coming-soon" aria-disabled="true">
         <div className="boat-img">
           <img src={boat.images[0]} alt="" style={{ filter: "blur(14px)", transform: "scale(1.1)" }} />
           <div className="coming-soon-overlay">
-            <span className="coming-soon-badge">Coming Soon</span>
-            <span className="coming-soon-sub">Bientôt dans la flotte</span>
+            <span className="coming-soon-badge">{t("Coming Soon", "Coming Soon")}</span>
+            <span className="coming-soon-sub">{t("Bientôt dans la flotte", "Coming to the fleet")}</span>
           </div>
         </div>
         <div className="boat-body">
           <div className="boat-row">
-            <h3 style={{ opacity: 0.6 }}>Nouveau bateau</h3>
+            <h3 style={{ opacity: 0.6 }}>{t("Nouveau bateau", "New boat")}</h3>
           </div>
           <p className="boat-meta">
             <span><Icon name="pin" size={14} /> Mandelieu</span>
             <span className="dot-sep">·</span>
-            <span>Disponible prochainement</span>
+            <span>{t("Disponible prochainement", "Available soon")}</span>
           </p>
         </div>
       </article>
@@ -195,17 +201,17 @@ function BoatCard({ boat, onClick }) {
         <p className="boat-meta">
           <span><Icon name="pin" size={14} /> {boat.port}</span>
           <span className="dot-sep">·</span>
-          <span><Icon name="users" size={14} /> {boat.capacity} pers.</span>
+          <span><Icon name="users" size={14} /> {boat.capacity} {t("pers.", "people")}</span>
           <span className="dot-sep">·</span>
           <span>{boat.length}</span>
         </p>
         <div className="boat-foot">
           <div className="price">
             <strong>{fmtPrice(boat.price)}</strong>
-            <span> / jour</span>
+            <span> {t("/ jour", "/ day")}</span>
           </div>
           <span className="boat-cta">
-            Découvrir <Icon name="arrow" size={15} />
+            {t("Découvrir", "Discover")} <Icon name="arrow" size={15} />
           </span>
         </div>
       </div>
@@ -324,38 +330,72 @@ const fmtDate = (s) => {
 
 // ============ DETAIL ============
 function DetailPage({ id, setPage }) {
+  const t = window.useT();
   const boat = BOATS.find((b) => b.id === id);
   const [idx, setIdx] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
+  useEffect(() => {
+    if (!lightbox || !boat) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setLightbox(false);
+      if (e.key === "ArrowRight") setIdx((i) => (i + 1) % boat.images.length);
+      if (e.key === "ArrowLeft") setIdx((i) => (i - 1 + boat.images.length) % boat.images.length);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [lightbox, boat]);
   if (!boat) return null;
+  const openLightbox = (i) => { setIdx(i); setLightbox(true); };
+  const sideImgs = boat.images.slice(1, 5);
 
   return (
     <main className="detail">
       <Breadcrumb setPage={setPage} trail={[
-        { label: "Accueil", page: { name: "home" } },
-        { label: "Catalogue", page: { name: "catalog" } },
+        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Catalogue", "Catalog"), page: { name: "catalog" } },
         { label: boat.name },
       ]} />
       <div className="detail-top">
         <button className="back" onClick={() => setPage({ name: "catalog" })}>
-          <Icon name="arrowL" size={16} /> Retour au catalogue
+          <Icon name="arrowL" size={16} /> {t("Retour au catalogue", "Back to catalog")}
         </button>
       </div>
 
-      <section className="gallery">
-        <div className="gallery-main">
-          <img src={boat.images[idx]} alt={boat.name} />
-          <button className="gal-arrow left" onClick={() => setIdx((idx - 1 + boat.images.length) % boat.images.length)}><Icon name="arrowL" /></button>
-          <button className="gal-arrow right" onClick={() => setIdx((idx + 1) % boat.images.length)}><Icon name="arrow" /></button>
-          <div className="gal-counter">{idx + 1} / {boat.images.length}</div>
-        </div>
-        <div className="gallery-thumbs">
-          {boat.images.map((src, i) =>
-          <button key={i} className={"thumb" + (i === idx ? " active" : "")} onClick={() => setIdx(i)}>
+      <section className={`gallery-mosaic side-${sideImgs.length}`}>
+        <button className="mosaic-main" onClick={() => openLightbox(0)}>
+          <img src={boat.images[0]} alt={boat.name} />
+        </button>
+        <div className="mosaic-side">
+          {sideImgs.map((src, i) =>
+            <button key={i} className="mosaic-cell" onClick={() => openLightbox(i + 1)}>
               <img src={src} alt="" />
             </button>
           )}
         </div>
+        <button className="mosaic-viewall" onClick={() => openLightbox(0)}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          {t(`Voir les ${boat.images.length} photos`, `View ${boat.images.length} photos`)}
+        </button>
       </section>
+
+      {lightbox && (
+        <div className="lightbox" onClick={() => setLightbox(false)}>
+          <button className="lightbox-close" onClick={() => setLightbox(false)} aria-label={t("Fermer", "Close")}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          <div className="lightbox-counter">{idx + 1} / {boat.images.length}</div>
+          <button className="lightbox-arrow left" onClick={(e) => { e.stopPropagation(); setIdx((idx - 1 + boat.images.length) % boat.images.length); }} aria-label={t("Précédent", "Previous")}>
+            <Icon name="arrowL" size={24} />
+          </button>
+          <img className="lightbox-img" src={boat.images[idx]} alt={boat.name} onClick={(e) => e.stopPropagation()} />
+          <button className="lightbox-arrow right" onClick={(e) => { e.stopPropagation(); setIdx((idx + 1) % boat.images.length); }} aria-label={t("Suivant", "Next")}>
+            <Icon name="arrow" size={24} />
+          </button>
+        </div>
+      )}
 
       <section className="detail-body">
         <div className="detail-main">
@@ -364,11 +404,11 @@ function DetailPage({ id, setPage }) {
               <p className="eyebrow">{boat.type} · {boat.port}</p>
               <h1>{boat.name}</h1>
               <div className="detail-meta">
-                <span className="rating"><Star size={14} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} avis</span></span>
+                <span className="rating"><Star size={14} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} {t("avis", "reviews")}</span></span>
                 <span className="dot-sep">·</span>
                 <span>{boat.length}</span>
                 <span className="dot-sep">·</span>
-                <span>{boat.capacity} personnes</span>
+                <span>{boat.capacity} {t("personnes", "people")}</span>
                 <span className="dot-sep">·</span>
                 <span>{boat.year}</span>
               </div>
@@ -376,35 +416,35 @@ function DetailPage({ id, setPage }) {
           </div>
 
           <div className="detail-section">
-            <h3>À propos du bateau</h3>
-            <p className="lead">{boat.description}</p>
+            <h3>{t("À propos du bateau", "About this boat")}</h3>
+            <p className="lead">{t(boat.description, boat.description_en || boat.description)}</p>
           </div>
 
           <div className="detail-section">
-            <h3>Équipement</h3>
+            <h3>{t("Équipement", "Equipment")}</h3>
             <ul className="features">
-              {boat.features.map((f) =>
-              <li key={f}><Icon name="check" size={16} /> {f}</li>
+              {boat.features.map((f, i) =>
+              <li key={f}><Icon name="check" size={16} /> {(boat.features_en && boat.features_en[i]) ? t(f, boat.features_en[i]) : f}</li>
               )}
             </ul>
           </div>
 
           <div className="detail-section">
-            <h3>Inclus dans la location</h3>
+            <h3>{t("Inclus dans la location", "Included with the rental")}</h3>
             <div className="includes">
-              <div><Icon name="anchor" /> {boat.crew}</div>
-              <div><Icon name="shield" /> Assurance complète</div>
-              <div><Icon name="sparkle" /> Carburant 1er plein</div>
-              <div><Icon name="wave" /> Briefing de sécurité</div>
+              <div><Icon name="anchor" /> {t(boat.crew, boat.crew_en || boat.crew)}</div>
+              <div><Icon name="shield" /> {t("Assurance complète", "Full insurance")}</div>
+              <div><Icon name="sparkle" /> {t("Carburant 1er plein", "First tank of fuel")}</div>
+              <div><Icon name="wave" /> {t("Briefing de sécurité", "Safety briefing")}</div>
             </div>
           </div>
 
           <div className="detail-section">
-            <h3>Options à la carte</h3>
+            <h3>{t("Options à la carte", "Optional add-ons")}</h3>
             <div className="includes">
-              <div><Icon name="sparkle" /> Barbecue à bord</div>
-              <div><Icon name="sparkle" /> Plateau de gourmandises</div>
-              <div><Icon name="wave" /> Bouée tractée</div>
+              <div><Icon name="sparkle" /> {t("Barbecue à bord", "Onboard barbecue")}</div>
+              <div><Icon name="sparkle" /> {t("Plateau de gourmandises", "Gourmet platter")}</div>
+              <div><Icon name="wave" /> {t("Bouée tractée", "Towed inflatable")}</div>
             </div>
           </div>
         </div>
@@ -412,21 +452,21 @@ function DetailPage({ id, setPage }) {
         <aside className="booking-card" style={{ backgroundColor: "rgb(255, 255, 255)", borderRadius: "20px" }}>
           <div className="bk-price">
             <strong>{fmtPrice(boat.price)}</strong>
-            <span> / jour</span>
+            <span> {t("/ jour", "/ day")}</span>
           </div>
           <div className="bk-rating">
-            <Star size={13} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} avis</span>
+            <Star size={13} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} {t("avis", "reviews")}</span>
           </div>
           <button className="btn btn-primary btn-block" onClick={() => setPage({ name: "booking", id: boat.id })} style={{ borderRadius: "20px" }}>
-            Réserver ce bateau
+            {t("Réserver ce bateau", "Book this boat")}
           </button>
           <button className="btn btn-outline btn-block" onClick={() => setPage({ name: "contact" })} style={{ backgroundColor: "rgb(244, 248, 251)", borderRadius: "20px" }}>
-            Contacter un conseiller
+            {t("Contacter un conseiller", "Contact an advisor")}
           </button>
           <ul className="bk-list">
-            <li><Icon name="check" size={14} /> Annulation gratuite jusqu'à 7 jours</li>
-            <li><Icon name="check" size={14} /> Paiement sécurisé</li>
-            <li><Icon name="check" size={14} /> Conciergerie 7j/7</li>
+            <li><Icon name="check" size={14} /> {t("Annulation gratuite jusqu'à 7 jours", "Free cancellation up to 7 days")}</li>
+            <li><Icon name="check" size={14} /> {t("Paiement sécurisé", "Secure payment")}</li>
+            <li><Icon name="check" size={14} /> {t("Conciergerie 7j/7", "Concierge 7 days a week")}</li>
           </ul>
         </aside>
       </section>
@@ -1409,6 +1449,7 @@ function CapSudArticlePage({ id, setPage }) {
 
 // ============ FOOTER ============
 function Footer() {
+  const t = window.useT();
   return (
     <footer className="foot">
       <div className="foot-inner">
@@ -1421,26 +1462,26 @@ function Footer() {
             </span>
             <span className="logo-text">South Boat<sup>°</sup></span>
           </div>
-          <p>La location de bateaux<br />sur la Côte d'Azur.</p>
+          <p>{t("La location de bateaux", "Boat rentals")}<br />{t("sur la Côte d'Azur.", "on the French Riviera.")}</p>
         </div>
         <div className="foot-cols">
           <div>
-            <h5>Naviguer</h5>
-            <a>Catalogue</a><a>Destinations</a><a>Skippers</a>
+            <h5>{t("Naviguer", "Navigate")}</h5>
+            <a>{t("Catalogue", "Catalog")}</a><a>{t("Destinations", "Destinations")}</a><a>{t("Skippers", "Skippers")}</a>
           </div>
           <div>
-            <h5>Maison</h5>
-            <a>À propos</a><a>Contact</a><a>Presse</a>
+            <h5>{t("Maison", "House")}</h5>
+            <a>{t("À propos", "About")}</a><a>{t("Contact", "Contact")}</a><a>{t("Presse", "Press")}</a>
           </div>
           <div>
-            <h5>Légal</h5>
-            <a>CGV</a><a>Mentions légales</a><a>Confidentialité</a>
+            <h5>{t("Légal", "Legal")}</h5>
+            <a>{t("CGV", "Terms")}</a><a>{t("Mentions légales", "Legal notice")}</a><a>{t("Confidentialité", "Privacy")}</a>
           </div>
         </div>
       </div>
       <div className="foot-bottom">
         <span>© 2026 South Boat — Mandelieu La Napoule, France</span>
-        <span>Belle journée en mer à vous </span>
+        <span>{t("Belle journée en mer à vous", "Have a great day at sea")}</span>
       </div>
     </footer>);
 

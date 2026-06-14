@@ -25,6 +25,29 @@
 <script type="text/babel" data-presets="env,react">
 const { useState, useEffect } = React;
 
+// ============ I18N ============
+window.LangContext = React.createContext({ lang: "fr", setLang: () => {} });
+window.useT = () => {
+  const ctx = React.useContext(window.LangContext);
+  const t = (fr, en) => ctx.lang === "en" ? (en != null ? en : fr) : fr;
+  t.lang = ctx.lang;
+  t.setLang = ctx.setLang;
+  return t;
+};
+
+function LangProvider({ children }) {
+  const [lang, setLangState] = useState(() => {
+    try { return localStorage.getItem("sb_lang") || "fr"; } catch (e) { return "fr"; }
+  });
+  const setLang = (l) => {
+    setLangState(l);
+    try { localStorage.setItem("sb_lang", l); } catch (e) {}
+    document.documentElement.setAttribute("lang", l);
+  };
+  useEffect(() => { document.documentElement.setAttribute("lang", lang); }, [lang]);
+  return <window.LangContext.Provider value={{ lang, setLang }}>{children}</window.LangContext.Provider>;
+}
+
 function App() {
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
@@ -83,7 +106,7 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<LangProvider><App /></LangProvider>);
 </script>
 </body>
 </html>

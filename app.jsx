@@ -21,14 +21,18 @@ const BOATS = [
   rating: 4.9,
   reviews: 47,
   crew: "Avec ou sans skipper",
+  crew_en: "With or without skipper",
   images: [
-  "images/mochi/01-cover.jpg",
-  "images/mochi/02-port.jpg",
-  "images/mochi/04-arriere.jpg",
-  "images/mochi/03-moteur.jpg"],
+  "images/mochi/01-hero.jpg",
+  "images/mochi/02-mer.jpg",
+  "images/mochi/03-interieur.jpg",
+  "images/mochi/04-sunset.jpg",
+  "images/mochi/05-port.jpg"],
 
   description: "Élégance méditerranéenne et confort à bord. Idéal pour une journée en famille au large des calanques.",
-  features: ["Bain de soleil avant", "Sono Bluetooth", "Bimini", "GPS", "Échelle de bain", "Frigo"]
+  description_en: "Mediterranean elegance and onboard comfort. Perfect for a family day out off the coves.",
+  features: ["Bain de soleil avant", "Sono Bluetooth", "Bimini", "GPS", "Échelle de bain", "Frigo"],
+  features_en: ["Front sun deck", "Bluetooth sound system", "Bimini top", "GPS", "Swim ladder", "Fridge"]
 },
 {
   id: 2,
@@ -150,13 +154,14 @@ function applyTheme(dark) {
 // ============ NAV ============
 function Nav({ page, setPage, dark }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = window.useT();
   const items = [
-  { id: "home", label: "Accueil" },
-  { id: "catalog", label: "Catalogue" },
-  { id: "planning", label: "Disponibilités" },
+  { id: "home", label: t("Accueil", "Home") },
+  { id: "catalog", label: t("Catalogue", "Catalog") },
+  { id: "planning", label: t("Disponibilités", "Availability") },
   { id: "capsud", label: "Cap Sud" },
-  { id: "about", label: "À propos" },
-  { id: "contact", label: "Contact" }];
+  { id: "about", label: t("À propos", "About") },
+  { id: "contact", label: t("Contact", "Contact") }];
 
   const navigate = (id) => { setPage({ name: id }); setMobileOpen(false); };
 
@@ -185,16 +190,25 @@ function Nav({ page, setPage, dark }) {
             href="https://marine.meteoconsult.fr/"
             target="_blank"
             rel="noopener noreferrer"
-            title="Météo Marine (ouvre dans un nouvel onglet)">
-            Météo Marine
+            title={t("Météo Marine (ouvre dans un nouvel onglet)", "Marine weather (opens in a new tab)")}>
+            {t("Météo Marine", "Marine Weather")}
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: "middle" }}>
               <path d="M7 17L17 7M9 7h8v8" />
             </svg>
           </a>
         </nav>
         <div className="nav-actions">
+          <button
+            className="lang-toggle"
+            onClick={() => t.setLang(t.lang === "fr" ? "en" : "fr")}
+            aria-label={t("Changer de langue", "Change language")}
+            title={t("Changer de langue", "Change language")}>
+            <span className={t.lang === "fr" ? "lang-on" : "lang-off"}>FR</span>
+            <span className="lang-sep">|</span>
+            <span className={t.lang === "en" ? "lang-on" : "lang-off"}>EN</span>
+          </button>
           <button className="btn btn-primary nav-cta" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: "20px" }}>
-            Réserver
+            {t("Réserver", "Book")}
           </button>
           <button className="hamburger-btn" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu" aria-expanded={mobileOpen}>
             {mobileOpen
