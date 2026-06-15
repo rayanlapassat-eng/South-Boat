@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rayanlapassat-eng.github.io/South-Boat/sitemap.xml
