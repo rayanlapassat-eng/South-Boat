@@ -231,7 +231,7 @@ function CatalogPage({ setPage, query, setQuery }) {
         { label: t("Catalogue", "Catalog") },
       ]} />
 
-      <div className="catalog-body">
+      <div className="catalog-body single">
         <section className="catalog-results" style={{ width: "100%" }}>
           <div className="catalog-head">
             <div>
