@@ -14,8 +14,10 @@ const BOATS = [
   name: "Mochi",
   type: "Day cruiser",
   capacity: 8,
-  length: "9,8 m",
-  year: 2023,
+  length: "7,15 m",
+  year: 2013,
+  designCategory: "Classe C",
+  enginePower: "150 chevaux",
   port: "Mandelieu",
   price: 435,
   priceHalfDay: 320,
@@ -23,7 +25,9 @@ const BOATS = [
   preAuth: 2000,
   options: [
     { id: "buoy", label: "Bouée tractée", label_en: "Towed inflatable", price: 30 },
-    { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 40 }
+    { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 40 },
+    { id: "paddle", label: "Paddle board", label_en: "Paddle board", price: 30 },
+    { id: "snorkel", label: "Accessoires snorkeling", label_en: "Snorkeling gear", price: 20 }
   ],
   rating: 4.9,
   reviews: 47,
@@ -43,8 +47,8 @@ const BOATS = [
 
   description: "Élégance méditerranéenne et confort à bord. Idéal pour une journée en famille au large des calanques.",
   description_en: "Mediterranean elegance and onboard comfort. Perfect for a family day out off the coves.",
-  features: ["Bain de soleil avant", "Sono Bluetooth", "Bimini", "GPS", "Échelle de bain", "Frigo"],
-  features_en: ["Front sun deck", "Bluetooth sound system", "Bimini top", "GPS", "Swim ladder", "Fridge"]
+  features: ["Bain de soleil", "Sono Bluetooth", "Bimini", "GPS", "Échelle de bain"],
+  features_en: ["Sun deck", "Bluetooth sound system", "Bimini top", "GPS", "Swim ladder"]
 },
 {
   id: 2,

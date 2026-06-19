@@ -31,9 +31,7 @@ function HomePage({ setPage, query, setQuery }) {
           </div>
         </div>
         <div className="hero-stats">
-          <div><strong>1</strong><span>{t("Bateau disponible", "Boat available")}</span></div>
           <div><strong>Mandelieu</strong><span>{t("Port de départ", "Departure port")}</span></div>
-          <div><strong>4,9<Star size={12} /></strong><span>{t("Note moyenne", "Average rating")}</span></div>
         </div>
       </section>
 
@@ -71,8 +69,8 @@ function HomePage({ setPage, query, setQuery }) {
           <div className="value-card">
             <span className="value-icon"><Icon name="sparkle" /></span>
             <h3>{t("Sans mauvaise surprise", "No nasty surprises")}</h3>
-            <p>{t("Carburant inclus jusqu'à un certain seuil, annulation flexible, conciergerie disponible 7j/7.",
-                  "Fuel included up to a certain threshold, flexible cancellation, concierge available 7 days a week.")}</p>
+            <p>{t("Tarifs clairs, sans frais cachés. Annulation flexible et une équipe à votre écoute pour vous accompagner avant chaque sortie.",
+                  "Clear pricing, no hidden fees. Flexible cancellation and a team on hand to support you before every outing.")}</p>
           </div>
         </div>
       </section>
@@ -196,7 +194,6 @@ function BoatCard({ boat, onClick }) {
       <div className="boat-body">
         <div className="boat-row">
           <h3>{boat.name}</h3>
-          <span className="rating"><Star size={13} /> {boat.rating.toFixed(1)} <span className="muted">({boat.reviews})</span></span>
         </div>
         <p className="boat-meta">
           <span><Icon name="pin" size={14} /> {boat.port}</span>
@@ -222,25 +219,10 @@ function BoatCard({ boat, onClick }) {
 // ============ CATALOG ============
 function CatalogPage({ setPage, query, setQuery }) {
   const t = window.useT();
-  const [filters, setFilters] = useState({
-    minPrice: 0,
-    maxPrice: 2500,
-    minCap: 1,
-    sort: "rec"
-  });
-  const [showFilters, setShowFilters] = useState(true);
 
   const available = BOATS.filter((b) => !b.comingSoon);
   const teasers = BOATS.filter((b) => b.comingSoon);
-
-  const filtered = useMemo(() => {
-    let list = available.slice();
-    list = list.filter((b) => b.price >= filters.minPrice && b.price <= filters.maxPrice && b.capacity >= filters.minCap);
-    if (filters.sort === "price-asc") list.sort((a, b) => a.price - b.price);
-    if (filters.sort === "price-desc") list.sort((a, b) => b.price - a.price);
-    if (filters.sort === "rating") list.sort((a, b) => b.rating - a.rating);
-    return list;
-  }, [filters]);
+  const filtered = available;
 
   return (
     <main className="catalog">
@@ -250,57 +232,12 @@ function CatalogPage({ setPage, query, setQuery }) {
       ]} />
 
       <div className="catalog-body">
-        <aside className={"filters" + (showFilters ? "" : " hidden")}>
-          <div className="filters-head">
-            <h3>{t("Filtres", "Filters")}</h3>
-            <button className="link" onClick={() => setFilters({ minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>{t("Réinitialiser", "Reset")}</button>
-          </div>
-
-          <div className="filter-block">
-            <h4>{t("Prix par jour", "Price per day")}</h4>
-            <div className="range-row">
-              <span>{fmtPrice(filters.minPrice)}</span>
-              <span>{fmtPrice(filters.maxPrice)}</span>
-            </div>
-            <input type="range" min="0" max="2500" step="50" value={filters.maxPrice} onChange={(e) => setFilters({ ...filters, maxPrice: +e.target.value })} />
-          </div>
-
-          <div className="filter-block">
-            <h4>{t("Capacité minimum", "Minimum capacity")}</h4>
-            <div className="stepper">
-              <button onClick={() => setFilters({ ...filters, minCap: Math.max(1, filters.minCap - 1) })}><Icon name="minus" size={14} /></button>
-              <span>{filters.minCap} {t(filters.minCap > 1 ? "personnes" : "personne", filters.minCap > 1 ? "people" : "person")}</span>
-              <button onClick={() => setFilters({ ...filters, minCap: Math.min(8, filters.minCap + 1) })}><Icon name="plus" size={14} /></button>
-            </div>
-          </div>
-
-          <div className="filter-block">
-            <h4>{t("Trier par", "Sort by")}</h4>
-            <div className="radio-list">
-              {[
-              { id: "rec", label: t("Recommandés", "Recommended") },
-              { id: "price-asc", label: t("Prix croissant", "Price: low to high") },
-              { id: "price-desc", label: t("Prix décroissant", "Price: high to low") },
-              { id: "rating", label: t("Mieux notés", "Top rated") }].
-              map((s) =>
-              <label key={s.id} className={"radio" + (filters.sort === s.id ? " active" : "")}>
-                  <input type="radio" name="sort" checked={filters.sort === s.id} onChange={() => setFilters({ ...filters, sort: s.id })} />
-                  <span>{s.label}</span>
-                </label>
-              )}
-            </div>
-          </div>
-        </aside>
-
-        <section className="catalog-results">
+        <section className="catalog-results" style={{ width: "100%" }}>
           <div className="catalog-head">
             <div>
               <h1 style={{ fontSize: "1.5rem", margin: 0 }}>{t(`Location de bateaux à Mandelieu — ${filtered.length} bateau${filtered.length > 1 ? "x" : ""} disponible${filtered.length > 1 ? "s" : ""}`, `Boat rentals in Mandelieu — ${filtered.length} boat${filtered.length > 1 ? "s" : ""} available`)}</h1>
-              <p className="muted">{t("Port de Mandelieu · du", "Port de Mandelieu · from")} {fmtDate(query.from, t.lang)} {t("au", "to")} {fmtDate(query.to, t.lang)}</p>
+              <p className="muted">{t("Port de Mandelieu", "Port de Mandelieu")}</p>
             </div>
-            <button className="btn btn-ghost mobile-filters" onClick={() => setShowFilters(!showFilters)}>
-              {showFilters ? t("Masquer les filtres", "Hide filters") : t("Afficher les filtres", "Show filters")}
-            </button>
           </div>
           <div className="grid-3">
             {filtered.map((b) =>
@@ -311,8 +248,7 @@ function CatalogPage({ setPage, query, setQuery }) {
             )}
             {filtered.length === 0 && teasers.length === 0 &&
             <div className="empty">
-                <p>{t("Aucun bateau ne correspond à vos critères.", "No boats match your criteria.")}</p>
-                <button className="btn btn-ghost" onClick={() => setFilters({ minPrice: 0, maxPrice: 2500, minCap: 1, sort: "rec" })}>{t("Réinitialiser", "Reset")}</button>
+                <p>{t("Aucun bateau disponible pour le moment.", "No boats available at the moment.")}</p>
               </div>
             }
           </div>
@@ -325,7 +261,8 @@ function CatalogPage({ setPage, query, setQuery }) {
 
 const fmtDate = (s, lang) => {
   if (!s) return "—";
-  const d = new Date(s);
+  const [y, m, day] = s.split("-").map(Number);
+  const d = new Date(y, m - 1, day);
   return d.toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "short" });
 };
 
@@ -405,13 +342,23 @@ function DetailPage({ id, setPage }) {
               <p className="eyebrow">{boat.type} · {boat.port}</p>
               <h1>{boat.name}</h1>
               <div className="detail-meta">
-                <span className="rating"><Star size={14} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} {t("avis", "reviews")}</span></span>
-                <span className="dot-sep">·</span>
                 <span>{boat.length}</span>
                 <span className="dot-sep">·</span>
                 <span>{boat.capacity} {t("personnes", "people")}</span>
                 <span className="dot-sep">·</span>
                 <span>{boat.year}</span>
+                {boat.designCategory && (
+                  <>
+                    <span className="dot-sep">·</span>
+                    <span>{t("Catégorie de conception : ", "Design category: ")}{boat.designCategory}</span>
+                  </>
+                )}
+                {boat.enginePower && (
+                  <>
+                    <span className="dot-sep">·</span>
+                    <span>{t("Motorisation : ", "Engine: ")}{boat.enginePower}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -435,7 +382,6 @@ function DetailPage({ id, setPage }) {
             <div className="includes">
               <div><Icon name="anchor" /> {t(boat.crew, boat.crew_en || boat.crew)}</div>
               <div><Icon name="shield" /> {t("Assurance complète", "Full insurance")}</div>
-              <div><Icon name="sparkle" /> {t("Carburant 1er plein", "First tank of fuel")}</div>
               <div><Icon name="wave" /> {t("Briefing de sécurité", "Safety briefing")}</div>
             </div>
           </div>
@@ -443,9 +389,11 @@ function DetailPage({ id, setPage }) {
           <div className="detail-section">
             <h3>{t("Options à la carte", "Optional add-ons")}</h3>
             <div className="includes">
-              <div><Icon name="sparkle" /> {t("Barbecue à bord", "Onboard barbecue")}</div>
               <div><Icon name="sparkle" /> {t("Plateau de gourmandises", "Gourmet platter")}</div>
               <div><Icon name="wave" /> {t("Bouée tractée", "Towed inflatable")}</div>
+              <div><Icon name="wave" /> {t("Wakeboard", "Wakeboard")}</div>
+              <div><Icon name="wave" /> {t("Paddle board", "Paddle board")}</div>
+              <div><Icon name="wave" /> {t("Accessoires snorkeling", "Snorkeling gear")}</div>
             </div>
           </div>
         </div>
@@ -455,10 +403,6 @@ function DetailPage({ id, setPage }) {
             <strong>{fmtPrice(boat.price)}</strong>
             <span> {t("/ jour", "/ day")}</span>
           </div>
-          <div className="bk-rating">
-            <Star size={13} /> {boat.rating.toFixed(1)} <span className="muted">· {boat.reviews} {t("avis", "reviews")}</span>
-          </div>
-
           {(boat.priceHalfDay || boat.deposit || boat.preAuth || (boat.options && boat.options.length)) && (
             <div className="bk-tariffs" style={{ marginTop: 14, padding: "12px 14px", background: "var(--surface-2, #f4f8fb)", borderRadius: 14, fontSize: 13 }}>
               <h4 style={{ margin: "0 0 8px", fontSize: 13, textTransform: "uppercase", letterSpacing: 0.4, color: "var(--muted, #5b6b7a)" }}>{t("Tarifs", "Pricing")}</h4>
@@ -505,7 +449,7 @@ function DetailPage({ id, setPage }) {
           <ul className="bk-list">
             <li><Icon name="check" size={14} /> {t("Annulation gratuite jusqu'à 7 jours", "Free cancellation up to 7 days")}</li>
             <li><Icon name="check" size={14} /> {t("Paiement sécurisé", "Secure payment")}</li>
-            <li><Icon name="check" size={14} /> {t("Conciergerie 7j/7", "Concierge 7 days a week")}</li>
+            <li><Icon name="check" size={14} /> {t("Conciergerie", "Concierge")}</li>
           </ul>
         </aside>
       </section>
@@ -525,7 +469,7 @@ const ITINERARIES = [
 
 const EMAIL_TEMPLATE = {
   subject: "Confirmation de votre réservation — South Boat",
-  body: ({ firstName, boatName, dateLong, slot, adults, children, itinerary, total, deposit, refundPolicy }) => `
+  body: ({ firstName, boatName, dateLong, slot, adults, children, itinerary, total, deposit, balance, refundPolicy }) => `
 Bonjour ${firstName},
 
 Nous vous confirmons votre réservation auprès de South Boat.
@@ -539,6 +483,7 @@ ${itinerary ? "Itinéraire : " + itinerary + "\n" : ""}
 — MONTANTS —
 Total : ${total}
 Acompte payé : ${deposit}
+Reste à payer le Jour-J : ${balance}
 
 — CONDITIONS DE REMBOURSEMENT —
 ${refundPolicy}
@@ -591,15 +536,17 @@ Pré-remplir le contrat avec ces informations pour le Jour-J.
 `
 };
 
-function BookingPage({ id, setPage, initialDate }) {
+function BookingPage({ id, setPage, initialDate, initialSlot }) {
   const t = window.useT();
   const boat = BOATS.find((b) => b.id === id) || BOATS[0];
   const [step, setStep] = useState(1);
   const [errorMsg, setErrorMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  const presetPeriod = initialSlot === "am" || initialSlot === "pm" ? initialSlot : "";
   const [data, setData] = useState({
     date: initialDate || "",
-    slot: "day",
+    slot: presetPeriod ? "halfday" : "day",
+    period: presetPeriod,
     extras: [],
     adults: 2,
     children: 0,
@@ -611,6 +558,7 @@ function BookingPage({ id, setPage, initialDate }) {
     preAuthDone: false,
     paymentMethod: "",
     paymentDone: false,
+    transferProof: null, // fichier joint (preuve de virement) — obligatoire si virement
   });
 
   // Options dynamiques par bateau (sinon defaults génériques)
@@ -633,7 +581,7 @@ function BookingPage({ id, setPage, initialDate }) {
       if (!ex) return sum;
       return sum + (ex.id === "lunch" ? ex.price * (data.adults + data.children) : ex.price);
     }, 0);
-    const skipperCost = data.crew === "with" ? 280 : 0;
+    const skipperCost = data.crew === "with" ? (data.slot === "halfday" ? 150 : 200) : 0;
     const total = base + extrasCost + skipperCost;
     // Acompte et caution : valeurs définies par le bateau (Mochi : 90€ / 2000€)
     const deposit = boat.deposit != null ? boat.deposit : Math.round(total * 0.3);
@@ -855,13 +803,19 @@ function BookingPage({ id, setPage, initialDate }) {
               <div className="seg two">
                 <button className={"seg-btn" + (data.crew === "with" ? " active" : "")} onClick={() => setData({ ...data, crew: "with" })}>
                   <strong>{t("Avec skipper", "With skipper")}</strong>
-                  <span>{t("+280 € / jour", "+€280 / day")}</span>
+                  <span>{t("+150 € demi-journée · +200 € journée", "+€150 half day · +€200 full day")}</span>
                 </button>
                 <button className={"seg-btn" + (data.crew === "without" ? " active" : "")} onClick={() => setData({ ...data, crew: "without", itinerary: "" })}>
                   <strong>{t("Sans skipper", "Without skipper")}</strong>
                   <span>{t("Permis bateau requis", "Boating license required")}</span>
                 </button>
               </div>
+
+              {data.crew === "without" && (
+                <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "10px 14px", borderRadius: 4, color: "#3b4a5a", marginTop: 12, fontSize: 13 }}>
+                  {t("Les destinations vous seront proposées le jour de la location.", "Destinations will be suggested to you on the day of the rental.")}
+                </div>
+              )}
 
               {data.crew === "with" && (
                 <>
@@ -910,7 +864,7 @@ function BookingPage({ id, setPage, initialDate }) {
                 {data.crew === "with" && selectedItinerary && (
                   <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{t(selectedItinerary.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[selectedItinerary.id] || selectedItinerary.name)}</strong></div>
                 )}
-                <div className="recap-row"><span>{t("Skipper", "Skipper")}</span><strong>{data.crew === "with" ? t("Inclus (+280 €)", "Included (+€280)") : t("Sans skipper", "Without skipper")}</strong></div>
+                <div className="recap-row"><span>{t("Skipper", "Skipper")}</span><strong>{data.crew === "with" ? t(`Inclus (+${skipperCost} €)`, `Included (+€${skipperCost})`) : t("Sans skipper", "Without skipper")}</strong></div>
                 <div className="recap-row"><span>{t("Tarif base", "Base price")}</span><strong>{fmtPrice(base)}</strong></div>
                 {data.extras.map((eId) => {
                   const ex = extras.find((x) => x.id === eId);
@@ -923,9 +877,6 @@ function BookingPage({ id, setPage, initialDate }) {
                     </div>
                   );
                 })}
-                {skipperCost > 0 && (
-                  <div className="recap-row"><span>{t("Skipper", "Skipper")}</span><strong>+{fmtPrice(skipperCost)}</strong></div>
-                )}
                 <div className="recap-row total"><span>{t("Total", "Total")}</span><strong>{fmtPrice(total)}</strong></div>
               </div>
             </section>
@@ -949,6 +900,7 @@ function BookingPage({ id, setPage, initialDate }) {
                 <label className="field">
                   <span>{t("Date de naissance", "Date of birth")}</span>
                   <input data-fkey="billing.birthdate" type="date" value={data.billing.birthdate} onChange={(e) => setBilling("birthdate", e.target.value)} />
+                  <small style={{ color: "var(--muted, #5b6b7a)" }}>{t("Minimum 20 ans.", "Minimum age: 20.")}</small>
                   {fieldErrors["billing.birthdate"] && <small style={{ color: "#c00" }}>{t(fieldErrors["billing.birthdate"], "Required")}</small>}
                 </label>
                 <label className="field">
@@ -1172,6 +1124,64 @@ function BookingPage({ id, setPage, initialDate }) {
                     onClick={() => setData((d) => ({ ...d, paymentDone: true }))}>
                     {t("J'ai effectué le virement", "I've made the transfer")}
                   </button>
+
+                  {data.paymentDone && (
+                    <div style={{ marginTop: 18, paddingTop: 18, borderTop: "1px solid #eef1f4" }}>
+                      <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.6, color: "var(--muted, #5b6b7a)", marginBottom: 10 }}>
+                        {t("Preuve de virement (obligatoire)", "Proof of transfer (required)")}
+                      </div>
+                      <p style={{ fontSize: 13, color: "#3b4a5a", marginTop: 0, marginBottom: 12 }}>
+                        {t("Joignez une capture d'écran ou un PDF de votre virement pour finaliser votre réservation.",
+                           "Attach a screenshot or PDF of your transfer to finalize your booking.")}
+                      </p>
+                      <label
+                        htmlFor="transfer-proof-input"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 12,
+                          border: "1px dashed " + (data.transferProof ? "#1a5a32" : "#cbd5e0"),
+                          background: data.transferProof ? "#f0f8f3" : "#fafbfc",
+                          borderRadius: 10,
+                          padding: "14px 16px",
+                          cursor: "pointer",
+                          fontSize: 13,
+                        }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                          <Icon name={data.transferProof ? "check" : "plus"} size={16} />
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {data.transferProof
+                              ? data.transferProof.name
+                              : t("Choisir un fichier (JPG, PNG, PDF)", "Choose a file (JPG, PNG, PDF)")}
+                          </span>
+                        </span>
+                        {data.transferProof && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); setData((d) => ({ ...d, transferProof: null })); }}
+                            style={{ background: "none", border: "none", color: "var(--muted, #5b6b7a)", cursor: "pointer", fontSize: 13, padding: 4 }}>
+                            {t("Retirer", "Remove")}
+                          </button>
+                        )}
+                      </label>
+                      <input
+                        id="transfer-proof-input"
+                        type="file"
+                        accept="image/jpeg,image/png,image/heic,application/pdf"
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                          const f = e.target.files && e.target.files[0];
+                          if (f) setData((d) => ({ ...d, transferProof: f }));
+                        }}
+                      />
+                      {data.transferProof && (
+                        <p style={{ fontSize: 12, color: "var(--muted, #5b6b7a)", marginTop: 8, marginBottom: 0 }}>
+                          {t("Fichier prêt à être joint à votre confirmation.", "File ready to be attached to your confirmation.")}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1197,67 +1207,62 @@ function BookingPage({ id, setPage, initialDate }) {
                 <div className="recap-row"><span>{t("Participants", "Guests")}</span><strong>{data.adults} {t(data.adults > 1 ? "adultes" : "adulte", data.adults > 1 ? "adults" : "adult")}{data.children ? " · " + data.children + " " + t(data.children > 1 ? "enfants" : "enfant", data.children > 1 ? "children" : "child") : ""}</strong></div>
                 {selectedItinerary && <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{t(selectedItinerary.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[selectedItinerary.id] || selectedItinerary.name)}</strong></div>}
                 <div className="recap-row"><span>{t("Acompte payé", "Deposit paid")}</span><strong>{fmtPrice(deposit)}</strong></div>
+                <div className="recap-row"><span>{t("Reste à payer le Jour-J", "Balance due on the day")}</span><strong>{fmtPrice(Math.max(0, total - deposit))}</strong></div>
                 <div className="recap-row total"><span>{t("Total", "Total")}</span><strong>{fmtPrice(total)}</strong></div>
               </div>
 
-              <details className="email-preview" style={{ marginTop: 18, border: "1px solid #e5e7eb", borderRadius: 10, padding: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 600 }}>{t("Aperçu du mail client (envoyé à votre adresse)", "Customer email preview (sent to your address)")}</summary>
-                <p style={{ marginTop: 10 }}><strong>Objet :</strong> {EMAIL_TEMPLATE.subject}</p>
-                <pre style={{ whiteSpace: "pre-wrap", fontFamily: "ui-monospace, monospace", fontSize: 13, background: "#f8fafc", padding: 12, borderRadius: 8 }}>
-{EMAIL_TEMPLATE.body({
-  firstName: data.billing.firstName || "—",
-  boatName: boat.name,
-  dateLong: data.date ? fmtLong(data.date) : "—",
-  slot: labelSlot(data.slot),
-  adults: data.adults,
-  children: data.children,
-  itinerary: selectedItinerary ? selectedItinerary.name : "",
-  total: fmtPrice(total),
-  deposit: fmtPrice(deposit),
-  refundPolicy: EMAIL_TEMPLATE.refundPolicy,
-})}
-                </pre>
-              </details>
-
-              <details className="email-preview" style={{ marginTop: 12, border: "1px solid #e5e7eb", borderRadius: 10, padding: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-                  {t("Aperçu du mail interne (envoyé à", "Internal email preview (sent to")} {INTERNAL_EMAIL_TEMPLATE.to})
-                </summary>
-                <p style={{ marginTop: 10 }}><strong>Objet :</strong> {INTERNAL_EMAIL_TEMPLATE.subject}</p>
-                <pre style={{ whiteSpace: "pre-wrap", fontFamily: "ui-monospace, monospace", fontSize: 13, background: "#f8fafc", padding: 12, borderRadius: 8 }}>
-{INTERNAL_EMAIL_TEMPLATE.body({
-  boatName: boat.name,
-  dateLong: data.date ? fmtLong(data.date) : "—",
-  slot: labelSlot(data.slot),
-  adults: data.adults,
-  children: data.children,
-  itinerary: selectedItinerary ? selectedItinerary.name : "",
-  total: fmtPrice(total),
-  deposit: fmtPrice(deposit),
-  preAuth: fmtPrice(preAuth),
-  paymentMethod: ({ cb: "Carte bancaire", paypal: "PayPal", applepay: "Apple Pay", paybybank: "Pay by Bank", virement: "Virement bancaire" })[data.paymentMethod] || "—",
-  billing: data.billing,
-  permit: data.permit,
-  permitDifferent: data.permitDifferent,
-})}
-                </pre>
-              </details>
+              {/* Mail client + mail interne envoyés en arrière-plan à contact@south-boat.com — aperçu non affiché au client.
+                  Les templates EMAIL_TEMPLATE et INTERNAL_EMAIL_TEMPLATE sont utilisés côté backend lorsqu'il sera branché. */}
 
               <button className="btn btn-primary btn-block" style={{ marginTop: 18 }} onClick={() => setPage({ name: "home" })}>{t("Retour à l'accueil", "Back to home")}</button>
             </section>
           )}
 
-          {step < 7 && (
-            <div className="step-actions" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
-              <div style={{ display: "flex", gap: 10, justifyContent: "space-between" }}>
-                <button className="btn btn-outline" onClick={goPrev} disabled={step === 1}>{t("Précédent", "Previous")}</button>
-                <button className="btn btn-primary" onClick={goNext}>
-                  {step === 3 ? t("Réserver", "Book") : step === 4 ? t("Aller à la caution", "Go to deposit hold") : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue")} <Icon name="arrow" size={16} />
-                </button>
+          {step < 7 && (() => {
+            // Le bouton suivant est désactivé tant que tous les champs requis de l'étape ne sont pas remplis
+            const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isStr = (v) => v && String(v).trim().length > 0;
+            let stepIncomplete = false;
+            if (step === 1) {
+              stepIncomplete = !data.date || !data.slot;
+            } else if (step === 2) {
+              stepIncomplete = data.adults < 1 || (data.adults + data.children > boat.capacity) || (data.crew === "with" && !data.itinerary);
+            } else if (step === 4) {
+              const billingOk = ["firstName", "lastName", "birthdate", "email", "phone", "address"].every((k) => isStr(data.billing[k])) && emailRe.test(data.billing.email || "");
+              const permitNumOk = data.permitDifferent || data.crew !== "without" || isStr(data.billing.permitNumber);
+              const permitOk = !data.permitDifferent || (
+                ["firstName", "lastName", "birthdate", "email", "phone", "address", "permitNumber"].every((k) => isStr(data.permit[k])) &&
+                emailRe.test(data.permit.email || "")
+              );
+              stepIncomplete = !billingOk || !permitNumOk || !permitOk;
+            }
+            const nextDisabled =
+              stepIncomplete ||
+              (step === 5 && !data.preAuthDone) ||
+              (step === 6 && (!data.paymentDone || (data.paymentMethod === "virement" && !data.transferProof)));
+            return (
+              <div className="step-actions" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+                <div style={{ display: "flex", gap: 10, justifyContent: "space-between" }}>
+                  <button className="btn btn-outline" onClick={goPrev} disabled={step === 1}>{t("Précédent", "Previous")}</button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={goNext}
+                    disabled={nextDisabled}
+                    style={nextDisabled ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
+                    title={nextDisabled
+                      ? (step === 5
+                          ? t("Effectuez d'abord la pré-autorisation bancaire.", "Complete the bank pre-authorization first.")
+                          : step === 6
+                            ? t("Finalisez le paiement avant de continuer.", "Finalize the payment before continuing.")
+                            : t("Veuillez compléter les champs requis.", "Please complete the required fields."))
+                      : undefined}>
+                    {step === 3 ? t("Réserver", "Book") : step === 4 ? t("Aller à la caution", "Go to deposit hold") : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue")} <Icon name="arrow" size={16} />
+                  </button>
+                </div>
+                {errorMsg && <p style={{ color: "#c00", margin: 0, textAlign: "right" }}>{errorMsg}</p>}
               </div>
-              {errorMsg && <p style={{ color: "#c00", margin: 0, textAlign: "right" }}>{errorMsg}</p>}
-            </div>
-          )}
+            );
+          })()}
         </div>
 
         {showSidebar && (
@@ -1304,7 +1309,9 @@ function BookingPage({ id, setPage, initialDate }) {
 }
 
 const fmtLong = (s, lang) => {
-  const d = new Date(s);
+  if (!s) return "—";
+  const [y, m, day] = s.split("-").map(Number);
+  const d = new Date(y, m - 1, day);
   return d.toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 };
 const labelSlot = (s, t) => {
@@ -1348,7 +1355,7 @@ function Calendar({ selected, onSelect }) {
         {dows.map((d, i) => <span key={i} className="cal-dow">{d}</span>)}
         {days.map((d, i) => {
           if (!d) return <span key={i} className="cal-cell empty" />;
-          const iso = d.toISOString().slice(0, 10);
+          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
           const isPast = d < today;
           const isUnav = unavailable.has(`${view.y}-${view.m}-${d.getDate()}`);
           const isSel = selected === iso;
@@ -1406,9 +1413,6 @@ function AboutPage({ setPage }) {
 
       {/* STATS */}
       <section className="ab-stats">
-        <div className="ab-stat"><strong>+12 000</strong><span>{t("Journées en mer organisées", "Days at sea organized")}</span></div>
-        <div className="ab-stat"><strong>1</strong><span>{t("Bateau au catalogue", "Boat in the catalog")}</span></div>
-        <div className="ab-stat"><strong>{t("4,9 / 5", "4.9 / 5")}</strong><span>{t("Note moyenne des clients", "Average customer rating")}</span></div>
         <div className="ab-stat"><strong>Mandelieu</strong><span>{t("Port de départ", "Departure port")}</span></div>
       </section>
 
@@ -1470,48 +1474,6 @@ function AboutPage({ setPage }) {
         </div>
       </section>
 
-      {/* TEAM */}
-      <section className="ab-team">
-        <div className="ab-team-head">
-          <p className="eyebrow">{t("L'équipage", "The crew")}</p>
-          <h2>{t("Les visages derrière chaque sortie.", "The faces behind every outing.")}</h2>
-        </div>
-        <div className="ab-team-grid">
-          <article className="ab-member">
-            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80" alt={t("Marine Caron, fondatrice et capitaine South Boat à Mandelieu", "Marine Caron, South Boat founder and captain in Mandelieu")} /></div>
-            <h4>Marine Caron</h4>
-            <span>{t("Fondatrice & capitaine", "Founder & captain")}</span>
-            <p>{t("Vingt ans en mer, dont huit à South Boat. Marine connaît chaque amer de la côte par son prénom.", "Twenty years at sea, eight of them at South Boat. Marine knows every landmark along the coast by name.")}</p>
-          </article>
-          <article className="ab-member">
-            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" alt={t("Théo Vidal, skipper en chef South Boat sur la Côte d'Azur", "Théo Vidal, South Boat lead skipper on the French Riviera")} /></div>
-            <h4>Théo Vidal</h4>
-            <span>{t("Skipper en chef", "Lead skipper")}</span>
-            <p>{t("Brevet 200 UMS, formé à La Rochelle. Théo a une passion : les couchers de soleil au large de l'Estérel.", "200 UMS license, trained in La Rochelle. Théo's passion: sunsets off the Estérel coast.")}</p>
-          </article>
-          <article className="ab-member">
-            <div className="ab-portrait"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80" alt={t("Léa Bertrand, conciergerie et relations clients South Boat", "Léa Bertrand, South Boat concierge and customer relations")} /></div>
-            <h4>Léa Bertrand</h4>
-            <span>{t("Conciergerie & relations clients", "Concierge & customer relations")}</span>
-            <p>{t("Le sourire au bout du fil, sept jours sur sept. Léa orchestre vos sorties dans le moindre détail.", "A smile on the line, seven days a week. Léa orchestrates your outings down to the smallest detail.")}</p>
-          </article>
-        </div>
-      </section>
-
-      {/* QUOTE */}
-      <section className="ab-quote">
-        <div className="ab-quote-inner">
-          <span className="ab-quote-mark">&ldquo;</span>
-          <blockquote>
-            <p>{t("La meilleure journée en mer est celle dont on ne se souvient que de l'horizon.", "The best day at sea is the one where you only remember the horizon.")}</p>
-            <footer>
-              <strong>Marine Caron</strong>
-              <span>{t("Fondatrice", "Founder")}</span>
-            </footer>
-          </blockquote>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="ab-cta">
         <div className="ab-cta-inner">
@@ -1544,12 +1506,45 @@ function ContactPage({ setPage }) {
         <div className="contact-info">
           <p className="eyebrow">{t("Contact", "Contact")}</p>
           <h1>{t("Parlons de votre journée en mer.", "Let's plan your day at sea.")}</h1>
-          <p className="lead">{t("Notre conciergerie vous répond du lundi au dimanche, de 8h à 19h.", "Our concierge team is available Monday to Sunday, 8am to 7pm.")}</p>
+          <p className="lead">{t("Nous vous répondons du lundi au dimanche, de 8h à 19h.", "We reply Monday to Sunday, 8am to 7pm.")}</p>
           <ul className="contact-list">
-            <li><Icon name="phone" /> <div><strong>+33 4 93 00 00 00</strong><span>{t("Conciergerie 7j/7", "Concierge 7 days a week")}</span></div></li>
+            <li><Icon name="phone" /> <div><strong>06 34 49 16 21</strong><span>{t("Nous appeler", "Call us")}</span></div></li>
+            <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
           </ul>
         </div>
-        <form className="contact-form" onSubmit={(e) => {e.preventDefault();setSent(true);}}>
+        <form className="contact-form" onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.currentTarget;
+          const name = form.querySelector('input[type="text"]').value;
+          const email = form.querySelector('input[type="email"]').value;
+          const subject = form.querySelector('select').value;
+          const message = form.querySelector('textarea').value;
+          try {
+            const res = await fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Accept": "application/json" },
+              body: JSON.stringify({
+                access_key: "867b6825-3025-4db9-88a7-56b7f25342f8",
+                subject: "[Contact South Boat] " + subject,
+                from_name: name,
+                email,
+                name,
+                sujet: subject,
+                message,
+              }),
+            });
+            const data = await res.json();
+            if (data.success) {
+              setSent(true);
+            } else {
+              alert(t("Une erreur est survenue. Merci de réessayer ou de nous écrire à contact@south-boat.com",
+                      "An error occurred. Please try again or email us at contact@south-boat.com"));
+            }
+          } catch (err) {
+            alert(t("Une erreur est survenue. Merci de réessayer ou de nous écrire à contact@south-boat.com",
+                    "An error occurred. Please try again or email us at contact@south-boat.com"));
+          }
+        }}>
           {sent ? <div className="sent">
               <div className="success-icon"><Icon name="check" size={28} /></div>
               <h3>{t("Merci pour votre message", "Thank you for your message")}</h3>
@@ -1583,7 +1578,8 @@ function ContactPage({ setPage }) {
 // ============ CAP SUD — BLOG ============
 const fmtArticleDate = (s, lang) => {
   if (!s) return "";
-  const d = new Date(s);
+  const [y, m, day] = s.split("-").map(Number);
+  const d = new Date(y, m - 1, day);
   return d.toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long", year: "numeric" });
 };
 
@@ -1778,10 +1774,18 @@ function CapSudArticlePage({ id, setPage }) {
           <img src={article.cover} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} />
         </div>
         <div className="article-body">
-          {(article.content || []).map((p, i) => <p key={i}>{p}</p>)}
+          {(article.content || []).map((p, i) => {
+            if (p.startsWith("### ")) return <h3 key={i}>{p.slice(4)}</h3>;
+            if (p.startsWith("## ")) return <h2 key={i}>{p.slice(3)}</h2>;
+            if (p.startsWith("# ")) return <h2 key={i}>{p.slice(2)}</h2>;
+            return <p key={i}>{p}</p>;
+          })}
         </div>
         <div className="article-foot">
           <button className="btn btn-outline" onClick={() => setPage({ name: "capsud" })}>← {t("Tous les articles", "All articles")}</button>
+          <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: 20 }}>
+            {t("Réserver un bateau", "Book a boat")} <Icon name="arrow" size={16} />
+          </button>
         </div>
       </article>
       <Footer />

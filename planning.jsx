@@ -58,16 +58,16 @@ function PlanningPage({ setPage }) {
   const [view, setView] = useState({ y: today.getFullYear(), m: today.getMonth() });
   const [weekStart, setWeekStart] = useState(startOfWeek(today));
   const [viewMode, setViewMode] = useState("month"); // "month" | "week"
-  const [selectedBoatId, setSelectedBoatId] = useState("all");
-
   const bookableBoats = BOATS.filter((b) => !b.comingSoon);
+  const [selectedBoatId, setSelectedBoatId] = useState(bookableBoats[0]?.id ?? null);
+  const [pickerDay, setPickerDay] = useState(null); // { date, amInfo, pmInfo }
 
   // Build map iso -> [{boatId, status, client, slot}]
   const dayMap = useMemo(() => {
     const map = new Map();
     bookableBoats.forEach((b) => {
       (RESERVATIONS[b.id] || []).forEach((r) => {
-        if (selectedBoatId !== "all" && b.id !== selectedBoatId) return;
+        if (b.id !== selectedBoatId) return;
         if (!map.has(r.date)) map.set(r.date, []);
         map.get(r.date).push({ boatId: b.id, status: r.status, client: r.client, slot: r.slot || "full" });
       });
@@ -83,7 +83,7 @@ function PlanningPage({ setPage }) {
   for (let i = 1; i <= last.getDate(); i++) cells.push(new Date(view.y, view.m, i));
   const monthName = first.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
 
-  const considered = selectedBoatId === "all" ? bookableBoats : bookableBoats.filter((b) => b.id === selectedBoatId);
+  const considered = bookableBoats.filter((b) => b.id === selectedBoatId);
 
   // ===== STATS =====
   const stats = useMemo(() => {
@@ -139,7 +139,7 @@ function PlanningPage({ setPage }) {
   const handleSlotClick = (d, slotId, info) => {
     if (info.isPast || info.fullyBooked) return;
     const boat = info.availableBoats[0];
-    if (boat) setPage({ name: "booking", id: boat.id, date: d.toISOString().slice(0, 10) });
+    if (boat) setPage({ name: "booking", id: boat.id, date: d.toISOString().slice(0, 10), slot: slotId });
   };
 
   const dayStatus = (d) => {
@@ -162,6 +162,59 @@ function PlanningPage({ setPage }) {
 
   return (
     <main className="planning planning-v2">
+      <style>{`
+        .pc-grid { gap: 8px; }
+        .pc-dow { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: #6B7A8E; text-transform: uppercase; text-align: center; padding-bottom: 6px; }
+        .pc-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; min-height: 76px; border-radius: 14px; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: filter .15s ease, transform .12s ease, box-shadow .18s ease; }
+        .pc-day:hover:not(:disabled) { filter: brightness(0.97); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(11,31,58,0.1); }
+        .pc-day:disabled { cursor: not-allowed; }
+        .pc-day.today { box-shadow: 0 0 0 2px var(--navy, #0B1F3A) inset; }
+        .pc-day.today:hover:not(:disabled) { box-shadow: 0 0 0 2px var(--navy, #0B1F3A) inset, 0 6px 16px rgba(11,31,58,0.1); }
+        .pc-day .pc-day-num { font-weight: 700; font-size: 19px; line-height: 1; }
+        .pc-day .pc-day-state { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; display: inline-flex; align-items: center; gap: 4px; }
+        .pc-day .pc-day-state::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.85; }
+        .pc-day.past .pc-day-state::before { display: none; }
+        .pc-day.avail { background: #D9F0DE; color: #1B5E20; border-color: #BFE3C7; }
+        .pc-day.partial { background: #FFEBC7; color: #8A5A00; border-color: #F2D49A; }
+        .pc-day.booked { background: #F9CECE; color: #8A1F1F; border-color: #ECB1B1; }
+        .pc-day.past { background: #F4F6F9; color: #A8B2BD; border-color: #E5E9EF; }
+        .pc-legend { margin-top: 18px; flex-wrap: wrap; }
+        /* Slot picker modal */
+        .pc-modal-backdrop { position: fixed; inset: 0; background: rgba(11,31,58,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: pc-fade .15s ease; }
+        @keyframes pc-fade { from { opacity: 0; } to { opacity: 1; } }
+        .pc-modal { background: #fff; border-radius: 16px; padding: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .pc-modal h3 { margin: 0 0 6px; font-size: 18px; color: #0B1F3A; }
+        .pc-modal .pc-modal-sub { margin: 0 0 18px; font-size: 13px; color: #6B7A8E; }
+        .pc-modal-slots { display: flex; flex-direction: column; gap: 10px; }
+        .pc-modal-slot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 10px; border: 1px solid #E5E9EF; cursor: pointer; font-family: inherit; transition: filter .15s ease, transform .1s ease; }
+        .pc-modal-slot:hover:not(:disabled) { filter: brightness(0.97); transform: translateY(-1px); }
+        .pc-modal-slot:disabled { cursor: not-allowed; opacity: 0.7; }
+        .pc-modal-slot.avail { background: #D4F0DA; color: #1B5E20; border-color: #B5DFBD; }
+        .pc-modal-slot.booked { background: #F8C9C9; color: #8A1F1F; border-color: #E9A8A8; }
+        .pc-modal-slot .ms-left { text-align: left; }
+        .pc-modal-slot .ms-name { font-weight: 700; font-size: 14px; }
+        .pc-modal-slot .ms-hours { font-size: 11px; opacity: 0.8; }
+        .pc-modal-slot .ms-state { font-size: 12px; font-weight: 600; }
+        .pc-modal-close { margin-top: 16px; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E5E9EF; background: #fff; color: #6B7A8E; font-weight: 500; cursor: pointer; font-family: inherit; }
+        .pc-modal-close:hover { background: #F8F9FB; }
+        @media (max-width: 720px) {
+          .planning-calendar { padding: 0 10px !important; }
+          .pc-grid { padding: 8px !important; gap: 3px !important; grid-auto-rows: 52px !important; border-radius: 12px; }
+          .pc-day { padding: 4px 2px; min-height: 0; border-radius: 8px; gap: 2px; }
+          .pc-day .pc-day-num { font-size: 13px; }
+          .pc-day .pc-day-state { font-size: 8px; letter-spacing: 0.02em; gap: 2px; }
+          .pc-day .pc-day-state::before { width: 4px; height: 4px; }
+          .pc-dow { font-size: 9px; padding-bottom: 2px; }
+        }
+        @media (max-width: 480px) {
+          .planning-calendar { padding: 0 6px !important; }
+          .pc-grid { padding: 6px !important; gap: 2px !important; grid-auto-rows: 46px !important; }
+          .pc-day { padding: 2px 1px; border-radius: 6px; gap: 1px; }
+          .pc-day .pc-day-num { font-size: 12px; }
+          .pc-day .pc-day-state { font-size: 7px; gap: 1px; }
+          .pc-day .pc-day-state::before { width: 3px; height: 3px; }
+        }
+      `}</style>
       <Breadcrumb setPage={setPage} trail={[
         { label: "Accueil", page: { name: "home" } },
         { label: "Disponibilités" },
@@ -208,9 +261,6 @@ function PlanningPage({ setPage }) {
         </div>
 
         <div className="planning-legend">
-          <button className={"chip" + (selectedBoatId === "all" ? " active" : "")} onClick={() => setSelectedBoatId("all")}>
-            Tous les bateaux
-          </button>
           {bookableBoats.map((b) => (
             <button key={b.id} className={"chip" + (selectedBoatId === b.id ? " active" : "")} onClick={() => setSelectedBoatId(b.id)}>
               {b.name}
@@ -284,27 +334,38 @@ function PlanningPage({ setPage }) {
           ))}
           {cells.map((d, i) => {
             if (!d) return <span key={i} className="pc-cell empty" />;
-            const info = dayStatus(d);
             const isToday = d.getTime() === today.getTime();
-            let stateCls = " avail";
-            if (info.isPast) stateCls = " past";
-            else if (info.fullyBooked) stateCls = " booked";
-            else if (info.items.length > 0) stateCls = " partial";
-            const cls = "pc-cell" + stateCls + (isToday ? " today" : "");
-            const label = info.fullyBooked
-              ? "Complet"
-              : info.availableBoats.length === considered.length
-                ? (considered.length === 1 ? "Disponible" : `${info.availableBoats.length} dispo`)
-                : `${info.availableBoats.length}/${considered.length} dispo`;
+            const amInfo = slotStatus(d, "am");
+            const pmInfo = slotStatus(d, "pm");
+            const isPast = amInfo.isPast;
+            const amBooked = amInfo.fullyBooked;
+            const pmBooked = pmInfo.fullyBooked;
+            let cls = "pc-day";
+            let stateLabel = "";
+            if (isPast) { cls += " past"; stateLabel = ""; }
+            else if (amBooked && pmBooked) { cls += " booked"; stateLabel = "Complet"; }
+            else if (amBooked || pmBooked) { cls += " partial"; stateLabel = "Partiel"; }
+            else { cls += " avail"; stateLabel = "Libre"; }
+            if (isToday) cls += " today";
+            const titleText = isPast
+              ? "Date passée"
+              : (amBooked && pmBooked)
+                ? "Matin et après-midi réservés"
+                : amBooked
+                  ? "Matin réservé · Après-midi disponible"
+                  : pmBooked
+                    ? "Matin disponible · Après-midi réservé"
+                    : "Matin et après-midi disponibles";
             return (
               <button
                 key={i}
+                type="button"
                 className={cls}
-                disabled={info.isPast || info.fullyBooked}
-                onClick={() => handleDayClick(info)}
-                title={info.items.map((it) => `${(BOATS.find((b) => b.id === it.boatId)?.name) || "—"} — ${STATUS_LABEL[it.status]}`).join("\n") || "Disponible"}>
+                disabled={isPast || (amBooked && pmBooked)}
+                onClick={() => setPickerDay({ date: d, amInfo, pmInfo })}
+                title={titleText}>
                 <span className="pc-day-num">{d.getDate()}</span>
-                {!info.isPast && <span className="pc-day-state">{label}</span>}
+                <span className="pc-day-state">{stateLabel}</span>
               </button>
             );
           })}
@@ -330,6 +391,49 @@ function PlanningPage({ setPage }) {
       </section>
 
       <Footer />
+
+      {pickerDay && (() => {
+        const { date, amInfo, pmInfo } = pickerDay;
+        const dateLabel = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+        const close = () => setPickerDay(null);
+        const pick = (slotId, info) => {
+          if (info.fullyBooked || info.isPast) return;
+          close();
+          handleSlotClick(date, slotId, info);
+        };
+        return (
+          <div className="pc-modal-backdrop" onClick={close}>
+            <div className="pc-modal" onClick={(e) => e.stopPropagation()}>
+              <h3>Choisissez votre créneau</h3>
+              <p className="pc-modal-sub">{dateLabel}</p>
+              <div className="pc-modal-slots">
+                {[
+                  { id: "am", label: "Matin", hours: "9h – 13h", info: amInfo },
+                  { id: "pm", label: "Après-midi", hours: "14h – 18h", info: pmInfo },
+                ].map((s) => {
+                  const booked = s.info.fullyBooked;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={"pc-modal-slot " + (booked ? "booked" : "avail")}
+                      disabled={booked}
+                      onClick={() => pick(s.id, s.info)}>
+                      <span className="ms-left">
+                        <span className="ms-name">{s.label}</span>
+                        <br />
+                        <span className="ms-hours">{s.hours}</span>
+                      </span>
+                      <span className="ms-state">{booked ? "Réservé" : "Disponible"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button className="pc-modal-close" onClick={close}>Fermer</button>
+            </div>
+          </div>
+        );
+      })()}
     </main>
   );
 }

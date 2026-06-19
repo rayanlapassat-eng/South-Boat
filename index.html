@@ -96,12 +96,6 @@
     "availability": "https://schema.org/InStock",
     "url": "https://rayanlapassat-eng.github.io/South-Boat/",
     "priceValidUntil": "2026-12-31"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "reviewCount": "47",
-    "bestRating": "5"
   }
 }
 </script>
@@ -126,7 +120,7 @@
 <li>Côte d'Azur</li>
 </ul>
 <h2>Contact</h2>
-<p>Activez JavaScript pour réserver en ligne ou contactez la conciergerie 7j/7 de 8h à 19h.</p>
+<p>Activez JavaScript pour réserver en ligne ou contactez la conciergerie de 8h à 19h.</p>
 </main>
 </noscript>
 
@@ -134,11 +128,11 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<script src="articles.js"></script>
-<script type="text/babel" src="tweaks-panel.jsx"></script>
-<script type="text/babel" src="app.jsx"></script>
-<script type="text/babel" src="pages.jsx"></script>
-<script type="text/babel" src="planning.jsx"></script>
+<script src="articles.js?v=20260619d"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=20260619d"></script>
+<script type="text/babel" src="app.jsx?v=20260619d"></script>
+<script type="text/babel" src="pages.jsx?v=20260619d"></script>
+<script type="text/babel" src="planning.jsx?v=20260619d"></script>
 
 <script type="text/babel" data-presets="env,react">
 const { useState, useEffect } = React;
@@ -213,7 +207,7 @@ function App() {
       title = `À propos — Notre équipe et notre histoire | ${SITE}`;
       desc  = "South Boat, votre conciergerie de location de bateaux à Mandelieu-La-Napoule. Rencontrez l'équipe et notre vision de la mer en Côte d'Azur.";
     } else if (page.name === "contact") {
-      title = `Contact — Conciergerie 7j/7 | ${SITE}`;
+      title = `Contact — Conciergerie | ${SITE}`;
       desc  = "Contactez South Boat pour réserver votre journée en mer à Mandelieu. Conciergerie disponible du lundi au dimanche, 8h-19h.";
     } else if (page.name === "capsud") {
       title = `Cap Sud — Le blog du nautisme en Côte d'Azur | ${SITE}`;
@@ -245,7 +239,7 @@ function App() {
       {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} />}
       {page.name === "planning" && <PlanningPage setPage={setPage} />}
       {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
-      {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} />}
+      {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} initialSlot={page.slot} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}
       {page.name === "contact" && <ContactPage setPage={setPage} />}
       {page.name === "capsud" && <CapSudListPage setPage={setPage} />}

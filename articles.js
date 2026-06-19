@@ -11,31 +11,38 @@
 
 const ARTICLES = [
   {
-    id: "iles-de-lerins-en-une-journee",
-    title: "Les Îles de Lérins en une journée",
-    date: "2026-05-08",
+    id: "location-bateau-mandelieu-guide-esterel",
+    title: "Location de bateau à Mandelieu : le guide pour découvrir l'Estérel par la mer",
+    date: "2026-06-19",
     author: "L'équipage South Boat",
     cover: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
-    excerpt: "Sainte-Marguerite, Saint-Honorat, mouillages secrets et eaux turquoise — l'itinéraire idéal pour une journée d'évasion depuis Mandelieu.",
+    excerpt: "Criques cachées, falaises rouges et eaux turquoise — partez à la découverte du massif de l'Estérel depuis Mandelieu-La Napoule.",
     content: [
-      "Partir tôt, c'est la clé. Quitter le quai visiteur de Mandelieu avant 9h, c'est s'offrir une mer encore lisse et le choix des mouillages.",
-      "Premier arrêt : l'anse de l'île Sainte-Marguerite, côté nord. L'eau y est claire, le fond sableux, et les pins parasols offrent une ombre bienvenue pour le déjeuner à bord.",
-      "L'après-midi, cap vers Saint-Honorat. L'abbaye cistercienne, les vignes en bord de mer, et le petit tour de l'île à pied valent l'arrêt. Pensez à bien tenir votre annexe.",
-      "Retour en fin de journée, le soleil dans le dos, en longeant la côte de l'Estérel. Trois heures de navigation tranquille — souvenirs garantis."
-    ]
-  },
-  {
-    id: "premiere-sortie-conseils-skipper",
-    title: "Première sortie : les conseils de notre skipper",
-    date: "2026-04-22",
-    author: "Marine, fondatrice",
-    cover: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
-    excerpt: "Vous louez un bateau pour la première fois ? Voici tout ce qu'il faut savoir avant de larguer les amarres depuis Mandelieu.",
-    content: [
-      "Avant tout : la météo. Consultez Météo Marine la veille et le matin du départ. Un vent annoncé à plus de 15 nœuds, c'est une journée à reporter.",
-      "Le briefing à bord dure 20 à 30 minutes. Prenez le temps : moteur, GPS, ancrage, sécurité, contacts. Notez les numéros utiles dans votre téléphone.",
-      "Préparez vos affaires en sac souple — plus facile à ranger qu'une valise. Crème solaire, casquette, lunettes polarisantes, et un coupe-vent même en juillet.",
-      "Et surtout : ne vous mettez pas la pression. Le but, c'est de profiter. Notre conciergerie reste joignable toute la journée si besoin."
+      "Quand on visite la Côte d'Azur, on pense souvent aux plages, aux villages perchés ou aux routes qui longent le littoral. Pourtant, une partie des plus beaux paysages se découvre depuis la mer. En choisissant une location de bateau à Mandelieu, vous accédez rapidement aux criques du massif de l'Estérel, à ses falaises rouges et à des coins bien plus difficiles à rejoindre par la terre.",
+      "Chez South Boat, nous proposons des bateaux à louer au départ de Mandelieu-La Napoule pour une sortie en mer simple, sécurisée et adaptée aussi bien aux vacanciers qu'aux habitants de la région.",
+      "## Pourquoi louer un bateau à Mandelieu pour découvrir l'Estérel ?",
+      "La grande question que tout futur matelot se pose : où louer un bateau pour une excursion en mer réussie ?",
+      "Le choix du port de départ joue un rôle important dans la réussite d'une journée en mer. Située entre Cannes et le massif de l'Estérel, Mandelieu-La Napoule bénéficie d'un emplacement particulièrement pratique pour rejoindre rapidement les plus beaux sites du littoral.",
+      "La commune possède une véritable culture maritime et plusieurs ports réputés, dont le port de La Napoule, le port de La Rague et le port du Riou de l'Argentière. Depuis ces ports, il est possible de naviguer vers les îles de Lérins, les côtes sauvages de l'Estérel ou encore de petites criques préservées accessibles principalement par bateau.",
+      "## Les plus belles criques de l'Estérel accessibles en bateau",
+      "L'un des grands avantages d'une excursion en bateau au départ de Mandelieu est de pouvoir rejoindre des endroits parfois difficiles d'accès depuis la côte. Voici quelques sites particulièrement appréciés des plaisanciers.",
+      "### Le Cap Roux",
+      "Le secteur du Cap Roux abrite plusieurs petites anses rocheuses aux eaux claires, idéales pour la baignade et le snorkeling.",
+      "### La baie d'Agay",
+      "En s'éloignant des plages les plus fréquentées, on découvre des criques plus calmes où l'on peut profiter d'une pause loin de l'agitation estivale.",
+      "### Le Trayas",
+      "Entre Mandelieu et Saint-Raphaël, cette portion de côte offre certains des paysages les plus sauvages du massif de l'Estérel, avec de nombreux mouillages agréables pour une halte baignade.",
+      "### La calanque de Maubois",
+      "Entourée des célèbres roches rouges de l'Estérel, la calanque de Maubois séduit par la clarté de son eau et son décor spectaculaire. Son accès terrestre limité contribue à préserver son charme.",
+      "### La calanque des Anglais",
+      "Plus discrète, cette crique bordée de falaises rocheuses est appréciée pour son calme et son caractère naturel.",
+      "### L'île des Vieilles",
+      "Situé au large du Cap Dramont, ce petit îlot rocheux offre un cadre remarquable pour une pause au mouillage, notamment hors des périodes de forte affluence.",
+      "## Bon à savoir / Navigation responsable",
+      "Certaines zones du massif de l'Estérel sont réglementées afin de protéger les herbiers de posidonie et les écosystèmes marins. Avant de jeter l'ancre, il est recommandé de vérifier les règles de mouillage en vigueur, surtout en été.",
+      "## Une journée bateau entre falaises rouges et eaux méditerranéennes",
+      "Que ce soit pour une demi-journée, une journée complète ou une simple balade au coucher du soleil, louer un bateau à Mandelieu reste l'une des meilleures façons de découvrir l'Estérel à son rythme.",
+      "Alors embarquez avec nous pour une balade flottante à bord de l'un de nos bateaux afin de longer ces superbes falaises rouges de l'Esterel et de naviguer entre ces eaux turquoises de la Méditerranée. Des calanques et criques secrètes qui vous dévoilent leurs plus belles couleurs mais vous marqueront aussi de leurs plus beaux souvenirs."
     ]
   }
 ];
