@@ -133,7 +133,7 @@ function HomePage({ setPage, query, setQuery }) {
         <div className="section-head">
           <div>
             <p className="eyebrow">{t("Destinations", "Destinations")}</p>
-            <h2>{t("Du port aux îles", "From port to islands")}</h2>
+            <h2>{t("Les itinéraires", "The itineraries")}</h2>
           </div>
         </div>
         <div className="dest-grid">
@@ -1468,7 +1468,7 @@ function AboutPage({ setPage }) {
           <article className="ab-pillar">
             <span className="ab-num">03</span>
             <h3>{t("Le respect du large", "Respect for the sea")}</h3>
-            <p>{t("Nos skippers privilégient les mouillages écologiques. Nous reversons 1% de notre chiffre à la protection des fonds marins.", "Our skippers favor eco-friendly anchorages. We donate 1% of our revenue to marine ecosystem protection.")}</p>
+            <p>{t("Nos skippers privilégient les mouillages écologiques.", "Our skippers favor eco-friendly anchorages.")}</p>
             <span className="ab-tag">{t("Engagement", "Commitment")}</span>
           </article>
         </div>
