@@ -459,6 +459,74 @@ function DetailPage({ id, setPage }) {
 }
 
 // ============ BOOKING ============
+function PayLogo({ brand }) {
+  const wrap = { width: 38, height: 24, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 };
+  if (brand === "cb") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="#fff" stroke="#d4dae0" />
+          <rect x="0.5" y="6" width="37" height="4" fill="#0a2540" />
+          <rect x="5" y="14" width="10" height="2" rx="0.5" fill="#94a3b8" />
+          <rect x="5" y="18" width="6" height="1.5" rx="0.5" fill="#cbd5e0" />
+        </svg>
+      </span>
+    );
+  }
+  if (brand === "paypal") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="#fff" stroke="#d4dae0" />
+          <text x="19" y="16" textAnchor="middle" fontFamily="Helvetica, Arial, sans-serif" fontSize="9" fontWeight="700" fontStyle="italic" fill="#003087">Pay<tspan fill="#009cde">Pal</tspan></text>
+        </svg>
+      </span>
+    );
+  }
+  if (brand === "applepay") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="#000" stroke="#000" />
+          <path d="M10.5 10.6c-.3.4-.8.7-1.3.6-.1-.5.2-1 .5-1.4.3-.4.8-.7 1.3-.7.1.5-.1 1-.5 1.5zm.5.6c-.7 0-1.3.4-1.7.4-.4 0-.9-.4-1.5-.4-.8 0-1.5.4-1.9 1.2-.8 1.4-.2 3.5.6 4.6.4.5.8 1.1 1.4 1.1.6 0 .8-.4 1.5-.4.7 0 .9.4 1.5.4.6 0 1-.5 1.4-1.1.3-.4.5-.9.7-1.4-.8-.3-1.4-1.1-1.4-2 0-.8.4-1.5 1-1.9-.4-.5-1-.7-1.6-.5z" fill="#fff"/>
+          <text x="15" y="16.5" fontFamily="Helvetica, Arial, sans-serif" fontSize="8.5" fontWeight="600" fill="#fff">Pay</text>
+        </svg>
+      </span>
+    );
+  }
+  if (brand === "paybybank") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="#fff" stroke="#d4dae0" />
+          <path d="M19 5l-7 3.5v1h14v-1L19 5z" fill="#0a2540"/>
+          <rect x="13" y="11" width="1.5" height="6" fill="#0a2540"/>
+          <rect x="17" y="11" width="1.5" height="6" fill="#0a2540"/>
+          <rect x="21" y="11" width="1.5" height="6" fill="#0a2540"/>
+          <rect x="25" y="11" width="1.5" height="6" fill="#0a2540"/>
+          <rect x="12" y="18" width="14" height="1.2" fill="#0a2540"/>
+        </svg>
+      </span>
+    );
+  }
+  if (brand === "virement") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="#fff" stroke="#d4dae0" />
+          <path d="M19 5l-7 3.5v1h14v-1L19 5z" fill="#1a5a32"/>
+          <rect x="13" y="11" width="1.5" height="6" fill="#1a5a32"/>
+          <rect x="17" y="11" width="1.5" height="6" fill="#1a5a32"/>
+          <rect x="21" y="11" width="1.5" height="6" fill="#1a5a32"/>
+          <rect x="25" y="11" width="1.5" height="6" fill="#1a5a32"/>
+          <rect x="12" y="18" width="14" height="1.2" fill="#1a5a32"/>
+        </svg>
+      </span>
+    );
+  }
+  return null;
+}
+
 const ITINERARIES = [
   { id: "lerins", name: "Îles de Lérins", desc: "Sainte-Marguerite, baignade et déjeuner en mer." },
   { id: "esterel", name: "Calanques de l'Estérel", desc: "Roches rouges, eaux turquoise, snorkeling." },
@@ -603,8 +671,8 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     setErrorMsg("");
     setFieldErrors({});
     if (step === 1) {
-      if (!data.date) { setErrorMsg(t("Veuillez choisir une date.", "Please select a date.")); return false; }
-      if (!data.slot) { setErrorMsg(t("Veuillez choisir un créneau.", "Please select a time slot.")); return false; }
+      if (!data.slot) { setErrorMsg(t("Veuillez choisir un type de créneau.", "Please select a slot type.")); return false; }
+      if (data.slot === "halfday" && !data.period) { setErrorMsg(t("Veuillez choisir Matin ou Après-midi.", "Please choose Morning or Afternoon.")); return false; }
     }
     if (step === 2) {
       if (data.adults < 1) { setErrorMsg(t("Au moins 1 adulte requis.", "At least 1 adult required.")); return false; }
@@ -722,43 +790,59 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
             })}
           </div>
 
-          {step === 1 && (
-            <section className="step-card">
-              <h2>{t("Choisissez votre créneau", "Choose your time slot")}</h2>
+          {step === 1 && (() => {
+            const calLink =
+              data.slot === "day"
+                ? "south-boat/journee"
+                : data.period === "pm"
+                  ? "south-boat/demi-journee-apres-midi"
+                  : "south-boat/matin";
+            const tabActive = (slot, period) => data.slot === slot && (slot === "day" || data.period === period);
+            return (
+              <section className="step-card">
+                <h2>{t("Choisissez votre créneau", "Choose your time slot")}</h2>
 
-              {false && (
-                <div className="cal-embed" style={{ marginBottom: 16, border: "1px solid #e5e7eb", borderRadius: 14, overflow: "hidden", minHeight: 600 }}>
+                <h3 className="sub" style={{ marginTop: 8 }}>{t("Type de créneau", "Slot type")}</h3>
+                <div className="seg" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                  <button
+                    type="button"
+                    className={"seg-btn" + (tabActive("halfday", "am") ? " active" : "")}
+                    onClick={() => setData({ ...data, slot: "halfday", period: "am" })}>
+                    <strong>{t("Matin", "Morning")}</strong>
+                    <span>9h — 13h · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={"seg-btn" + (tabActive("halfday", "pm") ? " active" : "")}
+                    onClick={() => setData({ ...data, slot: "halfday", period: "pm" })}>
+                    <strong>{t("Après-midi", "Afternoon")}</strong>
+                    <span>14h — 18h · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={"seg-btn" + (tabActive("day", "") ? " active" : "")}
+                    onClick={() => setData({ ...data, slot: "day", period: "" })}>
+                    <strong>{t("Journée", "Full day")}</strong>
+                    <span>9h — 18h · {fmtPrice(boat.price)}</span>
+                  </button>
+                </div>
+
+                <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "10px 14px", borderRadius: 4, margin: "16px 0", color: "#3b4a5a", fontSize: 13 }}>
+                  {t("Sélectionnez votre date et horaire directement dans le calendrier ci-dessous, puis cliquez sur « Continuer » pour finaliser les options.", "Pick your date and time directly in the calendar below, then click \"Continue\" to finalize the options.")}
+                </div>
+
+                <div className="cal-embed" style={{ border: "1px solid #e5e7eb", borderRadius: 14, overflow: "hidden", minHeight: 720 }}>
                   <iframe
+                    key={calLink}
                     title={t("Réservez votre créneau", "Book your time slot")}
-                    src="https://cal.com/CAL_USERNAME/EVENT_TYPE?embed=true"
-                    style={{ width: "100%", height: 600, border: 0 }}
+                    src={"https://www.cal.eu/" + calLink + "?embed=true&layout=month_view&theme=light"}
+                    style={{ width: "100%", height: 720, border: 0, display: "block" }}
                     loading="lazy"
                   />
                 </div>
-              )}
-              <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "10px 14px", borderRadius: 4, marginBottom: 14, color: "#3b4a5a", fontSize: 13 }}>
-                {t("Calendrier synchronisé en cours d'activation. Sélectionnez votre date ci-dessous.", "Synced calendar coming soon. Please select your date below.")}
-              </div>
-
-              <Calendar selected={data.date} onSelect={(d) => setData({ ...data, date: d })} />
-
-              <h3 className="sub">{t("Créneau", "Time slot")}</h3>
-              <div className="seg two">
-                <button
-                  className={"seg-btn" + (data.slot === "day" ? " active" : "")}
-                  onClick={() => setData({ ...data, slot: "day" })}>
-                  <strong>{t("Journée complète", "Full day")}</strong>
-                  <span>{t("8h", "8h")} · {fmtPrice(boat.price)}</span>
-                </button>
-                <button
-                  className={"seg-btn" + (data.slot === "halfday" ? " active" : "")}
-                  onClick={() => setData({ ...data, slot: "halfday" })}>
-                  <strong>{t("Demi-journée", "Half day")}</strong>
-                  <span>{t("4h", "4h")} · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
-                </button>
-              </div>
-            </section>
-          )}
+              </section>
+            );
+          })()}
 
           {step === 2 && (
             <section className="step-card">
@@ -996,19 +1080,15 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                   {t("Empreinte CB sécurisée — libérée automatiquement après la location si aucun dommage n'est constaté.", "Secure card hold — automatically released after the rental if no damage is reported.")}
                 </p>
                 <a
-                  href="#SWIKLY_LINK"
+                  href="https://v2.swik.link/REpq148"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn btn-primary btn-block"
-                  aria-disabled="true"
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setData((d) => ({ ...d, preAuthDone: true }));
-                  }}
-                  style={{ opacity: 0.95 }}>
+                  }}>
                   {t("Pré-autorisation bancaire (Swikly)", "Bank pre-authorization (Swikly)")}
                 </a>
-                <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
-                  {t("Lien Swikly en cours de configuration — bouton actif en mode démonstration.", "Swikly link being set up — button active in demo mode.")}
-                </p>
               </div>
               {data.preAuthDone && (
                 <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #1a5a32", padding: "14px 16px", borderRadius: 4, marginTop: 18, fontSize: 14, color: "#1a3a52" }}>
@@ -1026,39 +1106,47 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
               </p>
 
               <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "12px 14px", borderRadius: 4, marginTop: 8, marginBottom: 22, fontSize: 13, color: "#3b4a5a" }}>
-                {t("Les liens de paiement sont actuellement en cours de configuration. La fonctionnalité sera activée prochainement.", "Payment links are currently being set up. This feature will be activated shortly.")}
+                {t("Seul le virement bancaire est disponible pour le moment. Les autres moyens de paiement seront activés prochainement.", "Only bank transfer is available at the moment. Other payment methods will be activated shortly.")}
               </div>
 
               <div className="pay-methods" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
                 {[
-                  { id: "cb", label: t("Carte bancaire", "Credit card") },
-                  { id: "paypal", label: "PayPal" },
-                  { id: "applepay", label: "Apple Pay" },
-                  { id: "paybybank", label: "Pay by Bank" },
-                  { id: "virement", label: t("Virement bancaire", "Bank transfer") },
+                  { id: "cb", label: t("Carte bancaire", "Credit card"), logo: <PayLogo brand="cb" /> },
+                  { id: "paypal", label: "PayPal", logo: <PayLogo brand="paypal" /> },
+                  { id: "applepay", label: "Apple Pay", logo: <PayLogo brand="applepay" /> },
+                  { id: "paybybank", label: "Pay by Bank", logo: <PayLogo brand="paybybank" /> },
+                  { id: "virement", label: t("Virement bancaire", "Bank transfer"), logo: <PayLogo brand="virement" /> },
                 ].map((m) => {
+                  const enabled = m.id === "virement";
                   const active = data.paymentMethod === m.id;
                   return (
                     <button
                       key={m.id}
                       type="button"
-                      onClick={() => setData((d) => ({ ...d, paymentMethod: m.id }))}
+                      disabled={!enabled}
+                      onClick={() => enabled && setData((d) => ({ ...d, paymentMethod: m.id }))}
+                      title={!enabled ? t("Bientôt disponible", "Coming soon") : undefined}
                       style={{
                         border: active ? "1.5px solid var(--ink, #0a2540)" : "1px solid #e5e7eb",
                         borderRadius: 10,
                         padding: "16px 18px",
                         background: active ? "#f7f9fb" : "#fff",
                         textAlign: "left",
-                        cursor: "pointer",
+                        cursor: enabled ? "pointer" : "not-allowed",
                         fontSize: 14,
                         fontWeight: active ? 600 : 500,
                         color: "var(--ink, #0a2540)",
+                        opacity: enabled ? 1 : 0.45,
                         transition: "border-color .15s, background .15s",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
+                        gap: 10,
                       }}>
-                      <span>{m.label}</span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        {m.logo}
+                        <span>{m.label}</span>
+                      </span>
                       <span style={{
                         width: 16, height: 16, borderRadius: "50%",
                         border: active ? "5px solid var(--ink, #0a2540)" : "1.5px solid #cbd5e0",
@@ -1224,7 +1312,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
             const isStr = (v) => v && String(v).trim().length > 0;
             let stepIncomplete = false;
             if (step === 1) {
-              stepIncomplete = !data.date || !data.slot;
+              stepIncomplete = !data.slot || (data.slot === "halfday" && !data.period);
             } else if (step === 2) {
               stepIncomplete = data.adults < 1 || (data.adults + data.children > boat.capacity) || (data.crew === "with" && !data.itinerary);
             } else if (step === 4) {
@@ -1405,44 +1493,52 @@ function AboutPage({ setPage }) {
             <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&q=80" alt={t("Bateau au mouillage dans une calanque de l'Esterel, location South Boat", "Boat anchored in an Esterel cove, South Boat rental")} />
           </div>
           <div className="ab-badge">
-            <strong>{t("Depuis 2018", "Since 2018")}</strong>
-            <span>Mandelieu-la-Napoule</span>
+            <strong>Mandelieu-la-Napoule</strong>
+            <span>{t("Port de départ", "Departure port")}</span>
           </div>
         </div>
-      </section>
-
-      {/* STATS */}
-      <section className="ab-stats">
-        <div className="ab-stat"><strong>Mandelieu</strong><span>{t("Port de départ", "Departure port")}</span></div>
       </section>
 
       {/* STORY */}
       <section className="ab-story">
         <div className="ab-story-head">
           <p className="eyebrow">{t("Notre histoire", "Our story")}</p>
-          <h2>{t("Huit ans sur la même ligne d'horizon.", "Eight years on the same horizon line.")}</h2>
+          <h2>{t("Une amitié devenue aventure entrepreneuriale.", "A friendship that became an entrepreneurial adventure.")}</h2>
         </div>
         <div className="ab-timeline">
           <div className="ab-step">
-            <span className="ab-year">2018</span>
-            <h3>{t("Les débuts", "The beginnings")}</h3>
-            <p>{t("Marine quitte la Marine Marchande et lance South Boat avec un seul bateau, un Cap Camarat 6.5, amarré à Mandelieu.", "Marine leaves the Merchant Navy and launches South Boat with a single boat, a Cap Camarat 6.5, moored in Mandelieu.")}</p>
+            <span className="ab-year">01</span>
+            <h3>{t("Une amitié, une passion commune", "A friendship, a shared passion")}</h3>
+            <p>{t("Tout a commencé par une amitié et une passion partagée pour l'aventure, la mer et les découvertes.", "It all started with a friendship and a shared passion for adventure, the sea and discovery.")}</p>
           </div>
           <div className="ab-step">
-            <span className="ab-year">2020</span>
-            <h3>{t("L'équipage s'étoffe", "The crew grows")}</h3>
-            <p>{t("Trois skippers rejoignent l'aventure. La flotte grandit, mais la promesse reste la même : un seul interlocuteur, une attention sur-mesure.", "Three skippers join the adventure. The fleet grows, but the promise stays the same: one dedicated contact, tailored care.")}</p>
+            <span className="ab-year">02</span>
+            <h3>{t("Des années à explorer notre littoral", "Years spent exploring our coastline")}</h3>
+            <p>{t("Pendant des années, nous avons parcouru les criques, les plages et les plus beaux coins de notre région, à la recherche de nouvelles aventures.", "For years, we sailed through coves, beaches and the most beautiful spots of our region, always looking for new adventures.")}</p>
           </div>
           <div className="ab-step">
-            <span className="ab-year">2023</span>
-            <h3>{t("Cap sur l'Azur", "Heading for the Riviera")}</h3>
-            <p>{t("Ouverture des bases de Cannes, Antibes et Nice. South Boat couvre désormais l'ensemble de la côte, du Cap Roux à Monaco.", "Opening of the Cannes, Antibes and Nice bases. South Boat now covers the entire coast, from Cap Roux to Monaco.")}</p>
+            <span className="ab-year">03</span>
+            <h3>{t("Une idée qui s'impose naturellement", "An idea that came naturally")}</h3>
+            <p>{t("Au fil de nos escapades, une évidence est née : partager cette passion et faire découvrir ces lieux exceptionnels au plus grand nombre.", "Along our escapades, it became obvious: share this passion and let others discover these exceptional places.")}</p>
           </div>
           <div className="ab-step">
-            <span className="ab-year">2026</span>
-            <h3>{t("Aujourd'hui", "Today")}</h3>
-            <p>{t("Mochi, notre bateau familial au départ de Mandelieu, et la même obsession qu'au premier jour : que chaque sortie soit un souvenir précieux.", "Mochi, our family boat departing from Mandelieu, with the same obsession as on day one: that every outing becomes a precious memory.")}</p>
+            <span className="ab-year">04</span>
+            <h3>{t("Le lancement de notre aventure entrepreneuriale", "Launching our entrepreneurial adventure")}</h3>
+            <p>{t("Portés par la confiance, l'amitié et l'envie d'entreprendre ensemble, nous avons créé notre société de location de bateaux.", "Driven by trust, friendship and the desire to build something together, we created our boat rental company.")}</p>
           </div>
+          <div className="ab-step">
+            <span className="ab-year">05</span>
+            <h3>{t("Aujourd'hui, bien plus que de la location", "Today, much more than rental")}</h3>
+            <p>{t("Nous partageons notre expérience à travers un accompagnement personnalisé, des conseils, des services d'entretien et une exigence constante en matière de qualité, de confort et de sécurité.", "We share our experience through personalized support, advice, maintenance services and a constant focus on quality, comfort and safety.")}</p>
+          </div>
+        </div>
+        <div className="ab-story-cta" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <button className="btn btn-primary" onClick={() => setPage({ name: "capsud-article", id: "cap-sur-histoire-south-boat" })}>
+            {t("Cap sur notre histoire", "Set sail on our story")} <Icon name="arrow" size={16} />
+          </button>
+          <a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <Icon name="instagram" size={16} /> {t("Suivez nos aventures sur Instagram", "Follow our adventures on Instagram")}
+          </a>
         </div>
       </section>
 
@@ -1455,21 +1551,21 @@ function AboutPage({ setPage }) {
         <div className="ab-pillars-grid">
           <article className="ab-pillar">
             <span className="ab-num">01</span>
-            <h3>{t("Une flotte choisie", "A curated fleet")}</h3>
-            <p>{t("Pas de catalogue infini. Un bateau soigneusement sélectionné, inspecté et adopté par notre équipe avant d'être proposé.", "No endless catalog. One boat carefully selected, inspected and adopted by our team before being offered.")}</p>
-            <span className="ab-tag">{t("Sélection", "Selection")}</span>
+            <h3>{t("L'humain avant tout", "People first")}</h3>
+            <p>{t("Une relation fondée sur la confiance, l'écoute et l'accompagnement personnalisé. Chaque client doit être accueilli avec attention, conseillé avec sincérité et accompagné du premier contact jusqu'au retour au port. Nous croyons qu'une belle expérience commence avant même de monter à bord.", "A relationship built on trust, listening and personalized support. Every client is welcomed with care, advised honestly and accompanied from the first contact to the return to port. We believe a great experience starts before you even step on board.")}</p>
+            <span className="ab-tag">{t("Confiance", "Trust")}</span>
           </article>
           <article className="ab-pillar">
             <span className="ab-num">02</span>
-            <h3>{t("Un seul interlocuteur", "One dedicated contact")}</h3>
-            <p>{t("De la première question au retour au port, vous échangez avec un conseiller dédié qui connaît chaque bateau de la flotte.", "From your first question to your return to port, you talk with a dedicated advisor who knows every boat in the fleet.")}</p>
-            <span className="ab-tag">{t("Accompagnement", "Support")}</span>
+            <h3>{t("La sécurité et l'excellence sans compromis", "Safety and excellence, no compromise")}</h3>
+            <p>{t("Des bateaux rigoureusement entretenus, des équipements vérifiés et une attention constante portée à la sécurité, au confort et à la qualité du service. La sérénité de nos clients repose sur des standards élevés que nous nous imposons chaque jour.", "Rigorously maintained boats, checked equipment and constant attention to safety, comfort and service quality. Our clients' peace of mind relies on the high standards we set ourselves every day.")}</p>
+            <span className="ab-tag">{t("Exigence", "Standards")}</span>
           </article>
           <article className="ab-pillar">
             <span className="ab-num">03</span>
-            <h3>{t("Le respect du large", "Respect for the sea")}</h3>
-            <p>{t("Nos skippers privilégient les mouillages écologiques.", "Our skippers favor eco-friendly anchorages.")}</p>
-            <span className="ab-tag">{t("Engagement", "Commitment")}</span>
+            <h3>{t("L'esprit d'aventure et de découverte", "The spirit of adventure and discovery")}</h3>
+            <p>{t("La passion de la mer, des paysages et des expériences authentiques est au cœur de notre projet. Nous souhaitons partager cet amour du littoral, de la navigation et des découvertes qui rendent chaque sortie unique. L'aventure n'est pas une option, c'est la raison même de notre existence.", "Passion for the sea, the landscapes and authentic experiences is at the heart of our project. We want to share this love of the coast, navigation and discoveries that make every outing unique. Adventure isn't an option — it's the very reason we exist.")}</p>
+            <span className="ab-tag">{t("Aventure", "Adventure")}</span>
           </article>
         </div>
       </section>
@@ -1510,6 +1606,7 @@ function ContactPage({ setPage }) {
           <ul className="contact-list">
             <li><Icon name="phone" /> <div><strong>06 34 49 16 21</strong><span>{t("Nous appeler", "Call us")}</span></div></li>
             <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
+            <li><Icon name="instagram" /> <div><strong><a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>@south_boat_</a></strong><span>{t("Nous suivre sur Instagram", "Follow us on Instagram")}</span></div></li>
           </ul>
         </div>
         <form className="contact-form" onSubmit={async (e) => {
@@ -1796,6 +1893,11 @@ function CapSudArticlePage({ id, setPage }) {
 // ============ FOOTER ============
 function Footer() {
   const t = window.useT();
+  const go = (name) => {
+    if (window.__setPage) window.__setPage({ name });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
+  const linkStyle = { cursor: "pointer" };
   return (
     <footer className="foot">
       <div className="foot-inner">
@@ -1809,19 +1911,30 @@ function Footer() {
             <span className="logo-text">South Boat<sup>°</sup></span>
           </div>
           <p>{t("La location de bateaux", "Boat rentals")}<br />{t("sur la Côte d'Azur.", "on the French Riviera.")}</p>
+          <div className="foot-socials" style={{ marginTop: 12, display: "flex", gap: 10 }}>
+            <a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram South Boat" style={{ color: "inherit", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 999, border: "1px solid var(--line)" }}>
+              <Icon name="instagram" size={18} />
+            </a>
+          </div>
         </div>
         <div className="foot-cols">
           <div>
             <h5>{t("Naviguer", "Navigate")}</h5>
-            <a>{t("Catalogue", "Catalog")}</a><a>{t("Destinations", "Destinations")}</a><a>{t("Skippers", "Skippers")}</a>
+            <a style={linkStyle} onClick={() => go("catalog")}>{t("Catalogue", "Catalog")}</a>
+            <a style={linkStyle} onClick={() => go("catalog")}>{t("Destinations", "Destinations")}</a>
+            <a style={linkStyle} onClick={() => go("catalog")}>{t("Skippers", "Skippers")}</a>
           </div>
           <div>
             <h5>{t("Maison", "House")}</h5>
-            <a>{t("À propos", "About")}</a><a>{t("Contact", "Contact")}</a><a>{t("Presse", "Press")}</a>
+            <a style={linkStyle} onClick={() => go("about")}>{t("À propos", "About")}</a>
+            <a style={linkStyle} onClick={() => go("contact")}>{t("Contact", "Contact")}</a>
+            <a style={linkStyle} onClick={() => go("contact")}>{t("Presse", "Press")}</a>
           </div>
           <div>
             <h5>{t("Légal", "Legal")}</h5>
-            <a>{t("CGV", "Terms")}</a><a>{t("Mentions légales", "Legal notice")}</a><a>{t("Confidentialité", "Privacy")}</a>
+            <a style={linkStyle} onClick={() => go("contact")}>{t("CGV", "Terms")}</a>
+            <a style={linkStyle} onClick={() => go("contact")}>{t("Mentions légales", "Legal notice")}</a>
+            <a style={linkStyle} onClick={() => go("contact")}>{t("Confidentialité", "Privacy")}</a>
           </div>
         </div>
       </div>
