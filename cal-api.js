@@ -2,7 +2,8 @@
 // Le proxy PHP (cal-proxy.php) gère la clé API côté serveur.
 // En local (sans PHP), un mode mock prend le relais pour que le tunnel reste testable.
 (function () {
-  var PROXY = "/cal-proxy.php";
+  // Chemin relatif : résolu via <base href> (cf. index.html) → marche en racine et en sous-dossier.
+  var PROXY = "cal-proxy.php";
   var mockMode = null;
 
   function detectMock() {
