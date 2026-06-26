@@ -1,16 +1,80 @@
 /* global React, BOATS, PORTS, fmtPrice, Star, Icon */
-const { useState, useEffect, useMemo, useRef } = React;
+/* var : scripts classiques séparés partageant la portée globale (cf. app.jsx). */
+var { useState, useEffect, useMemo, useRef } = React;
+
+// ============ FAQ (SEO : résultats enrichis Google) ============
+const FAQ_ITEMS = [
+  {
+    q_fr: "Faut-il le permis bateau pour louer chez South Boat ?",
+    q_en: "Do I need a boating license to rent with South Boat?",
+    a_fr: "Sans skipper, un permis bateau côtier en cours de validité est obligatoire : seul le titulaire du permis pourra conduire le bateau. Avec skipper, aucun permis n'est nécessaire, c'est notre capitaine qui pilote.",
+    a_en: "Without a skipper, a valid coastal boating license is required: only the license holder may operate the boat. With a skipper, no license is needed — our captain handles the helm.",
+  },
+  {
+    q_fr: "Quel est le prix d'une location de bateau à Mandelieu ?",
+    q_en: "How much does a boat rental in Mandelieu cost?",
+    a_fr: "Le Mochi (day cruiser, jusqu'à 8 personnes) est à partir de 435 € la journée complète et 320 € la demi-journée. Le skipper est en option (+150 € la demi-journée, +200 € la journée). Tarifs clairs, sans frais cachés.",
+    a_en: "The Mochi (day cruiser, up to 8 people) starts at €435 for a full day and €320 for a half day. A skipper is optional (+€150 half day, +€200 full day). Clear pricing, no hidden fees.",
+  },
+  {
+    q_fr: "D'où partent les locations de bateau ?",
+    q_en: "Where do the boat rentals depart from?",
+    a_fr: "Toutes nos sorties partent du quai visiteur du Port de Mandelieu, à Mandelieu-la-Napoule (06210). Notre équipe vous y accueille pour un briefing avant chaque départ.",
+    a_en: "All our trips depart from the visitor dock of Port de Mandelieu, in Mandelieu-la-Napoule (06210). Our team welcomes you there for a briefing before each departure.",
+  },
+  {
+    q_fr: "Quelles destinations peut-on rejoindre depuis Mandelieu ?",
+    q_en: "Which destinations can I reach from Mandelieu?",
+    a_fr: "Depuis Mandelieu, on rejoint facilement les calanques rouges du massif de l'Estérel, les îles de Lérins (Sainte-Marguerite et Saint-Honorat), le Cap d'Antibes et la baie de Cannes.",
+    a_en: "From Mandelieu, you can easily reach the red coves of the Estérel massif, the Lérins Islands (Sainte-Marguerite and Saint-Honorat), Cap d'Antibes and the bay of Cannes.",
+  },
+  {
+    q_fr: "Combien de personnes peuvent monter à bord ?",
+    q_en: "How many people can come aboard?",
+    a_fr: "Le Mochi accueille jusqu'à 8 personnes. Les enfants sont les bienvenus, sous la responsabilité des adultes accompagnants.",
+    a_en: "The Mochi welcomes up to 8 people. Children are welcome, under the responsibility of accompanying adults.",
+  },
+  {
+    q_fr: "Quelle est la politique d'annulation ?",
+    q_en: "What is the cancellation policy?",
+    a_fr: "L'annulation est gratuite jusqu'à 7 jours avant le départ. Entre 7 et 3 jours, 50 % de l'acompte est retenu ; à moins de 3 jours, l'acompte n'est pas remboursable.",
+    a_en: "Cancellation is free up to 7 days before departure. Between 7 and 3 days, 50% of the deposit is retained; under 3 days, the deposit is non-refundable.",
+  },
+];
 
 // ============ HOME ============
 function HomePage({ setPage, query, setQuery }) {
   const t = window.useT();
   const featured = BOATS.slice(0, 3);
   const latestArticle = (window.ARTICLES && window.ARTICLES.length > 0) ? window.ARTICLES[0] : null;
+  const [openFaq, setOpenFaq] = useState(0);
+
+  // SEO : JSON-LD FAQPage (uniquement sur l'accueil, pour matcher le contenu visible)
+  useEffect(() => {
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": FAQ_ITEMS.map((f) => ({
+        "@type": "Question",
+        "name": f.q_fr,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a_fr },
+      })),
+    };
+    const tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.id = "ld-faq";
+    tag.textContent = JSON.stringify(ld);
+    const existing = document.getElementById("ld-faq");
+    if (existing) existing.remove();
+    document.head.appendChild(tag);
+    return () => { const e = document.getElementById("ld-faq"); if (e) e.remove(); };
+  }, []);
+
   return (
     <main className="home">
       <section className="hero">
         <div className="hero-bg">
-          <img src="https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=2400&q=80" alt={t("Bateau en mer sur la Côte d'Azur — location de bateau à Mandelieu avec South Boat", "Boat at sea on the French Riviera — South Boat rentals in Mandelieu")} />
+          <img src="https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=2400&q=80" alt={t("Bateau en mer sur la Côte d'Azur — location de bateau à Mandelieu avec South Boat", "Boat at sea on the French Riviera — South Boat rentals in Mandelieu")} fetchpriority="high" decoding="async" />
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
@@ -117,7 +181,7 @@ function HomePage({ setPage, query, setQuery }) {
           </div>
           <article className="capsud-feature-card" onClick={() => setPage({ name: "capsud-article", id: latestArticle.id })}>
             <div className="capsud-feature-img">
-              <img src={latestArticle.cover} alt={latestArticle.title} />
+              <img src={latestArticle.cover} alt={latestArticle.title} loading="lazy" decoding="async" />
             </div>
             <div className="capsud-feature-body">
               <span className="capsud-date">{fmtArticleDate(latestArticle.date)}</span>
@@ -138,12 +202,12 @@ function HomePage({ setPage, query, setQuery }) {
         </div>
         <div className="dest-grid">
           {[
-          { n: t("Îles de Lérins", "Lérins Islands"), img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: t("Baignade & déjeuner en mer", "Swimming & lunch at sea") },
-          { n: "Cannes", img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=1200&q=80", c: t("Baie & Croisette", "Bay & Croisette") },
-          { n: "Estérel", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: t("Calanques & roches rouges", "Coves & red rocks") }].
+          { id: "lerins", n: t("Îles de Lérins", "Lérins Islands"), img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: t("Baignade & déjeuner en mer", "Swimming & lunch at sea") },
+          { id: "cap-antibes", n: t("Cap d'Antibes", "Cap d'Antibes"), img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80", c: t("Villas & criques sauvages", "Villas & wild coves") },
+          { id: "esterel", n: t("Calanques de l'Estérel", "Estérel calanques"), img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: t("Calanques & roches rouges", "Coves & red rocks") }].
           map((d) =>
-          <button key={d.n} className="dest-card" onClick={() => setPage({ name: "catalog" })}>
-              <img src={d.img} alt={d.n} />
+          <button key={d.id} className="dest-card" onClick={() => setPage({ name: "itinerary", id: d.id })}>
+              <img src={d.img} alt={d.n} loading="lazy" decoding="async" />
               <div className="dest-overlay" />
               <div className="dest-info">
                 <h4>{d.n}</h4>
@@ -151,6 +215,36 @@ function HomePage({ setPage, query, setQuery }) {
               </div>
             </button>
           )}
+        </div>
+      </section>
+
+      <section className="section faq">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{t("Questions fréquentes", "Frequently asked questions")}</p>
+            <h2>{t("Tout savoir avant d'embarquer", "Everything you need before boarding")}</h2>
+          </div>
+        </div>
+        <div className="faq-list" style={{ maxWidth: 820 }}>
+          {FAQ_ITEMS.map((f, i) => {
+            const isOpen = openFaq === i;
+            return (
+              <div key={i} className={"faq-item" + (isOpen ? " open" : "")} style={{ borderBottom: "1px solid var(--line)" }}>
+                <button
+                  type="button"
+                  className="faq-q"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpenFaq(isOpen ? -1 : i)}
+                  style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 4px", background: "none", border: "none", cursor: "pointer", textAlign: "left", font: "inherit", color: "var(--ink)" }}>
+                  <span style={{ fontWeight: 600, fontSize: "1.02rem" }}>{t(f.q_fr, f.q_en)}</span>
+                  <span style={{ flexShrink: 0, transition: "transform .2s", transform: isOpen ? "rotate(45deg)" : "none" }}><Icon name="plus" size={18} /></span>
+                </button>
+                {isOpen && (
+                  <p className="faq-a" style={{ margin: "0 4px 18px", color: "var(--ink-soft)", lineHeight: 1.6 }}>{t(f.a_fr, f.a_en)}</p>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -188,7 +282,7 @@ function BoatCard({ boat, onClick }) {
   return (
     <article className="boat-card" onClick={onClick}>
       <div className="boat-img">
-        <img src={boat.images[0]} alt={`${boat.name} - Location de bateau à Mandelieu sur la Côte d'Azur`} />
+        <img src={boat.images[0]} alt={`${boat.name} - Location de bateau à Mandelieu sur la Côte d'Azur`} loading="lazy" decoding="async" />
         <div className="boat-tag">{boat.type}</div>
       </div>
       <div className="boat-body">
@@ -302,7 +396,7 @@ function DetailPage({ id, setPage }) {
 
       <section className={`gallery-mosaic side-${sideImgs.length}`}>
         <button className="mosaic-main" onClick={() => openLightbox(0)}>
-          <img src={boat.images[0]} alt={`${boat.name} - Location bateau Mandelieu Côte d'Azur, port et Esterel`} />
+          <img src={boat.images[0]} alt={`${boat.name} - Location bateau Mandelieu Côte d'Azur, port et Estérel`} />
         </button>
         <div className="mosaic-side">
           {sideImgs.map((src, i) =>
@@ -528,12 +622,12 @@ function PayLogo({ brand }) {
 }
 
 const ITINERARIES = [
-  { id: "lerins", name: "Îles de Lérins", desc: "Sainte-Marguerite, baignade et déjeuner en mer." },
-  { id: "esterel", name: "Calanques de l'Estérel", desc: "Roches rouges, eaux turquoise, snorkeling." },
-  { id: "saint-tropez", name: "Baie de Saint-Tropez & Pampelonne", desc: "Plages mythiques et villages perchés." },
-  { id: "monaco", name: "Cap Ferrat & Monaco", desc: "Yachts, villas et Rocher monégasque." },
-  { id: "porquerolles", name: "Îles d'Or — Porquerolles", desc: "Eaux cristallines et pinèdes protégées." },
+  { id: "lerins", name: "Îles de Lérins", desc: "Sainte-Marguerite, baignade et déjeuner en mer.", name_en: "Lérins Islands", desc_en: "Sainte-Marguerite, swim and lunch at sea." },
+  { id: "cap-antibes", name: "Cap d'Antibes", desc: "Villas, criques sauvages et eaux turquoise.", name_en: "Cap d'Antibes", desc_en: "Villas, wild coves and turquoise waters." },
+  { id: "esterel", name: "Calanques de l'Estérel", desc: "Roches rouges, eaux turquoise, snorkeling.", name_en: "Estérel calanques", desc_en: "Red rocks, turquoise waters, snorkeling." },
 ];
+const itName = (it, t) => t(it.name, it.name_en || it.name);
+const itDesc = (it, t) => t(it.desc, it.desc_en || it.desc);
 
 const EMAIL_TEMPLATE = {
   subject: "Confirmation de votre réservation — South Boat",
@@ -604,6 +698,82 @@ Pré-remplir le contrat avec ces informations pour le Jour-J.
 `
 };
 
+// ============ CAL.COM DATE PICKER ============
+// Sélecteur de date "maison" alimenté par cal-api.js (proxy PHP → Cal.com).
+// En l'absence de proxy (dev local), cal-api.js bascule en mode mock.
+function CalDatePicker({ eventKey, value, onChange, t }) {
+  const today = useMemo(() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }, []);
+  const [view, setView] = useState({ y: today.getFullYear(), m: today.getMonth() });
+  const [slots, setSlots] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!eventKey || !window.CalAPI) return;
+    let cancelled = false;
+    setLoading(true); setError("");
+    window.CalAPI.fetchAvailableSlots(eventKey, view.y, view.m)
+      .then((s) => { if (!cancelled) setSlots(s); })
+      .catch((e) => { if (!cancelled) setError(String(e.message || e)); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [eventKey, view.y, view.m]);
+
+  const first = new Date(view.y, view.m, 1);
+  const last = new Date(view.y, view.m + 1, 0);
+  const startOff = (first.getDay() + 6) % 7;
+  const cells = [];
+  for (let i = 0; i < startOff; i++) cells.push(null);
+  for (let i = 1; i <= last.getDate(); i++) cells.push(new Date(view.y, view.m, i));
+  const monthName = first.toLocaleDateString(t.lang === "en" ? "en-US" : "fr-FR", { month: "long", year: "numeric" });
+
+  const dayNames = t.lang === "en" ? ["M","T","W","T","F","S","S"] : ["L","M","M","J","V","S","D"];
+  const navMonth = (delta) => {
+    const m = view.m + delta;
+    setView({ y: view.y + Math.floor(m / 12), m: ((m % 12) + 12) % 12 });
+  };
+
+  const btnNav = { padding: "6px 12px", border: "1px solid #d4dae0", borderRadius: 8, background: "#fff", cursor: "pointer", fontFamily: "inherit", fontSize: 14 };
+
+  return (
+    <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 16, background: "#fff" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <button type="button" onClick={() => navMonth(-1)} style={btnNav} aria-label={t("Mois précédent", "Previous month")}>‹</button>
+        <strong style={{ textTransform: "capitalize", fontSize: 15 }}>{monthName}</strong>
+        <button type="button" onClick={() => navMonth(1)} style={btnNav} aria-label={t("Mois suivant", "Next month")}>›</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4, fontSize: 11, color: "#5b6b7a", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
+        {dayNames.map((d, i) => <div key={i} style={{ textAlign: "center", padding: 4 }}>{d}</div>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+        {cells.map((d, i) => {
+          if (!d) return <div key={i} />;
+          const iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+          const isPast = d < today;
+          const available = !!slots[iso] && !isPast;
+          const selected = value === iso;
+          const base = { padding: "10px 0", border: "1px solid transparent", borderRadius: 8, fontSize: 13, fontFamily: "inherit", textAlign: "center", transition: "all .15s" };
+          let style;
+          if (selected) style = { ...base, background: "#0a2540", color: "#fff", borderColor: "#0a2540", cursor: "pointer", fontWeight: 600 };
+          else if (available) style = { ...base, background: "#f0f7ff", color: "#0a2540", borderColor: "#cfe2f5", cursor: "pointer" };
+          else style = { ...base, background: "#fafbfc", color: "#b0bcc8", cursor: "not-allowed" };
+          return (
+            <button key={i} type="button" disabled={!available} onClick={() => onChange(iso, slots[iso])} style={style}>
+              {d.getDate()}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 12, display: "flex", gap: 14, fontSize: 11, color: "#5b6b7a" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 3, background: "#f0f7ff", border: "1px solid #cfe2f5", display: "inline-block" }} />{t("Disponible", "Available")}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: 3, background: "#fafbfc", border: "1px solid #e5e7eb", display: "inline-block" }} />{t("Indisponible", "Unavailable")}</span>
+      </div>
+      {loading && <p style={{ fontSize: 12, color: "#5b6b7a", marginTop: 10, marginBottom: 0 }}>{t("Chargement des disponibilités…", "Loading availability…")}</p>}
+      {error && <p style={{ fontSize: 12, color: "#a83232", marginTop: 10, marginBottom: 0 }}>{error}</p>}
+    </div>
+  );
+}
+
 function BookingPage({ id, setPage, initialDate, initialSlot }) {
   const t = window.useT();
   const boat = BOATS.find((b) => b.id === id) || BOATS[0];
@@ -618,7 +788,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     extras: [],
     adults: 2,
     children: 0,
-    crew: "with",
+    crew: "without",
     itinerary: "",
     billing: { firstName: "", lastName: "", birthdate: "", email: "", phone: "", address: "", permitNumber: "" },
     permitDifferent: false,
@@ -627,15 +797,20 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     paymentMethod: "",
     paymentDone: false,
     transferProof: null, // fichier joint (preuve de virement) — obligatoire si virement
+    slotConfirmed: false, // case à cocher : "j'ai bien sélectionné mon créneau dans le calendrier"
+    calStart: "", // ISO 8601 du créneau choisi via le picker (pour POST /book vers Cal.com)
   });
+  const [bookingError, setBookingError] = useState("");
+  const [bookingPending, setBookingPending] = useState(false);
 
-  // Options dynamiques par bateau (sinon defaults génériques)
-  const extras = boat.options && boat.options.length > 0
-    ? boat.options.map((o) => ({ id: o.id, label: o.label, price: o.price }))
+  // Options dynamiques par bateau (sinon defaults génériques) — filtrées par type de créneau
+  const allExtras = boat.options && boat.options.length > 0
+    ? boat.options
     : [
         { id: "lunch", label: "Plateau-repas chef (par pers.)", price: 65 },
         { id: "snorkel", label: "Pack snorkeling (4 pers.)", price: 80 },
       ];
+  const extras = allExtras.filter((o) => !o.slotOnly || o.slotOnly === data.slot);
 
   const toggleExtra = (x) =>
     setData((d) => ({ ...d, extras: d.extras.includes(x) ? d.extras.filter((e) => e !== x) : [...d.extras, x] }));
@@ -647,7 +822,13 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     const extrasCost = data.extras.reduce((sum, eId) => {
       const ex = extras.find((x) => x.id === eId);
       if (!ex) return sum;
-      return sum + (ex.id === "lunch" ? ex.price * (data.adults + data.children) : ex.price);
+      if (ex.onRequest) return sum;
+      if (ex.id === "lunch") return sum + ex.price * (data.adults + data.children);
+      if (ex.id === "aperitif-day") {
+        const pax = data.adults + data.children;
+        return sum + (pax <= 2 ? 30 : 45);
+      }
+      return sum + ex.price;
     }, 0);
     const skipperCost = data.crew === "with" ? (data.slot === "halfday" ? 150 : 200) : 0;
     const total = base + extrasCost + skipperCost;
@@ -673,6 +854,8 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     if (step === 1) {
       if (!data.slot) { setErrorMsg(t("Veuillez choisir un type de créneau.", "Please select a slot type.")); return false; }
       if (data.slot === "halfday" && !data.period) { setErrorMsg(t("Veuillez choisir Matin ou Après-midi.", "Please choose Morning or Afternoon.")); return false; }
+      if (!data.date) { setErrorMsg(t("Veuillez choisir une date de réservation.", "Please choose a booking date.")); return false; }
+      if (!data.slotConfirmed) { setErrorMsg(t("Veuillez confirmer que vous avez sélectionné votre créneau dans le calendrier.", "Please confirm you have selected your slot in the calendar.")); return false; }
     }
     if (step === 2) {
       if (data.adults < 1) { setErrorMsg(t("Au moins 1 adulte requis.", "At least 1 adult required.")); return false; }
@@ -722,7 +905,43 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     return true;
   };
 
-  const goNext = () => { if (validateStep()) { setStep((s) => Math.min(7, s + 1)); setErrorMsg(""); setFieldErrors({}); } };
+  const goNext = async () => {
+    if (!validateStep()) return;
+    // À l'étape 6 → 7, on crée la réservation dans Cal.com pour bloquer le créneau.
+    if (step === 6) {
+      if (!data.calStart) {
+        setErrorMsg(t("Créneau introuvable. Revenez à l'étape 1 et resélectionnez la date.", "Slot not found. Go back to step 1 and reselect the date."));
+        return;
+      }
+      const eventKey = data.slot === "day" ? "fullday" : (data.period === "pm" ? "halfday-pm" : "halfday-am");
+      const fullName = (data.billing.firstName + " " + data.billing.lastName).trim() || data.billing.email;
+      setBookingPending(true); setBookingError("");
+      const res = await window.CalAPI.createBooking({
+        event: eventKey,
+        start: data.calStart,
+        name: fullName,
+        email: data.billing.email,
+        phone: data.billing.phone,
+        metadata: {
+          boat: boat.name,
+          boatId: boat.id,
+          slot: data.slot,
+          period: data.period,
+          adults: data.adults,
+          children: data.children,
+          crew: data.crew,
+          paymentMethod: data.paymentMethod,
+        },
+      });
+      setBookingPending(false);
+      if (!res.ok) {
+        setBookingError(res.error || t("Impossible de réserver le créneau dans Cal.com.", "Could not book the slot in Cal.com."));
+        setErrorMsg(t("Le créneau n'a pas pu être bloqué. Essayez une autre date.", "The slot could not be locked. Try another date."));
+        return;
+      }
+    }
+    setStep((s) => Math.min(7, s + 1)); setErrorMsg(""); setFieldErrors({});
+  };
   const goPrev = () => { setErrorMsg(""); setFieldErrors({}); setStep((s) => Math.max(1, s - 1)); };
 
   // Scroll back to top whenever we change step (fixes "Options" not scrolling up)
@@ -791,55 +1010,79 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
           </div>
 
           {step === 1 && (() => {
-            const calLink =
-              data.slot === "day"
-                ? "south-boat/journee"
-                : data.period === "pm"
-                  ? "south-boat/demi-journee-apres-midi"
-                  : "south-boat/matin";
-            const tabActive = (slot, period) => data.slot === slot && (slot === "day" || data.period === period);
+            const eventKey = data.slot === "day" ? "fullday" : (data.period === "pm" ? "halfday-pm" : "halfday-am");
+            const pickerReady = data.slot === "day" || (data.slot === "halfday" && !!data.period);
             return (
               <section className="step-card">
                 <h2>{t("Choisissez votre créneau", "Choose your time slot")}</h2>
 
                 <h3 className="sub" style={{ marginTop: 8 }}>{t("Type de créneau", "Slot type")}</h3>
-                <div className="seg" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                <div className="seg two" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                   <button
                     type="button"
-                    className={"seg-btn" + (tabActive("halfday", "am") ? " active" : "")}
-                    onClick={() => setData({ ...data, slot: "halfday", period: "am" })}>
-                    <strong>{t("Matin", "Morning")}</strong>
-                    <span>9h — 13h · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
+                    className={"seg-btn" + (data.slot === "halfday" ? " active" : "")}
+                    onClick={() => setData({ ...data, slot: "halfday", period: data.period || "am", extras: data.extras.filter((eId) => { const ex = allExtras.find((x) => x.id === eId); return !ex || !ex.slotOnly || ex.slotOnly === "halfday"; }) })}>
+                    <strong>{t("Demi-journée", "Half day")}</strong>
+                    <span>4h · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
                   </button>
                   <button
                     type="button"
-                    className={"seg-btn" + (tabActive("halfday", "pm") ? " active" : "")}
-                    onClick={() => setData({ ...data, slot: "halfday", period: "pm" })}>
-                    <strong>{t("Après-midi", "Afternoon")}</strong>
-                    <span>14h — 18h · {fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={"seg-btn" + (tabActive("day", "") ? " active" : "")}
-                    onClick={() => setData({ ...data, slot: "day", period: "" })}>
-                    <strong>{t("Journée", "Full day")}</strong>
+                    className={"seg-btn" + (data.slot === "day" ? " active" : "")}
+                    onClick={() => setData({ ...data, slot: "day", period: "", extras: data.extras.filter((eId) => { const ex = allExtras.find((x) => x.id === eId); return !ex || !ex.slotOnly || ex.slotOnly === "day"; }) })}>
+                    <strong>{t("Journée complète", "Full day")}</strong>
                     <span>9h — 18h · {fmtPrice(boat.price)}</span>
                   </button>
                 </div>
 
-                <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "10px 14px", borderRadius: 4, margin: "16px 0", color: "#3b4a5a", fontSize: 13 }}>
-                  {t("Sélectionnez votre date et horaire directement dans le calendrier ci-dessous, puis cliquez sur « Continuer » pour finaliser les options.", "Pick your date and time directly in the calendar below, then click \"Continue\" to finalize the options.")}
-                </div>
+                {data.slot === "halfday" && (
+                  <>
+                    <h3 className="sub" style={{ marginTop: 16 }}>{t("Horaire de la demi-journée", "Half-day time")}</h3>
+                    <div className="seg two" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <button
+                        type="button"
+                        className={"seg-btn" + (data.period === "am" ? " active" : "")}
+                        onClick={() => setData({ ...data, slot: "halfday", period: "am" })}>
+                        <strong>{t("Matin", "Morning")}</strong>
+                        <span>9h — 13h</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={"seg-btn" + (data.period === "pm" ? " active" : "")}
+                        onClick={() => setData({ ...data, slot: "halfday", period: "pm" })}>
+                        <strong>{t("Après-midi", "Afternoon")}</strong>
+                        <span>14h — 18h</span>
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                <div className="cal-embed" style={{ border: "1px solid #e5e7eb", borderRadius: 14, overflow: "hidden", minHeight: 720 }}>
-                  <iframe
-                    key={calLink}
-                    title={t("Réservez votre créneau", "Book your time slot")}
-                    src={"https://www.cal.eu/" + calLink + "?embed=true&layout=month_view&theme=light"}
-                    style={{ width: "100%", height: 720, border: 0, display: "block" }}
-                    loading="lazy"
-                  />
-                </div>
+                {pickerReady ? (
+                  <>
+                    <h3 className="sub" style={{ marginTop: 20 }}>{t("Choisissez votre date", "Choose your date")}</h3>
+                    <CalDatePicker
+                      eventKey={eventKey}
+                      value={data.date}
+                      onChange={(iso, startISO) => setData({ ...data, date: iso, calStart: startISO || "", slotConfirmed: true })}
+                      t={t}
+                    />
+                    {data.date && (
+                      <div style={{ background: "#f0f7ff", border: "1px solid #cfe2f5", borderLeft: "3px solid #0a2540", padding: "12px 16px", borderRadius: 8, marginTop: 14, fontSize: 14, color: "#0a2540" }}>
+                        <strong>{t("Créneau sélectionné", "Selected slot")} :</strong>{" "}
+                        {fmtLong(data.date, t.lang)}
+                        {" · "}
+                        {data.slot === "day"
+                          ? t("Journée complète (9h — 18h)", "Full day (9am — 6pm)")
+                          : data.period === "pm"
+                            ? t("Après-midi (14h — 18h)", "Afternoon (2pm — 6pm)")
+                            : t("Matin (9h — 13h)", "Morning (9am — 1pm)")}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "12px 16px", borderRadius: 8, marginTop: 16, color: "#3b4a5a", fontSize: 13 }}>
+                    {t("Choisissez d'abord le type de créneau (et l'horaire pour une demi-journée) pour afficher les dates disponibles.", "First select the slot type (and time for a half day) to view available dates.")}
+                  </div>
+                )}
               </section>
             );
           })()}
@@ -850,14 +1093,30 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
 
               <h3 className="sub">{t("Options", "Add-ons")}</h3>
               <div className="extras">
-                {extras.map((x) => (
-                  <label key={x.id} className={"extra" + (data.extras.includes(x.id) ? " active" : "")}>
-                    <input type="checkbox" checked={data.extras.includes(x.id)} onChange={() => toggleExtra(x.id)} />
-                    <span className="extra-check"><Icon name="check" size={12} /></span>
-                    <span className="extra-label">{t(x.label, ({ buoy: "Towed inflatable", wake: "Wakeboard", lunch: "Chef-prepared lunch (per person)", snorkel: "Snorkeling pack (4 people)" })[x.id] || x.label)}</span>
-                    <span className="extra-price">+{x.price} €</span>
-                  </label>
-                ))}
+                {extras.map((x) => {
+                  const enLabelMap = { buoy: "Towed inflatable", wake: "Wakeboard", paddle: "Paddle board", lunch: "Chef-prepared lunch (per person)", snorkel: "Snorkeling gear", "aperitif-day": "Gourmet aperitif + non-alcoholic drink", "aperitif-halfday": "Gourmet aperitif + drink" };
+                  let priceLabel;
+                  if (x.onRequest) {
+                    priceLabel = t("Sur demande", "On request");
+                  } else if (x.id === "aperitif-day") {
+                    const pax = data.adults + data.children;
+                    priceLabel = "+" + (pax <= 2 ? 30 : 45) + " €";
+                  } else {
+                    priceLabel = "+" + x.price + " €";
+                  }
+                  const note = x.pricingNote ? t(x.pricingNote, x.pricingNote_en || x.pricingNote) : null;
+                  return (
+                    <label key={x.id} className={"extra" + (data.extras.includes(x.id) ? " active" : "")}>
+                      <input type="checkbox" checked={data.extras.includes(x.id)} onChange={() => toggleExtra(x.id)} />
+                      <span className="extra-check"><Icon name="check" size={12} /></span>
+                      <span className="extra-label">
+                        {t(x.label, enLabelMap[x.id] || x.label)}
+                        {note && <span style={{ display: "block", fontSize: 12, color: "#6b7280", marginTop: 2 }}>{note}</span>}
+                      </span>
+                      <span className="extra-price">{priceLabel}</span>
+                    </label>
+                  );
+                })}
               </div>
 
               <h3 className="sub">{t("Participants", "Guests")}</h3>
@@ -885,43 +1144,54 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
 
               <h3 className="sub">{t("Skipper", "Skipper")}</h3>
               <div className="seg two">
-                <button className={"seg-btn" + (data.crew === "with" ? " active" : "")} onClick={() => setData({ ...data, crew: "with" })}>
-                  <strong>{t("Avec skipper", "With skipper")}</strong>
-                  <span>{t("+150 € demi-journée · +200 € journée", "+€150 half day · +€200 full day")}</span>
-                </button>
                 <button className={"seg-btn" + (data.crew === "without" ? " active" : "")} onClick={() => setData({ ...data, crew: "without", itinerary: "" })}>
                   <strong>{t("Sans skipper", "Without skipper")}</strong>
                   <span>{t("Permis bateau requis", "Boating license required")}</span>
                 </button>
+                <button className={"seg-btn" + (data.crew === "with" ? " active" : "")} onClick={() => setData({ ...data, crew: "with" })}>
+                  <strong>{t("Avec skipper", "With skipper")}</strong>
+                  <span>{t("+150 € demi-journée · +200 € journée", "+€150 half day · +€200 full day")}</span>
+                </button>
               </div>
 
-              {data.crew === "without" && (
-                <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "10px 14px", borderRadius: 4, color: "#3b4a5a", marginTop: 12, fontSize: 13 }}>
-                  {t("Les destinations vous seront proposées le jour de la location.", "Destinations will be suggested to you on the day of the rental.")}
-                </div>
-              )}
-
-              {data.crew === "with" && (
-                <>
-                  <h3 className="sub">{t("Itinéraire", "Itinerary")}</h3>
-                  <div className="itinerary-list">
-                    {ITINERARIES.map((it) => (
-                      <label key={it.id} className={"itinerary-item" + (data.itinerary === it.id ? " active" : "")}>
-                        <input
-                          type="radio"
-                          name="itinerary"
-                          checked={data.itinerary === it.id}
-                          onChange={() => setData({ ...data, itinerary: it.id })}
-                        />
-                        <div>
-                          <strong>{t(it.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[it.id] || it.name)}</strong>
-                          <span className="muted" style={{ display: "block", fontSize: 13 }}>{t(it.desc, ({ lerins: "Sainte-Marguerite, swim and lunch at sea.", esterel: "Red rocks, turquoise waters, snorkeling.", "saint-tropez": "Iconic beaches and hilltop villages.", monaco: "Yachts, villas and the Monégasque Rock.", porquerolles: "Crystal-clear waters and protected pine forests." })[it.id] || it.desc)}</span>
+              <h3 className="sub">{data.crew === "with" ? t("Itinéraire", "Itinerary") : t("Destinations possibles", "Possible destinations")}</h3>
+              <div className="itinerary-list">
+                {ITINERARIES.map((it) => {
+                  const selectable = data.crew === "with";
+                  return (
+                    <div key={it.id} style={{ display: "flex", alignItems: "stretch", gap: 8 }}>
+                      {selectable ? (
+                        <label className={"itinerary-item" + (data.itinerary === it.id ? " active" : "")} style={{ flex: 1 }}>
+                          <input
+                            type="radio"
+                            name="itinerary"
+                            checked={data.itinerary === it.id}
+                            onChange={() => setData({ ...data, itinerary: it.id })}
+                          />
+                          <div>
+                            <strong>{itName(it, t)}</strong>
+                            <span className="muted" style={{ display: "block", fontSize: 13 }}>{itDesc(it, t)}</span>
+                          </div>
+                        </label>
+                      ) : (
+                        <div className="itinerary-item" style={{ flex: 1, cursor: "default" }}>
+                          <div>
+                            <strong>{itName(it, t)}</strong>
+                            <span className="muted" style={{ display: "block", fontSize: 13 }}>{itDesc(it, t)}</span>
+                          </div>
                         </div>
-                      </label>
-                    ))}
-                  </div>
-                </>
-              )}
+                      )}
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => setPage({ name: "itinerary", id: it.id })}
+                        style={{ whiteSpace: "nowrap", alignSelf: "center", padding: "8px 14px" }}>
+                        {t("Plus d'info", "More info")}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
 
               {data.crew === "without" && (
                 <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #a83232", padding: "10px 14px", borderRadius: 4, color: "#7a1f1f", marginTop: 12, fontSize: 13 }}>
@@ -946,7 +1216,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                 <div className="recap-row"><span>{t("Créneau", "Time slot")}</span><strong>{labelSlot(data.slot, t)}</strong></div>
                 <div className="recap-row"><span>{t("Adultes / Enfants", "Adults / Children")}</span><strong>{data.adults} {t(data.adults > 1 ? "adultes" : "adulte", data.adults > 1 ? "adults" : "adult")}{data.children ? " · " + data.children + " " + t(data.children > 1 ? "enfants" : "enfant", data.children > 1 ? "children" : "child") : ""}</strong></div>
                 {data.crew === "with" && selectedItinerary && (
-                  <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{t(selectedItinerary.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[selectedItinerary.id] || selectedItinerary.name)}</strong></div>
+                  <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{itName(selectedItinerary, t)}</strong></div>
                 )}
                 <div className="recap-row"><span>{t("Skipper", "Skipper")}</span><strong>{data.crew === "with" ? t(`Inclus (+${skipperCost} €)`, `Included (+€${skipperCost})`) : t("Sans skipper", "Without skipper")}</strong></div>
                 <div className="recap-row"><span>{t("Tarif base", "Base price")}</span><strong>{fmtPrice(base)}</strong></div>
@@ -1288,12 +1558,29 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
               <div className="success-icon"><Icon name="check" size={28} /></div>
               <h2>{t("Réservation confirmée", "Booking confirmed")}</h2>
               <p className="lead">{t("Un email de confirmation a été envoyé à", "A confirmation email has been sent to")} <strong>{data.billing.email || t("votre adresse", "your address")}</strong>.</p>
+
+              <div style={{ background: "#fdf2f2", border: "1px solid #f1c6c6", borderLeft: "4px solid #a83232", padding: "14px 18px", borderRadius: 6, margin: "20px 0", color: "#5a1a1a", fontSize: 14, lineHeight: 1.55 }}>
+                <strong style={{ display: "block", marginBottom: 6 }}>{t("Important", "Important")}</strong>
+                <p style={{ margin: 0 }}>
+                  {t(
+                    "Afin de garantir votre sécurité et de respecter les exigences de notre assurance, la présentation d'une pièce d'identité et du permis bateau en cours de validité de la personne ayant réservé sur le site est obligatoire avant toute prise en charge du bateau.",
+                    "To ensure your safety and meet our insurer's requirements, the booking holder must present a valid ID and a valid boating license before taking charge of the boat."
+                  )}
+                </p>
+                <p style={{ margin: "8px 0 0 0" }}>
+                  {t(
+                    "En l'absence de ces documents, la location ne pourra être effectuée et sera annulée.",
+                    "Without these documents, the rental cannot proceed and will be cancelled."
+                  )}
+                </p>
+              </div>
+
               <div className="recap">
                 <div className="recap-row"><span>{t("Bateau", "Boat")}</span><strong>{boat.name}</strong></div>
                 <div className="recap-row"><span>{t("Date", "Date")}</span><strong>{data.date ? fmtLong(data.date, t.lang) : "—"}</strong></div>
                 <div className="recap-row"><span>{t("Créneau", "Time slot")}</span><strong>{labelSlot(data.slot, t)}</strong></div>
                 <div className="recap-row"><span>{t("Participants", "Guests")}</span><strong>{data.adults} {t(data.adults > 1 ? "adultes" : "adulte", data.adults > 1 ? "adults" : "adult")}{data.children ? " · " + data.children + " " + t(data.children > 1 ? "enfants" : "enfant", data.children > 1 ? "children" : "child") : ""}</strong></div>
-                {selectedItinerary && <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{t(selectedItinerary.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[selectedItinerary.id] || selectedItinerary.name)}</strong></div>}
+                {selectedItinerary && <div className="recap-row"><span>{t("Itinéraire", "Itinerary")}</span><strong>{itName(selectedItinerary, t)}</strong></div>}
                 <div className="recap-row"><span>{t("Acompte payé", "Deposit paid")}</span><strong>{fmtPrice(deposit)}</strong></div>
                 <div className="recap-row"><span>{t("Reste à payer le Jour-J", "Balance due on the day")}</span><strong>{fmtPrice(Math.max(0, total - deposit))}</strong></div>
                 <div className="recap-row total"><span>{t("Total", "Total")}</span><strong>{fmtPrice(total)}</strong></div>
@@ -1312,7 +1599,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
             const isStr = (v) => v && String(v).trim().length > 0;
             let stepIncomplete = false;
             if (step === 1) {
-              stepIncomplete = !data.slot || (data.slot === "halfday" && !data.period);
+              stepIncomplete = !data.slot || (data.slot === "halfday" && !data.period) || !data.date || !data.slotConfirmed;
             } else if (step === 2) {
               stepIncomplete = data.adults < 1 || (data.adults + data.children > boat.capacity) || (data.crew === "with" && !data.itinerary);
             } else if (step === 4) {
@@ -1326,6 +1613,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
             }
             const nextDisabled =
               stepIncomplete ||
+              bookingPending ||
               (step === 5 && !data.preAuthDone) ||
               (step === 6 && (!data.paymentDone || (data.paymentMethod === "virement" && !data.transferProof)));
             return (
@@ -1344,10 +1632,13 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                             ? t("Finalisez le paiement avant de continuer.", "Finalize the payment before continuing.")
                             : t("Veuillez compléter les champs requis.", "Please complete the required fields."))
                       : undefined}>
-                    {step === 3 ? t("Réserver", "Book") : step === 4 ? t("Aller à la caution", "Go to deposit hold") : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue")} <Icon name="arrow" size={16} />
+                    {step === 6 && bookingPending
+                      ? t("Réservation du créneau…", "Locking the slot…")
+                      : (step === 3 ? t("Réserver", "Book") : step === 4 ? t("Aller à la caution", "Go to deposit hold") : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue"))} <Icon name="arrow" size={16} />
                   </button>
                 </div>
                 {errorMsg && <p style={{ color: "#c00", margin: 0, textAlign: "right" }}>{errorMsg}</p>}
+                {bookingError && <p style={{ color: "#c00", margin: 0, textAlign: "right", fontSize: 12 }}>Cal.com : {bookingError}</p>}
               </div>
             );
           })()}
@@ -1373,7 +1664,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
             {data.crew === "with" && selectedItinerary && (
               <div className="bs-line">
                 <span>{t("Itinéraire", "Itinerary")}</span>
-                <strong>{t(selectedItinerary.name, ({ lerins: "Lérins Islands", esterel: "Estérel calanques", "saint-tropez": "Bay of Saint-Tropez & Pampelonne", monaco: "Cap Ferrat & Monaco", porquerolles: "Golden Isles — Porquerolles" })[selectedItinerary.id] || selectedItinerary.name)}</strong>
+                <strong>{itName(selectedItinerary, t)}</strong>
               </div>
             )}
             {data.extras.length > 0 && (
@@ -1487,10 +1778,10 @@ function AboutPage({ setPage }) {
         </div>
         <div className="ab-hero-art">
           <div className="ab-img main">
-            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&q=80" alt={t("Marina de Mandelieu-La-Napoule, port de départ South Boat sur la Côte d'Azur", "Marina of Mandelieu-La-Napoule, South Boat's departure port on the French Riviera")} />
+            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&q=80" alt={t("Marina de Mandelieu-la-Napoule, port de départ South Boat sur la Côte d'Azur", "Marina of Mandelieu-la-Napoule, South Boat's departure port on the French Riviera")} fetchpriority="high" decoding="async" />
           </div>
           <div className="ab-img stack">
-            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&q=80" alt={t("Bateau au mouillage dans une calanque de l'Esterel, location South Boat", "Boat anchored in an Esterel cove, South Boat rental")} />
+            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&q=80" alt={t("Bateau au mouillage dans une calanque de l'Estérel, location South Boat", "Boat anchored in an Esterel cove, South Boat rental")} loading="lazy" decoding="async" />
           </div>
           <div className="ab-badge">
             <strong>Mandelieu-la-Napoule</strong>
@@ -1540,6 +1831,16 @@ function AboutPage({ setPage }) {
             <Icon name="instagram" size={16} /> {t("Suivez nos aventures sur Instagram", "Follow our adventures on Instagram")}
           </a>
         </div>
+
+        <div className="ab-contact-quick" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginTop: 18, paddingTop: 18, borderTop: "1px solid var(--line)" }}>
+          <span style={{ fontSize: 14, color: "var(--muted, #6b7280)", marginRight: 4 }}>{t("Nous joindre directement", "Reach us directly")} :</span>
+          <a href="tel:+33634491621" className="btn btn-outline" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <Icon name="phone" size={16} /> Maxime · 06 34 49 16 21
+          </a>
+          <a href="tel:+33786237848" className="btn btn-outline" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <Icon name="phone" size={16} /> Vincent · 07 86 23 78 48
+          </a>
+        </div>
       </section>
 
       {/* PILLARS */}
@@ -1575,7 +1876,7 @@ function AboutPage({ setPage }) {
         <div className="ab-cta-inner">
           <div>
             <h2>{t("Une question, une envie de large ?", "A question, a longing for the open sea?")}</h2>
-            <p>{t("Notre équipe vous répond du lundi au dimanche, de 8h à 21h. Conseil gratuit, sans engagement.", "Our team is available Monday to Sunday, 8am to 9pm. Free advice, no commitment.")}</p>
+            <p>{t("Notre équipe vous répond du lundi au dimanche, de 8h à 19h. Conseil gratuit, sans engagement.", "Our team is available Monday to Sunday, 8am to 7pm. Free advice, no commitment.")}</p>
           </div>
           <div className="ab-cta-actions">
             <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })}>{t("Réserver un bateau", "Book a boat")}</button>
@@ -1604,7 +1905,10 @@ function ContactPage({ setPage }) {
           <h1>{t("Parlons de votre journée en mer.", "Let's plan your day at sea.")}</h1>
           <p className="lead">{t("Nous vous répondons du lundi au dimanche, de 8h à 19h.", "We reply Monday to Sunday, 8am to 7pm.")}</p>
           <ul className="contact-list">
-            <li><Icon name="phone" /> <div><strong>06 34 49 16 21</strong><span>{t("Nous appeler", "Call us")}</span></div></li>
+            <li><Icon name="phone" /> <div><strong><a href="tel:+33634491621" style={{ color: "inherit", textDecoration: "none" }}>06 34 49 16 21</a></strong><span>{t("Maxime — nous appeler", "Maxime — call us")}</span></div></li>
+            <li><Icon name="phone" /> <div><strong><a href="tel:+33786237848" style={{ color: "inherit", textDecoration: "none" }}>07 86 23 78 48</a></strong><span>{t("Vincent — nous appeler", "Vincent — call us")}</span></div></li>
+            <li><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33634491621" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Maxime", "WhatsApp Maxime")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
+            <li><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33786237848" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Vincent", "WhatsApp Vincent")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
             <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
             <li><Icon name="instagram" /> <div><strong><a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>@south_boat_</a></strong><span>{t("Nous suivre sur Instagram", "Follow us on Instagram")}</span></div></li>
           </ul>
@@ -1753,7 +2057,7 @@ function CapSudListPage({ setPage }) {
             {rest.map((a) => (
               <article key={a.id} className="capsud-card" onClick={() => setPage({ name: "capsud-article", id: a.id })}>
                 <div className="capsud-card-img">
-                  <img src={a.cover} alt={a.title} />
+                  <img src={a.cover} alt={a.title} loading="lazy" decoding="async" />
                 </div>
                 <div className="capsud-card-body">
                   <span className="capsud-date">{fmtArticleDate(a.date, t.lang)}</span>
@@ -1820,10 +2124,10 @@ function CapSudArticlePage({ id, setPage }) {
       "publisher": {
         "@type": "Organization",
         "name": "South Boat",
-        "logo": { "@type": "ImageObject", "url": "https://rayanlapassat-eng.github.io/South-Boat/images/mochi/location-bateau-mandelieu-south-boat.jpg" }
+        "logo": { "@type": "ImageObject", "url": "https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg" }
       },
       "description": article.excerpt || "",
-      "mainEntityOfPage": "https://rayanlapassat-eng.github.io/South-Boat/#capsud-article/" + article.id
+      "mainEntityOfPage": "https://south-boat.com/cap-sud/" + article.id
     };
     const tag = document.createElement('script');
     tag.type = 'application/ld+json';
@@ -1868,7 +2172,7 @@ function CapSudArticlePage({ id, setPage }) {
           </p>
         </header>
         <div className="article-cover">
-          <img src={article.cover} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} />
+          <img src={article.cover} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} fetchpriority="high" decoding="async" />
         </div>
         <div className="article-body">
           {(article.content || []).map((p, i) => {
@@ -1885,6 +2189,140 @@ function CapSudArticlePage({ id, setPage }) {
           </button>
         </div>
       </article>
+      <Footer />
+    </main>
+  );
+}
+
+// ============ ITINERARY DETAIL ============
+const ITINERARY_DETAILS = {
+  "lerins": {
+    hero: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
+    duration_fr: "Journée complète", duration_en: "Full day",
+    distance_fr: "≈ 30 min de navigation depuis Mandelieu", distance_en: "≈ 30 min cruise from Mandelieu",
+    intro_fr: "À une trentaine de minutes de navigation du Port de Mandelieu, au large de Cannes, les îles de Lérins forment l'une des plus belles escales de la Côte d'Azur. Deux îles, deux ambiances : la nature préservée de Sainte-Marguerite et le calme monastique de Saint-Honorat, séparées par un plan d'eau turquoise idéal pour le mouillage et la baignade.",
+    intro_en: "About thirty minutes' cruise from Port de Mandelieu, off Cannes, the Lérins Islands are one of the finest stops on the French Riviera. Two islands, two moods: the unspoilt nature of Sainte-Marguerite and the monastic calm of Saint-Honorat, separated by turquoise water perfect for anchoring and swimming.",
+    sections: [
+      { h_fr: "Île Sainte-Marguerite", h_en: "Sainte-Marguerite Island", p_fr: "La plus grande des deux îles abrite le Fort Royal — où fut emprisonné le célèbre Masque de fer — et un réseau de sentiers ombragés sous les pins et les eucalyptus. Ses criques aux eaux translucides, comme la pointe du Dragon, sont parfaites pour une baignade au mouillage.", p_en: "The larger of the two islands is home to Fort Royal — where the famous Man in the Iron Mask was held — and a network of shaded trails beneath pines and eucalyptus. Its translucent coves, such as Pointe du Dragon, are perfect for a swim at anchor." },
+      { h_fr: "Île Saint-Honorat", h_en: "Saint-Honorat Island", p_fr: "Propriété des moines cisterciens depuis des siècles, Saint-Honorat séduit par son atmosphère paisible, son monastère fortifié et son vignoble. On en fait le tour au mouillage, à l'écart de l'agitation, dans une eau d'un bleu profond.", p_en: "Owned by Cistercian monks for centuries, Saint-Honorat charms visitors with its peaceful atmosphere, fortified monastery and vineyard. You can cruise around it at anchor, away from the crowds, in deep blue water." },
+      { h_fr: "Mouillage & baignade", h_en: "Anchoring & swimming", p_fr: "Le plateau du Milieu, entre les deux îles, offre des fonds clairs parfaits pour le snorkeling et le déjeuner à bord. Pensez à arriver tôt en été : c'est un spot prisé.", p_en: "The 'Plateau du Milieu' between the two islands offers clear shallows ideal for snorkeling and lunch on board. Arrive early in summer — it's a popular spot." },
+    ],
+  },
+  "cap-antibes": {
+    hero: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1600&q=80",
+    duration_fr: "Journée complète", duration_en: "Full day",
+    distance_fr: "≈ 45 min de navigation depuis Mandelieu", distance_en: "≈ 45 min cruise from Mandelieu",
+    intro_fr: "Cap au sud-est vers la presqu'île du Cap d'Antibes, l'un des littoraux les plus prestigieux de la Côte d'Azur. Villas d'exception cachées dans la pinède, criques sauvages et eaux d'un bleu profond se découvrent bien mieux depuis la mer que depuis la terre.",
+    intro_en: "Head south-east to the Cap d'Antibes peninsula, one of the most prestigious shorelines on the French Riviera. Exceptional villas hidden in the pines, wild coves and deep blue water are far better seen from the sea than from land.",
+    sections: [
+      { h_fr: "La baie de la Garoupe", h_en: "Garoupe Bay", p_fr: "Une grande baie abritée aux eaux claires, bordée d'une plage de sable réputée. Un mouillage de carte postale pour la baignade et la pause déjeuner.", p_en: "A large, sheltered bay with clear water, lined by a renowned sandy beach. A postcard anchorage for swimming and a lunch break." },
+      { h_fr: "Villas & sentier du littoral", h_en: "Villas & coastal path", p_fr: "Depuis l'eau, on longe les demeures mythiques du Cap et le célèbre sentier de Tire-Poil qui serpente entre les rochers — une perspective réservée aux plaisanciers.", p_en: "From the water, you cruise past the Cap's legendary mansions and the famous Tire-Poil coastal path winding between the rocks — a view reserved for boaters." },
+      { h_fr: "Criques sauvages", h_en: "Wild coves", p_fr: "La côte ouest du Cap cache de petites anses rocheuses, plus confidentielles, parfaites pour s'arrêter à l'écart de la foule et profiter du snorkeling.", p_en: "The Cap's western coast hides small, more secluded rocky inlets, perfect for stopping away from the crowds and enjoying some snorkeling." },
+    ],
+  },
+  "esterel": {
+    hero: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1600&q=80",
+    duration_fr: "Demi-journée ou journée", duration_en: "Half day or full day",
+    distance_fr: "≈ 15 min de navigation depuis Mandelieu", distance_en: "≈ 15 min cruise from Mandelieu",
+    intro_fr: "C'est l'escale la plus proche de Mandelieu, et l'une des plus spectaculaires : le massif de l'Estérel plonge dans la mer ses roches rouges de porphyre, créant un contraste saisissant avec le bleu turquoise de la Méditerranée. Idéal pour une demi-journée comme pour une journée complète.",
+    intro_en: "It's the closest stop to Mandelieu, and one of the most spectacular: the Estérel massif plunges its red porphyry rocks into the sea, creating a striking contrast with the turquoise Mediterranean. Perfect for a half day or a full day.",
+    sections: [
+      { h_fr: "Le Cap Roux", h_en: "Cap Roux", p_fr: "Sous la silhouette du pic du Cap Roux, plusieurs petites anses rocheuses aux eaux limpides sont idéales pour la baignade et le snorkeling, loin des plages bondées.", p_en: "Beneath the peak of Cap Roux, several small rocky inlets with crystal-clear water are ideal for swimming and snorkeling, far from the crowded beaches." },
+      { h_fr: "Le Cap Dramont & l'Île d'Or", h_en: "Cap Dramont & Île d'Or", p_fr: "Au large du Dramont, le petit îlot rocheux de l'Île d'Or et sa tour intriguent. Un cadre remarquable pour une halte au mouillage, surtout hors période de forte affluence.", p_en: "Off Dramont, the small rocky islet of Île d'Or and its tower are intriguing. A remarkable setting for a stop at anchor, especially outside peak times." },
+      { h_fr: "Calanques rouges & navigation responsable", h_en: "Red coves & responsible boating", p_fr: "Les calanques d'Anthéor et de Maubois dévoilent leurs roches flamboyantes. Certaines zones sont réglementées pour protéger les herbiers de posidonie : nous mouillons toujours dans le respect des fonds marins.", p_en: "The coves of Anthéor and Maubois reveal their flaming red rocks. Some areas are regulated to protect the posidonia seagrass: we always anchor with respect for the seabed." },
+    ],
+  },
+};
+
+function ItineraryPage({ id, setPage }) {
+  const t = window.useT();
+  const it = ITINERARIES.find((x) => x.id === id) || ITINERARIES[0];
+  const detail = ITINERARY_DETAILS[it.id] || {};
+  const sections = detail.sections || [];
+
+  // SEO : JSON-LD TouristTrip (itinéraire touristique en bateau)
+  useEffect(() => {
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "TouristTrip",
+      "name": itName(it, t) + " — itinéraire en bateau au départ de Mandelieu",
+      "description": detail.intro_fr || itDesc(it, t),
+      "image": detail.hero,
+      "touristType": "Plaisance, baignade, snorkeling",
+      "provider": { "@type": "Organization", "name": "South Boat", "url": "https://south-boat.com/" },
+      "itinerary": {
+        "@type": "ItemList",
+        "itemListElement": sections.map((s, i) => ({
+          "@type": "ListItem", "position": i + 1, "name": s.h_fr,
+        })),
+      },
+    };
+    const existing = document.getElementById("ld-trip");
+    if (existing) existing.remove();
+    const tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.id = "ld-trip";
+    tag.textContent = JSON.stringify(ld);
+    document.head.appendChild(tag);
+    return () => { const e = document.getElementById("ld-trip"); if (e) e.remove(); };
+  }, [it.id]);
+
+  return (
+    <main className="capsud-article">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Itinéraires", "Itineraries") },
+        { label: itName(it, t) },
+      ]} />
+
+      <section style={{ maxWidth: 920, margin: "0 auto", padding: "20px 24px 48px" }}>
+        <div style={{ borderRadius: 14, overflow: "hidden", marginBottom: 28, aspectRatio: "16/9", background: "#eef1f5" }}>
+          {detail.hero && <img src={detail.hero} alt={t("Itinéraire en bateau " + itName(it, t) + " depuis Mandelieu sur la Côte d'Azur", "Boat itinerary " + itName(it, t) + " from Mandelieu on the French Riviera")} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
+        </div>
+
+        <p className="eyebrow">{t("Itinéraire en bateau", "Boat itinerary")}</p>
+        <h1 style={{ marginTop: 6 }}>{itName(it, t)}</h1>
+
+        {(detail.duration_fr || detail.distance_fr) && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, margin: "14px 0 0" }}>
+            {detail.duration_fr && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "var(--surface-2, #f4f8fb)", border: "1px solid var(--line)", borderRadius: 999, padding: "6px 12px" }}>
+                <Icon name="cal" size={14} /> {t(detail.duration_fr, detail.duration_en)}
+              </span>
+            )}
+            {detail.distance_fr && (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--ink-soft)", background: "var(--surface-2, #f4f8fb)", border: "1px solid var(--line)", borderRadius: 999, padding: "6px 12px" }}>
+                <Icon name="pin" size={14} /> {t(detail.distance_fr, detail.distance_en)}
+              </span>
+            )}
+          </div>
+        )}
+
+        <p className="lead" style={{ marginTop: 18 }}>{t(detail.intro_fr || itDesc(it, t), detail.intro_en || itDesc(it, t))}</p>
+
+        <div className="article-body" style={{ marginTop: 8 }}>
+          {sections.map((s, i) => (
+            <React.Fragment key={i}>
+              <h2>{t(s.h_fr, s.h_en)}</h2>
+              <p>{t(s.p_fr, s.p_en)}</p>
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div style={{ background: "var(--surface-2, #f4f8fb)", border: "1px solid var(--line)", borderLeft: "3px solid var(--accent, #3a8dde)", padding: "16px 18px", borderRadius: 8, margin: "28px 0", color: "var(--ink-soft)", fontSize: 14 }}>
+          {t("Bon à savoir : l'itinéraire exact est adapté à la météo, à la mer et à vos envies. Avec un skipper, profitez pleinement du paysage ; sans skipper, un permis bateau est requis.", "Good to know: the exact route is adapted to the weather, the sea and your wishes. With a skipper, simply enjoy the scenery; without a skipper, a boating license is required.")}
+        </div>
+
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}>
+          <button className="btn btn-primary" onClick={() => setPage({ name: "booking", id: 1 })} style={{ borderRadius: 20 }}>
+            {t("Réserver cette sortie", "Book this trip")} <Icon name="arrow" size={16} />
+          </button>
+          <button className="btn btn-outline" onClick={() => setPage({ name: "catalog" })}>
+            {t("Voir le bateau", "View the boat")}
+          </button>
+        </div>
+      </section>
+
       <Footer />
     </main>
   );
@@ -1939,7 +2377,7 @@ function Footer() {
         </div>
       </div>
       <div className="foot-bottom">
-        <span>© 2026 South Boat — Mandelieu La Napoule, France</span>
+        <span>© 2026 South Boat — Mandelieu-la-Napoule, France</span>
         <span>{t("Belle journée en mer à vous", "Have a great day at sea")}</span>
       </div>
     </footer>);

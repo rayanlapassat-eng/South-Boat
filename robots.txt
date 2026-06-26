@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rayanlapassat-eng.github.io/South-Boat/sitemap.xml
+# Fichiers techniques inutiles à l'indexation
+Disallow: /cal-proxy.php
+Disallow: /cal-config.php
+
+Sitemap: https://south-boat.com/sitemap.xml

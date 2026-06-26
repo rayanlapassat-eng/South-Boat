@@ -14,17 +14,17 @@ const ARTICLES = [
     id: "cap-sur-histoire-south-boat",
     title: "Cap sur l'histoire de South Boat",
     date: "2026-06-22",
-    author: "Maxim & Vincent",
+    author: "Maxime & Vincent",
     cover: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
     excerpt: "Deux amis, une passion commune pour la mer et l'aventure : découvrez comment est née South Boat, entre amitié, confiance et envie d'entreprendre ensemble.",
     content: [
-      "Nous sommes Maxim et Vincent, les deux capitaines du navire, mais aussi deux amis unis autour des mêmes passions : l'aventure, les découvertes et les souvenirs qu'elles créent.",
+      "Nous sommes Maxime et Vincent, les deux capitaines du navire, mais aussi deux amis unis autour des mêmes passions : l'aventure, les découvertes et les souvenirs qu'elles créent.",
       "## Une amitié, une passion commune",
       "Depuis plusieurs années, nous passons une grande partie de notre temps libre à explorer les criques, les plages et les plus beaux coins de notre belle région. Que ce soit en mer ou en pleine nature, nous sommes mordus d'activités en plein air et de sports nautiques.",
       "Au fil de nos escapades, une idée est devenue une évidence : partager cette passion avec le plus grand nombre car nous avons à cœur de vous faire vivre des moments uniques qui se transformeront en souvenirs inoubliables. C'est ainsi qu'est née notre société de location de bateaux. Une aventure qui débute avant tout par une histoire d'amitié, de confiance et d'envie d'entreprendre ensemble.",
       "## Une même volonté : la création de souvenirs uniques",
       "Notre volonté va au-delà d'une simple location de bateau, elle s'ouvre à une dimension bien plus profonde : offrir à chaque client une expérience unique, des conseils personnalisés, le partage de nos meilleurs spots et un service de qualité, du premier contact, jusqu'au retour au port. Parce que l'accompagnement et le conseil sont pour nous l'essence même de notre entreprise.",
-      "Nous-même passionnés de navigation, nous avons conscience de la valeur des souvenirs qui peuvent être créés lors d'une journée en mer. Alors, que vous soyez en famille, entre amis, ou en couple, soyez sûr que nous mettrons tout en œuvre pour rendre votre sortie bateau inoubliable et qu'elle soit synonyme de plaisir, de découverte et de sérénité.",
+      "Nous-mêmes passionnés de navigation, nous avons conscience de la valeur des souvenirs qui peuvent être créés lors d'une journée en mer. Alors, que vous soyez en famille, entre amis, ou en couple, soyez sûrs que nous mettrons tout en œuvre pour rendre votre sortie bateau inoubliable et qu'elle soit synonyme de plaisir, de découverte et de sérénité.",
       "## Une exigence au service de votre expérience",
       "L'entretien de nos bateaux, la sécurité de nos passagers et la qualité de l'accueil que nous réservons à chacun de nos clients font l'objet d'une attention toute particulière.",
       "Aujourd'hui nous sommes fiers de partager notre passion et de faire découvrir la beauté de notre littoral à travers des expériences authentiques et mémorables, à bord de bateaux soigneusement sélectionnés et entretenus pour votre confort. Au-delà de la location, nous vous accompagnons aussi dans l'entretien et le nettoyage de votre bateau avec le même niveau d'exigence, de soin et d'attention que nous accordons à notre propre flotte.",
@@ -37,13 +37,13 @@ const ARTICLES = [
     date: "2026-06-19",
     author: "L'équipage South Boat",
     cover: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
-    excerpt: "Criques cachées, falaises rouges et eaux turquoise — partez à la découverte du massif de l'Estérel depuis Mandelieu-La Napoule.",
+    excerpt: "Criques cachées, falaises rouges et eaux turquoise — partez à la découverte du massif de l'Estérel depuis Mandelieu-la-Napoule.",
     content: [
       "Quand on visite la Côte d'Azur, on pense souvent aux plages, aux villages perchés ou aux routes qui longent le littoral. Pourtant, une partie des plus beaux paysages se découvre depuis la mer. En choisissant une location de bateau à Mandelieu, vous accédez rapidement aux criques du massif de l'Estérel, à ses falaises rouges et à des coins bien plus difficiles à rejoindre par la terre.",
-      "Chez South Boat, nous proposons des bateaux à louer au départ de Mandelieu-La Napoule pour une sortie en mer simple, sécurisée et adaptée aussi bien aux vacanciers qu'aux habitants de la région.",
+      "Chez South Boat, nous proposons des bateaux à louer au départ de Mandelieu-la-Napoule pour une sortie en mer simple, sécurisée et adaptée aussi bien aux vacanciers qu'aux habitants de la région.",
       "## Pourquoi louer un bateau à Mandelieu pour découvrir l'Estérel ?",
       "La grande question que tout futur matelot se pose : où louer un bateau pour une excursion en mer réussie ?",
-      "Le choix du port de départ joue un rôle important dans la réussite d'une journée en mer. Située entre Cannes et le massif de l'Estérel, Mandelieu-La Napoule bénéficie d'un emplacement particulièrement pratique pour rejoindre rapidement les plus beaux sites du littoral.",
+      "Le choix du port de départ joue un rôle important dans la réussite d'une journée en mer. Située entre Cannes et le massif de l'Estérel, Mandelieu-la-Napoule bénéficie d'un emplacement particulièrement pratique pour rejoindre rapidement les plus beaux sites du littoral.",
       "La commune possède une véritable culture maritime et plusieurs ports réputés, dont le port de La Napoule, le port de La Rague et le port du Riou de l'Argentière. Depuis ces ports, il est possible de naviguer vers les îles de Lérins, les côtes sauvages de l'Estérel ou encore de petites criques préservées accessibles principalement par bateau.",
       "## Les plus belles criques de l'Estérel accessibles en bateau",
       "L'un des grands avantages d'une excursion en bateau au départ de Mandelieu est de pouvoir rejoindre des endroits parfois difficiles d'accès depuis la côte. Voici quelques sites particulièrement appréciés des plaisanciers.",
@@ -63,7 +63,7 @@ const ARTICLES = [
       "Certaines zones du massif de l'Estérel sont réglementées afin de protéger les herbiers de posidonie et les écosystèmes marins. Avant de jeter l'ancre, il est recommandé de vérifier les règles de mouillage en vigueur, surtout en été.",
       "## Une journée bateau entre falaises rouges et eaux méditerranéennes",
       "Que ce soit pour une demi-journée, une journée complète ou une simple balade au coucher du soleil, louer un bateau à Mandelieu reste l'une des meilleures façons de découvrir l'Estérel à son rythme.",
-      "Alors embarquez avec nous pour une balade flottante à bord de l'un de nos bateaux afin de longer ces superbes falaises rouges de l'Esterel et de naviguer entre ces eaux turquoises de la Méditerranée. Des calanques et criques secrètes qui vous dévoilent leurs plus belles couleurs mais vous marqueront aussi de leurs plus beaux souvenirs."
+      "Alors embarquez avec nous pour une balade flottante à bord de l'un de nos bateaux afin de longer ces superbes falaises rouges de l'Estérel et de naviguer entre ces eaux turquoise de la Méditerranée. Des calanques et criques secrètes qui vous dévoilent leurs plus belles couleurs mais vous marqueront aussi de leurs plus beaux souvenirs."
     ]
   }
 ];

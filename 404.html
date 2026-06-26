@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>South Boat</title>
+<script>
+  // Technique standard "SPA sur GitHub Pages" : on mémorise l'URL demandée
+  // puis on redirige vers la racine, qui restaure ensuite cette URL via history.replaceState.
+  sessionStorage.redirect = location.href;
+  var base = location.pathname.startsWith("/South-Boat") ? "/South-Boat/" : "/";
+  location.replace(base);
+</script>
+</head>
+<body></body>
+</html>

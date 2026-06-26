@@ -1,5 +1,6 @@
 /* global React, BOATS, fmtPrice, Icon, Footer, Breadcrumb */
-const { useState, useMemo } = React;
+/* var : scripts classiques séparés partageant la portée globale (cf. app.jsx). */
+var { useState, useMemo } = React;
 
 // ============ DATA ============
 // Per-boat reservations keyed by ISO day. status: "booked" | "option" | "maintenance"

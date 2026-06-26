@@ -1,5 +1,7 @@
 /* global React, ReactDOM */
-const { useState, useEffect, useMemo, useRef } = React;
+/* var (et non const) : ces fichiers sont chargés comme scripts classiques séparés
+   qui partagent la portée globale ; var autorise la redéclaration entre fichiers. */
+var { useState, useEffect, useMemo, useRef } = React;
 
 // ============ TWEAKS DEFAULTS ============
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -27,7 +29,9 @@ const BOATS = [
     { id: "buoy", label: "Bouée tractée", label_en: "Towed inflatable", price: 30 },
     { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 40 },
     { id: "paddle", label: "Paddle board", label_en: "Paddle board", price: 30 },
-    { id: "snorkel", label: "Accessoires snorkeling", label_en: "Snorkeling gear", price: 20 }
+    { id: "snorkel", label: "Accessoires snorkeling", label_en: "Snorkeling gear", price: 20 },
+    { id: "aperitif-day", label: "Apéritif Gourmand + Boisson sans alcool", label_en: "Gourmet aperitif + non-alcoholic drink", price: 45, slotOnly: "day", pricingNote: "30 € pour 2 personnes · 45 € pour 4 personnes", pricingNote_en: "€30 for 2 people · €45 for 4 people" },
+    { id: "aperitif-halfday", label: "Apéritif Gourmand + Boisson", label_en: "Gourmet aperitif + drink", price: 0, slotOnly: "halfday", onRequest: true }
   ],
   rating: 4.9,
   reviews: 47,
@@ -88,6 +92,69 @@ const BOATS = [
 
 const PORTS = ["Mandelieu"];
 
+// ============ ROUTING (clean URLs) ============
+// Repo subfolder when hosted on GitHub Pages (ex: /South-Boat). Empty "" once on a real domain (Hostinger, etc).
+const BASE_PATH = window.location.pathname.startsWith("/South-Boat") ? "/South-Boat" : "";
+
+// ============ ASSET URL ============
+// Résout les chemins d'images locaux en URL absolue (racine du site) pour qu'ils
+// fonctionnent quelle que soit la profondeur de la route (ex: /bateau/1, /reservation/1).
+// Les URLs externes (https://, //, data:) sont laissées telles quelles.
+const asset = (p) =>
+  (!p || /^(https?:)?\/\//.test(p) || p.startsWith("data:")) ? p : BASE_PATH + "/" + p.replace(/^\/+/, "");
+// On normalise les images des bateaux une seule fois au chargement.
+BOATS.forEach((b) => { if (Array.isArray(b.images)) b.images = b.images.map(asset); });
+
+function pageToPath(page) {
+  let path = "/";
+  switch (page.name) {
+    case "home": path = "/"; break;
+    case "catalog": path = "/catalogue"; break;
+    case "planning": path = "/disponibilites"; break;
+    case "detail": path = `/bateau/${page.id}`; break;
+    case "booking": {
+      path = `/reservation/${page.id}`;
+      const params = new URLSearchParams();
+      if (page.date) params.set("date", page.date);
+      if (page.slot) params.set("slot", page.slot);
+      const qs = params.toString();
+      return BASE_PATH + path + (qs ? `?${qs}` : "");
+    }
+    case "about": path = "/a-propos"; break;
+    case "contact": path = "/contact"; break;
+    case "capsud": path = "/cap-sud"; break;
+    case "capsud-article": path = `/cap-sud/${page.id}`; break;
+    case "itinerary": path = `/itineraire/${page.id}`; break;
+    default: path = "/"; break;
+  }
+  return BASE_PATH + path;
+}
+
+function pathToPage(pathname, search) {
+  let p = pathname;
+  if (BASE_PATH && p.startsWith(BASE_PATH)) p = p.slice(BASE_PATH.length);
+  const parts = p.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
+  const params = new URLSearchParams(search || "");
+  if (parts.length === 0) return { name: "home" };
+  switch (parts[0]) {
+    case "catalogue": return { name: "catalog" };
+    case "disponibilites": return { name: "planning" };
+    case "bateau": return parts[1] ? { name: "detail", id: +parts[1] || parts[1] } : { name: "catalog" };
+    case "reservation": {
+      if (!parts[1]) return { name: "catalog" };
+      const page = { name: "booking", id: +parts[1] || parts[1] };
+      if (params.get("date")) page.date = params.get("date");
+      if (params.get("slot")) page.slot = params.get("slot");
+      return page;
+    }
+    case "a-propos": return { name: "about" };
+    case "contact": return { name: "contact" };
+    case "cap-sud": return parts[1] ? { name: "capsud-article", id: parts[1] } : { name: "capsud" };
+    case "itineraire": return parts[1] ? { name: "itinerary", id: parts[1] } : { name: "home" };
+    default: return { name: "home" };
+  }
+}
+
 // ============ HELPERS ============
 const fmtPrice = (n) => `${n.toLocaleString("fr-FR")} €`;
 
@@ -125,7 +192,8 @@ const Icon = ({ name, size = 18 }) => {
     wave: <path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 6c2-2 4-2 6 0s4 2 6 0 4-2 6 0" />,
     phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />,
     mail: <><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><path d="M22 6l-10 7L2 6" /></>,
-    instagram: <><rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><path d="M17.5 6.5h.01" /></>
+    instagram: <><rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><path d="M17.5 6.5h.01" /></>,
+    whatsapp: <><path d="M20.52 3.48A11.93 11.93 0 0 0 12.04 0C5.5 0 .2 5.3.2 11.84c0 2.09.55 4.13 1.6 5.93L0 24l6.4-1.68a11.84 11.84 0 0 0 5.64 1.44h.01c6.54 0 11.84-5.3 11.84-11.84 0-3.16-1.23-6.13-3.37-8.44z" /><path d="M17.4 14.38c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.48-1.77-1.66-2.07-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.07 2.87 1.22 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="currentColor" stroke="none" /></>
   };
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -300,6 +368,29 @@ function SearchBar({ query, setQuery, onSubmit, compact }) {
 
 // ============ BREADCRUMB ============
 function Breadcrumb({ trail, setPage }) {
+  // SEO : JSON-LD BreadcrumbList (fil d'Ariane enrichi dans les résultats Google)
+  const trailKey = trail.map((i) => i.label).join(">");
+  useEffect(() => {
+    const origin = window.location.origin;
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": trail.map((item, i) => {
+        const el = { "@type": "ListItem", "position": i + 1, "name": item.label };
+        if (item.page) el.item = origin + window.pageToPath(item.page);
+        return el;
+      }),
+    };
+    const existing = document.getElementById("ld-breadcrumb");
+    if (existing) existing.remove();
+    const tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.id = "ld-breadcrumb";
+    tag.textContent = JSON.stringify(ld);
+    document.head.appendChild(tag);
+    return () => { const e = document.getElementById("ld-breadcrumb"); if (e) e.remove(); };
+  }, [trailKey]);
+
   return (
     <nav className="breadcrumb" aria-label="Fil d'Ariane">
       <div className="breadcrumb-inner">
@@ -321,4 +412,4 @@ function Breadcrumb({ trail, setPage }) {
   );
 }
 
-Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, SearchBar, Breadcrumb, TWEAK_DEFAULTS });
+Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, SearchBar, Breadcrumb, TWEAK_DEFAULTS, pageToPath, pathToPage, BASE_PATH, asset });

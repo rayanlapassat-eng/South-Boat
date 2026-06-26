@@ -1,0 +1,21 @@
+{
+  "name": "south-boat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site South Boat — location de bateaux à Mandelieu. Les fichiers .jsx sont la source ; lancer `npm run build` pour générer les .js chargés en production.",
+  "scripts": {
+    "build": "babel tweaks-panel.jsx app.jsx pages.jsx planning.jsx boot.jsx --out-dir dist --compact true --no-comments"
+  },
+  "babel": {
+    "presets": [
+      ["@babel/preset-env", { "targets": "> 0.5%, last 2 versions, not dead", "modules": false }],
+      ["@babel/preset-react", { "runtime": "classic" }]
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.25.0",
+    "@babel/core": "^7.25.0",
+    "@babel/preset-env": "^7.25.0",
+    "@babel/preset-react": "^7.24.0"
+  }
+}
