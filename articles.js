@@ -7,18 +7,25 @@
    3. Placer le nouvel article EN HAUT du tableau (le plus récent en premier)
    4. Enregistrer le fichier — l'article apparaîtra automatiquement
       sur la page Cap Sud et en page d'accueil.
+
+   Pour mettre un article EN AVANT (« à la une » sur la page Cap Sud
+   et « Dernier article » sur la page d'accueil) :
+   → ajouter la ligne   featured: true,   dans le bloc de l'article.
+   Un seul article doit porter ce drapeau. Si aucun ne l'a, le plus
+   récent (le premier du tableau) est mis en avant par défaut.
    ============================================================ */
 
 const ARTICLES = [
   {
     id: "cap-sur-histoire-south-boat",
+    featured: true,
     title: "Cap sur l'histoire de South Boat",
     date: "2026-06-22",
-    author: "Maxime & Vincent",
-    cover: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=1600&q=80",
+    author: "Maxim & Vincent",
+    cover: "/images/capsud-feature.jpeg",
     excerpt: "Deux amis, une passion commune pour la mer et l'aventure : découvrez comment est née South Boat, entre amitié, confiance et envie d'entreprendre ensemble.",
     content: [
-      "Nous sommes Maxime et Vincent, les deux capitaines du navire, mais aussi deux amis unis autour des mêmes passions : l'aventure, les découvertes et les souvenirs qu'elles créent.",
+      "Nous sommes Maxim et Vincent, les deux capitaines du navire, mais aussi deux amis unis autour des mêmes passions : l'aventure, les découvertes et les souvenirs qu'elles créent.",
       "## Une amitié, une passion commune",
       "Depuis plusieurs années, nous passons une grande partie de notre temps libre à explorer les criques, les plages et les plus beaux coins de notre belle région. Que ce soit en mer ou en pleine nature, nous sommes mordus d'activités en plein air et de sports nautiques.",
       "Au fil de nos escapades, une idée est devenue une évidence : partager cette passion avec le plus grand nombre car nous avons à cœur de vous faire vivre des moments uniques qui se transformeront en souvenirs inoubliables. C'est ainsi qu'est née notre société de location de bateaux. Une aventure qui débute avant tout par une histoire d'amitié, de confiance et d'envie d'entreprendre ensemble.",
@@ -36,7 +43,7 @@ const ARTICLES = [
     title: "Location de bateau à Mandelieu : le guide pour découvrir l'Estérel par la mer",
     date: "2026-06-19",
     author: "L'équipage South Boat",
-    cover: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
+    cover: "/images/article-guide-esterel.jpeg",
     excerpt: "Criques cachées, falaises rouges et eaux turquoise — partez à la découverte du massif de l'Estérel depuis Mandelieu-la-Napoule.",
     content: [
       "Quand on visite la Côte d'Azur, on pense souvent aux plages, aux villages perchés ou aux routes qui longent le littoral. Pourtant, une partie des plus beaux paysages se découvre depuis la mer. En choisissant une location de bateau à Mandelieu, vous accédez rapidement aux criques du massif de l'Estérel, à ses falaises rouges et à des coins bien plus difficiles à rejoindre par la terre.",

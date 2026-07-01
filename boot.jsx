@@ -1,4 +1,4 @@
-/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage */
+/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage */
 /* ============================================================
    boot.jsx — Amorçage de l'application South Boat
    SOURCE JSX : à recompiler en boot.js via `npm run build`
@@ -80,6 +80,9 @@ function App() {
     } else if (page.name === "planning") {
       title = `Disponibilités — Réserver un bateau à Mandelieu | ${SITE}`;
       desc  = "Consultez les disponibilités en temps réel de notre flotte de bateaux à louer à Mandelieu sur la Côte d'Azur.";
+    } else if (page.name === "fireworks") {
+      title = `Feux d'artifice 2026 — Cannes, Antibes, Juan-les-Pins | ${SITE}`;
+      desc  = "Calendrier des feux d'artifice 2026 sur la Côte d'Azur. Réservez un bateau pour les vivre depuis la baie, loin de la foule.";
     } else if (page.name === "detail" && page.id) {
       const b = BOATS.find(x => x.id === page.id);
       if (b) {
@@ -138,7 +141,8 @@ function App() {
       <Nav page={page} setPage={setPage} />
       {page.name === "home" && <HomePage setPage={setPage} query={query} setQuery={setQuery} />}
       {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} />}
-      {page.name === "planning" && <PlanningPage setPage={setPage} />}
+      {page.name === "planning" && <PlanningPage setPage={setPage} initialDate={page.date} />}
+      {page.name === "fireworks" && <FireworksPage setPage={setPage} />}
       {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
       {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} initialSlot={page.slot} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}

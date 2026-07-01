@@ -46,7 +46,9 @@ const FAQ_ITEMS = [
 function HomePage({ setPage, query, setQuery }) {
   const t = window.useT();
   const featured = BOATS.slice(0, 3);
-  const latestArticle = (window.ARTICLES && window.ARTICLES.length > 0) ? window.ARTICLES[0] : null;
+  const latestArticle = (window.ARTICLES && window.ARTICLES.length > 0)
+    ? (window.ARTICLES.find((a) => a.featured) || window.ARTICLES[0])
+    : null;
   const [openFaq, setOpenFaq] = useState(0);
 
   // SEO : JSON-LD FAQPage (uniquement sur l'accueil, pour matcher le contenu visible)
@@ -74,7 +76,7 @@ function HomePage({ setPage, query, setQuery }) {
     <main className="home">
       <section className="hero">
         <div className="hero-bg">
-          <img src="https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=2400&q=80" alt={t("Bateau en mer sur la Côte d'Azur — location de bateau à Mandelieu avec South Boat", "Boat at sea on the French Riviera — South Boat rentals in Mandelieu")} fetchpriority="high" decoding="async" />
+          <img src={asset("images/hero.jpeg")} alt={t("Bateau South Boat dans une crique de l'Estérel — location de bateau à Mandelieu", "South Boat in an Estérel cove — boat rentals in Mandelieu")} fetchpriority="high" decoding="async" />
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
@@ -204,7 +206,7 @@ function HomePage({ setPage, query, setQuery }) {
           {[
           { id: "lerins", n: t("Îles de Lérins", "Lérins Islands"), img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: t("Baignade & déjeuner en mer", "Swimming & lunch at sea") },
           { id: "cap-antibes", n: t("Cap d'Antibes", "Cap d'Antibes"), img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80", c: t("Villas & criques sauvages", "Villas & wild coves") },
-          { id: "esterel", n: t("Calanques de l'Estérel", "Estérel calanques"), img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1200&q=80", c: t("Calanques & roches rouges", "Coves & red rocks") }].
+          { id: "esterel", n: t("Calanques de l'Estérel", "Estérel calanques"), img: asset("images/itineraire-esterel.jpeg"), c: t("Calanques & roches rouges", "Coves & red rocks") }].
           map((d) =>
           <button key={d.id} className="dest-card" onClick={() => setPage({ name: "itinerary", id: d.id })}>
               <img src={d.img} alt={d.n} loading="lazy" decoding="async" />
@@ -439,8 +441,6 @@ function DetailPage({ id, setPage }) {
                 <span>{boat.length}</span>
                 <span className="dot-sep">·</span>
                 <span>{boat.capacity} {t("personnes", "people")}</span>
-                <span className="dot-sep">·</span>
-                <span>{boat.year}</span>
                 {boat.designCategory && (
                   <>
                     <span className="dot-sep">·</span>
@@ -494,8 +494,8 @@ function DetailPage({ id, setPage }) {
 
         <aside className="booking-card" style={{ backgroundColor: "rgb(255, 255, 255)", borderRadius: "20px" }}>
           <div className="bk-price">
-            <strong>{fmtPrice(boat.price)}</strong>
-            <span> {t("/ jour", "/ day")}</span>
+            <span style={{ fontSize: 13, color: "var(--muted, #5b6b7a)", display: "block", marginBottom: 2 }}>{t("À partir de", "From")}</span>
+            <strong>{fmtPrice(boat.priceHalfDay || boat.price)}</strong>
           </div>
           {(boat.priceHalfDay || boat.deposit || boat.preAuth || (boat.options && boat.options.length)) && (
             <div className="bk-tariffs" style={{ marginTop: 14, padding: "12px 14px", background: "var(--surface-2, #f4f8fb)", borderRadius: 14, fontSize: 13 }}>
@@ -526,11 +526,16 @@ function DetailPage({ id, setPage }) {
                   <div style={{ fontSize: 12, color: "var(--muted, #5b6b7a)", marginBottom: 4 }}>{t("Options", "Add-ons")}</div>
                   {boat.options.map((o) => (
                     <div key={o.id} style={{ display: "flex", justifyContent: "space-between", padding: "3px 0" }}>
-                      <span>{t(o.label, o.label_en || o.label)}</span><strong>+{fmtPrice(o.price)}</strong>
+                      <span>{t(o.label, o.label_en || o.label)}</span>
+                      <strong>{o.onRequest ? t("à partir de " + fmtPrice(o.price), "from " + fmtPrice(o.price)) : "+" + fmtPrice(o.price)}</strong>
                     </div>
                   ))}
                 </>
               )}
+              <div style={{ height: 1, background: "rgba(10,37,64,0.08)", margin: "8px 0" }} />
+              <div style={{ fontSize: 12, color: "var(--muted, #5b6b7a)", fontStyle: "italic" }}>
+                {t("Carburant à la charge du client.", "Fuel at the client's expense.")}
+              </div>
             </div>
           )}
 
@@ -543,7 +548,6 @@ function DetailPage({ id, setPage }) {
           <ul className="bk-list">
             <li><Icon name="check" size={14} /> {t("Annulation gratuite jusqu'à 7 jours", "Free cancellation up to 7 days")}</li>
             <li><Icon name="check" size={14} /> {t("Paiement sécurisé", "Secure payment")}</li>
-            <li><Icon name="check" size={14} /> {t("Conciergerie", "Concierge")}</li>
           </ul>
         </aside>
       </section>
@@ -824,10 +828,6 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
       if (!ex) return sum;
       if (ex.onRequest) return sum;
       if (ex.id === "lunch") return sum + ex.price * (data.adults + data.children);
-      if (ex.id === "aperitif-day") {
-        const pax = data.adults + data.children;
-        return sum + (pax <= 2 ? 30 : 45);
-      }
       return sum + ex.price;
     }, 0);
     const skipperCost = data.crew === "with" ? (data.slot === "halfday" ? 150 : 200) : 0;
@@ -1094,13 +1094,10 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
               <h3 className="sub">{t("Options", "Add-ons")}</h3>
               <div className="extras">
                 {extras.map((x) => {
-                  const enLabelMap = { buoy: "Towed inflatable", wake: "Wakeboard", paddle: "Paddle board", lunch: "Chef-prepared lunch (per person)", snorkel: "Snorkeling gear", "aperitif-day": "Gourmet aperitif + non-alcoholic drink", "aperitif-halfday": "Gourmet aperitif + drink" };
+                  const enLabelMap = { buoy: "Towed inflatable", wake: "Wakeboard", paddle: "Paddle board", lunch: "Chef-prepared lunch (per person)", snorkel: "Snorkeling gear", "aperitif-halfday": "Gourmet aperitif + drink" };
                   let priceLabel;
                   if (x.onRequest) {
                     priceLabel = t("Sur demande", "On request");
-                  } else if (x.id === "aperitif-day") {
-                    const pax = data.adults + data.children;
-                    priceLabel = "+" + (pax <= 2 ? 30 : 45) + " €";
                   } else {
                     priceLabel = "+" + x.price + " €";
                   }
@@ -1835,7 +1832,7 @@ function AboutPage({ setPage }) {
         <div className="ab-contact-quick" style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginTop: 18, paddingTop: 18, borderTop: "1px solid var(--line)" }}>
           <span style={{ fontSize: 14, color: "var(--muted, #6b7280)", marginRight: 4 }}>{t("Nous joindre directement", "Reach us directly")} :</span>
           <a href="tel:+33634491621" className="btn btn-outline" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
-            <Icon name="phone" size={16} /> Maxime · 06 34 49 16 21
+            <Icon name="phone" size={16} /> Maxim · 06 34 49 16 21
           </a>
           <a href="tel:+33786237848" className="btn btn-outline" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
             <Icon name="phone" size={16} /> Vincent · 07 86 23 78 48
@@ -1905,12 +1902,12 @@ function ContactPage({ setPage }) {
           <h1>{t("Parlons de votre journée en mer.", "Let's plan your day at sea.")}</h1>
           <p className="lead">{t("Nous vous répondons du lundi au dimanche, de 8h à 19h.", "We reply Monday to Sunday, 8am to 7pm.")}</p>
           <ul className="contact-list">
-            <li><Icon name="phone" /> <div><strong><a href="tel:+33634491621" style={{ color: "inherit", textDecoration: "none" }}>06 34 49 16 21</a></strong><span>{t("Maxime — nous appeler", "Maxime — call us")}</span></div></li>
+            <li><Icon name="phone" /> <div><strong><a href="tel:+33634491621" style={{ color: "inherit", textDecoration: "none" }}>06 34 49 16 21</a></strong><span>{t("Maxim — nous appeler", "Maxim — call us")}</span></div></li>
             <li><Icon name="phone" /> <div><strong><a href="tel:+33786237848" style={{ color: "inherit", textDecoration: "none" }}>07 86 23 78 48</a></strong><span>{t("Vincent — nous appeler", "Vincent — call us")}</span></div></li>
-            <li><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33634491621" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Maxime", "WhatsApp Maxime")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
-            <li><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33786237848" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Vincent", "WhatsApp Vincent")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
+            <li className="brand-whatsapp"><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33634491621" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Maxim", "WhatsApp Maxim")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
+            <li className="brand-whatsapp"><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33786237848" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>{t("WhatsApp Vincent", "WhatsApp Vincent")}</a></strong><span>{t("Réponse rapide", "Quick reply")}</span></div></li>
             <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
-            <li><Icon name="instagram" /> <div><strong><a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>@south_boat_</a></strong><span>{t("Nous suivre sur Instagram", "Follow us on Instagram")}</span></div></li>
+            <li className="brand-instagram"><Icon name="instagram" /> <div><strong><a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>@south_boat_</a></strong><span>{t("Nous suivre sur Instagram", "Follow us on Instagram")}</span></div></li>
           </ul>
         </div>
         <form className="contact-form" onSubmit={async (e) => {
@@ -1987,8 +1984,8 @@ const fmtArticleDate = (s, lang) => {
 function CapSudListPage({ setPage }) {
   const t = window.useT();
   const articles = window.ARTICLES || [];
-  const highlight = articles[0];
-  const rest = articles.slice(1);
+  const highlight = articles.find((a) => a.featured) || articles[0];
+  const rest = articles;
 
   return (
     <main className="capsud">
@@ -1998,7 +1995,7 @@ function CapSudListPage({ setPage }) {
       ]} />
       <section className="hero">
         <div className="hero-bg">
-          <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=2400&q=80" alt={t("Bateau au mouillage sur la Côte d'Azur — Cap Sud, le blog nautisme de South Boat", "Boat at anchor on the French Riviera — Cap Sud, South Boat's nautical blog")} />
+          <img src={asset("images/capsud-hero.jpeg")} alt={t("Bateau au mouillage sur la Côte d'Azur — Cap Sud, le blog nautisme de South Boat", "Boat at anchor on the French Riviera — Cap Sud, South Boat's nautical blog")} />
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
@@ -2022,7 +2019,7 @@ function CapSudListPage({ setPage }) {
             </div>
           </div>
           <div className="departure-card" onClick={() => setPage({ name: "capsud-article", id: highlight.id })} style={{ cursor: "pointer" }}>
-            <div className="departure-map" style={{ minHeight: 320 }}>
+            <div className="departure-map">
               <img src={highlight.cover} alt={highlight.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
             <div className="departure-text">
@@ -2050,7 +2047,7 @@ function CapSudListPage({ setPage }) {
 
         {rest.length === 0 ? (
           <div className="empty">
-            <p>{articles.length === 0 ? t("Aucun article pour le moment. Revenez bientôt !", "No articles yet. Come back soon!") : t("Aucun autre article pour l'instant.", "No other articles for now.")}</p>
+            <p>{t("Aucun article pour le moment. Revenez bientôt !", "No articles yet. Come back soon!")}</p>
           </div>
         ) : (
           <div className="capsud-grid">
@@ -2221,7 +2218,7 @@ const ITINERARY_DETAILS = {
     ],
   },
   "esterel": {
-    hero: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1600&q=80",
+    hero: "images/itineraire-esterel.jpeg",
     duration_fr: "Demi-journée ou journée", duration_en: "Half day or full day",
     distance_fr: "≈ 15 min de navigation depuis Mandelieu", distance_en: "≈ 15 min cruise from Mandelieu",
     intro_fr: "C'est l'escale la plus proche de Mandelieu, et l'une des plus spectaculaires : le massif de l'Estérel plonge dans la mer ses roches rouges de porphyre, créant un contraste saisissant avec le bleu turquoise de la Méditerranée. Idéal pour une demi-journée comme pour une journée complète.",
@@ -2277,7 +2274,7 @@ function ItineraryPage({ id, setPage }) {
 
       <section style={{ maxWidth: 920, margin: "0 auto", padding: "20px 24px 48px" }}>
         <div style={{ borderRadius: 14, overflow: "hidden", marginBottom: 28, aspectRatio: "16/9", background: "#eef1f5" }}>
-          {detail.hero && <img src={detail.hero} alt={t("Itinéraire en bateau " + itName(it, t) + " depuis Mandelieu sur la Côte d'Azur", "Boat itinerary " + itName(it, t) + " from Mandelieu on the French Riviera")} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
+          {detail.hero && <img src={detail.hero.startsWith("http") ? detail.hero : asset(detail.hero)} alt={t("Itinéraire en bateau " + itName(it, t) + " depuis Mandelieu sur la Côte d'Azur", "Boat itinerary " + itName(it, t) + " from Mandelieu on the French Riviera")} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
         </div>
 
         <p className="eyebrow">{t("Itinéraire en bateau", "Boat itinerary")}</p>
@@ -2360,13 +2357,11 @@ function Footer() {
             <h5>{t("Naviguer", "Navigate")}</h5>
             <a style={linkStyle} onClick={() => go("catalog")}>{t("Catalogue", "Catalog")}</a>
             <a style={linkStyle} onClick={() => go("catalog")}>{t("Destinations", "Destinations")}</a>
-            <a style={linkStyle} onClick={() => go("catalog")}>{t("Skippers", "Skippers")}</a>
           </div>
           <div>
             <h5>{t("Maison", "House")}</h5>
             <a style={linkStyle} onClick={() => go("about")}>{t("À propos", "About")}</a>
             <a style={linkStyle} onClick={() => go("contact")}>{t("Contact", "Contact")}</a>
-            <a style={linkStyle} onClick={() => go("contact")}>{t("Presse", "Press")}</a>
           </div>
           <div>
             <h5>{t("Légal", "Legal")}</h5>

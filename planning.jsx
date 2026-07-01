@@ -31,6 +31,7 @@ const RESERVATIONS = {
 const SLOTS = [
   { id: "am", label: "Matin", hours: "9h – 13h" },
   { id: "pm", label: "Après-midi", hours: "14h – 18h" },
+  { id: "sunset", label: "Sunset", hours: "19h – 22h30" },
 ];
 
 const STATUS_COLOR = {
@@ -54,10 +55,18 @@ const startOfWeek = (d) => {
 const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
 
 // ============ COMPONENT ============
-function PlanningPage({ setPage }) {
+function PlanningPage({ setPage, initialDate }) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  const [view, setView] = useState({ y: today.getFullYear(), m: today.getMonth() });
-  const [weekStart, setWeekStart] = useState(startOfWeek(today));
+  const initial = (() => {
+    if (initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate)) {
+      const [y, m, d] = initialDate.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+    return today;
+  })();
+  const [view, setView] = useState({ y: initial.getFullYear(), m: initial.getMonth() });
+  const [weekStart, setWeekStart] = useState(startOfWeek(initial));
+  const highlightISO = initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate) ? initialDate : null;
   const [viewMode, setViewMode] = useState("month"); // "month" | "week"
   const bookableBoats = BOATS.filter((b) => !b.comingSoon);
   const [selectedBoatId, setSelectedBoatId] = useState(bookableBoats[0]?.id ?? null);
@@ -128,6 +137,7 @@ function PlanningPage({ setPage }) {
   const itemsForSlot = (d, slotId) => {
     const iso = d.toISOString().slice(0, 10);
     const items = dayMap.get(iso) || [];
+    if (slotId === "full") return items;
     return items.filter((it) => it.slot === "full" || it.slot === slotId);
   };
   const slotStatus = (d, slotId) => {
@@ -170,6 +180,8 @@ function PlanningPage({ setPage }) {
         .pc-day:hover:not(:disabled) { filter: brightness(0.97); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(11,31,58,0.1); }
         .pc-day:disabled { cursor: not-allowed; }
         .pc-day.today { box-shadow: 0 0 0 2px var(--navy, #0B1F3A) inset; }
+        .pc-day.highlight { box-shadow: 0 0 0 3px #5BAEDC inset, 0 6px 18px rgba(91,174,220,0.35); animation: pcPulse 1.6s ease-in-out 2; }
+        @keyframes pcPulse { 0%, 100% { box-shadow: 0 0 0 3px #5BAEDC inset, 0 6px 18px rgba(91,174,220,0.35); } 50% { box-shadow: 0 0 0 4px #5BAEDC inset, 0 10px 26px rgba(91,174,220,0.55); } }
         .pc-day.today:hover:not(:disabled) { box-shadow: 0 0 0 2px var(--navy, #0B1F3A) inset, 0 6px 16px rgba(11,31,58,0.1); }
         .pc-day .pc-day-num { font-weight: 700; font-size: 19px; line-height: 1; }
         .pc-day .pc-day-state { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; display: inline-flex; align-items: center; gap: 4px; }
@@ -348,6 +360,8 @@ function PlanningPage({ setPage }) {
             else if (amBooked || pmBooked) { cls += " partial"; stateLabel = "Partiel"; }
             else { cls += " avail"; stateLabel = "Libre"; }
             if (isToday) cls += " today";
+            const localIso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            if (highlightISO && localIso === highlightISO) cls += " highlight";
             const titleText = isPast
               ? "Date passée"
               : (amBooked && pmBooked)
@@ -411,6 +425,8 @@ function PlanningPage({ setPage }) {
                 {[
                   { id: "am", label: "Matin", hours: "9h – 13h", info: amInfo },
                   { id: "pm", label: "Après-midi", hours: "14h – 18h", info: pmInfo },
+                  { id: "sunset", label: "Sunset", hours: "19h – 22h30", info: slotStatus(date, "sunset") },
+                  { id: "full", label: "Journée complète", hours: "9h – 22h30", info: slotStatus(date, "full") },
                 ].map((s) => {
                   const booked = s.info.fullyBooked;
                   return (

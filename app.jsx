@@ -27,11 +27,10 @@ const BOATS = [
   preAuth: 2000,
   options: [
     { id: "buoy", label: "Bouée tractée", label_en: "Towed inflatable", price: 30 },
-    { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 40 },
-    { id: "paddle", label: "Paddle board", label_en: "Paddle board", price: 30 },
+    { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 30 },
+    { id: "paddle", label: "Paddle board", label_en: "Paddle board", price: 20 },
     { id: "snorkel", label: "Accessoires snorkeling", label_en: "Snorkeling gear", price: 20 },
-    { id: "aperitif-day", label: "Apéritif Gourmand + Boisson sans alcool", label_en: "Gourmet aperitif + non-alcoholic drink", price: 45, slotOnly: "day", pricingNote: "30 € pour 2 personnes · 45 € pour 4 personnes", pricingNote_en: "€30 for 2 people · €45 for 4 people" },
-    { id: "aperitif-halfday", label: "Apéritif Gourmand + Boisson", label_en: "Gourmet aperitif + drink", price: 0, slotOnly: "halfday", onRequest: true }
+    { id: "aperitif-halfday", label: "Apéritif Gourmand + Boisson", label_en: "Gourmet aperitif + drink", price: 25, slotOnly: "halfday", onRequest: true }
   ],
   rating: 4.9,
   reviews: 47,
@@ -110,7 +109,12 @@ function pageToPath(page) {
   switch (page.name) {
     case "home": path = "/"; break;
     case "catalog": path = "/catalogue"; break;
-    case "planning": path = "/disponibilites"; break;
+    case "planning": {
+      path = "/disponibilites";
+      if (page.date) return BASE_PATH + path + "?date=" + encodeURIComponent(page.date);
+      return BASE_PATH + path;
+    }
+    case "fireworks": path = "/feux-artifice"; break;
     case "detail": path = `/bateau/${page.id}`; break;
     case "booking": {
       path = `/reservation/${page.id}`;
@@ -138,7 +142,12 @@ function pathToPage(pathname, search) {
   if (parts.length === 0) return { name: "home" };
   switch (parts[0]) {
     case "catalogue": return { name: "catalog" };
-    case "disponibilites": return { name: "planning" };
+    case "disponibilites": {
+      const page = { name: "planning" };
+      if (params.get("date")) page.date = params.get("date");
+      return page;
+    }
+    case "feux-artifice": return { name: "fireworks" };
     case "bateau": return parts[1] ? { name: "detail", id: +parts[1] || parts[1] } : { name: "catalog" };
     case "reservation": {
       if (!parts[1]) return { name: "catalog" };
@@ -244,6 +253,7 @@ function Nav({ page, setPage, dark }) {
   { id: "home", label: t("Accueil", "Home") },
   { id: "catalog", label: t("Catalogue", "Catalog") },
   { id: "planning", label: t("Disponibilités", "Availability") },
+  { id: "fireworks", label: t("Feux d'artifice", "Fireworks") },
   { id: "capsud", label: "Cap Sud" },
   { id: "about", label: t("À propos", "About") },
   { id: "contact", label: t("Contact", "Contact") }];
