@@ -380,6 +380,24 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .quote p { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(28px, 3.5vw, 44px); line-height: 1.25; color: var(--ink); margin-bottom: 24px; }
 .quote span { font-size: 14px; color: var(--ink-soft); }
 
+/* ===== LEGAL PAGES ===== */
+.legal-page { max-width: 900px; margin: 0 auto; padding: 40px 32px 80px; }
+.legal-page .eyebrow { margin-bottom: 8px; }
+.legal-page h1 { margin: 8px 0 8px; font-size: clamp(32px, 4vw, 44px); line-height: 1.15; }
+.legal-page .legal-updated { color: var(--ink-soft); font-size: 14px; margin: 0 0 32px; }
+.legal-page section { margin: 32px 0; }
+.legal-page h2 { font-size: 22px; margin: 0 0 12px; color: var(--ink); }
+.legal-page h3 { font-size: 17px; margin: 20px 0 8px; color: var(--ink); font-weight: 600; }
+.legal-page p, .legal-page li { color: var(--ink-soft); line-height: 1.65; font-size: 15px; }
+.legal-page p { margin: 0 0 12px; }
+.legal-page ul { padding-left: 20px; margin: 0 0 12px; }
+.legal-page li { margin-bottom: 6px; }
+.legal-page a { color: var(--accent); text-decoration: none; }
+.legal-page a:hover { text-decoration: underline; }
+.legal-page .legal-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 20px 24px; margin: 12px 0 20px; }
+.legal-page .legal-card p { margin: 4px 0; }
+@media (max-width: 720px) { .legal-page { padding: 24px 18px 60px; } }
+
 /* ===== CONTACT ===== */
 .contact-grid { max-width: 1280px; margin: 0 auto; padding: 80px 32px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: start; }
 .contact-info h1 { margin: 12px 0 20px; }

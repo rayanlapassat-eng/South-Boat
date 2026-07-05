@@ -1,4 +1,4 @@
-/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage */
+/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage, MentionsLegalesPage, CGVPage, PrivacyPage */
 /* ============================================================
    boot.jsx — Amorçage de l'application South Boat
    SOURCE JSX : à recompiler en boot.js via `npm run build`
@@ -111,6 +111,15 @@ function App() {
       const nm = itMap[page.id] || "Itinéraire";
       title = `${nm} en bateau depuis Mandelieu | ${SITE}`;
       desc  = itDescMap[page.id] || `Découvrez l'itinéraire ${nm} depuis Mandelieu : escales, mouillages et conseils pour une journée en mer réussie avec South Boat.`;
+    } else if (page.name === "cgv") {
+      title = `Conditions Générales de Vente | ${SITE}`;
+      desc  = "Conditions Générales de Vente South Boat : réservation, annulation, caution, obligations du locataire, sécurité et médiation.";
+    } else if (page.name === "legal") {
+      title = `Mentions légales | ${SITE}`;
+      desc  = "Mentions légales du site South Boat : éditeur, hébergeur, propriété intellectuelle et contact.";
+    } else if (page.name === "privacy") {
+      title = `Politique de confidentialité | ${SITE}`;
+      desc  = "Politique de confidentialité South Boat : données collectées, finalités, durée de conservation, cookies et vos droits RGPD.";
     } else if (page.name === "capsud-article" && page.id) {
       const a = ARTICLES.find(x => x.id === page.id || x.slug === page.id);
       if (a) {
@@ -150,6 +159,9 @@ function App() {
       {page.name === "capsud" && <CapSudListPage setPage={setPage} />}
       {page.name === "capsud-article" && <CapSudArticlePage id={page.id} setPage={setPage} />}
       {page.name === "itinerary" && <ItineraryPage id={page.id} setPage={setPage} />}
+      {page.name === "cgv" && <CGVPage setPage={setPage} />}
+      {page.name === "legal" && <MentionsLegalesPage setPage={setPage} />}
+      {page.name === "privacy" && <PrivacyPage setPage={setPage} />}
 
       <TweaksPanel>
         <TweakSection title="Style des boutons">

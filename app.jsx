@@ -32,8 +32,6 @@ const BOATS = [
     { id: "snorkel", label: "Accessoires snorkeling", label_en: "Snorkeling gear", price: 20 },
     { id: "aperitif-halfday", label: "Apéritif Gourmand + Boisson", label_en: "Gourmet aperitif + drink", price: 25, slotOnly: "halfday", onRequest: true }
   ],
-  rating: 4.9,
-  reviews: 47,
   crew: "Avec ou sans skipper",
   crew_en: "With or without skipper",
   images: [
@@ -129,6 +127,9 @@ function pageToPath(page) {
     case "capsud": path = "/cap-sud"; break;
     case "capsud-article": path = `/cap-sud/${page.id}`; break;
     case "itinerary": path = `/itineraire/${page.id}`; break;
+    case "cgv": path = "/cgv"; break;
+    case "legal": path = "/mentions-legales"; break;
+    case "privacy": path = "/confidentialite"; break;
     default: path = "/"; break;
   }
   return BASE_PATH + path;
@@ -160,6 +161,9 @@ function pathToPage(pathname, search) {
     case "contact": return { name: "contact" };
     case "cap-sud": return parts[1] ? { name: "capsud-article", id: parts[1] } : { name: "capsud" };
     case "itineraire": return parts[1] ? { name: "itinerary", id: parts[1] } : { name: "home" };
+    case "cgv": return { name: "cgv" };
+    case "mentions-legales": return { name: "legal" };
+    case "confidentialite": return { name: "privacy" };
     default: return { name: "home" };
   }
 }
