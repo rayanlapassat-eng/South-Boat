@@ -183,7 +183,7 @@ function HomePage({ setPage, query, setQuery }) {
           </div>
           <article className="capsud-feature-card" onClick={() => setPage({ name: "capsud-article", id: latestArticle.id })}>
             <div className="capsud-feature-img">
-              <img src={latestArticle.cover} alt={latestArticle.title} loading="lazy" decoding="async" />
+              <img src={asset(latestArticle.cover)} alt={latestArticle.title} loading="lazy" decoding="async" />
             </div>
             <div className="capsud-feature-body">
               <span className="capsud-date">{fmtArticleDate(latestArticle.date)}</span>
@@ -2020,7 +2020,7 @@ function CapSudListPage({ setPage }) {
           </div>
           <div className="departure-card" onClick={() => setPage({ name: "capsud-article", id: highlight.id })} style={{ cursor: "pointer" }}>
             <div className="departure-map">
-              <img src={highlight.cover} alt={highlight.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <img src={asset(highlight.cover)} alt={highlight.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
             <div className="departure-text">
               <p className="eyebrow">{fmtArticleDate(highlight.date, t.lang)}</p>
@@ -2054,7 +2054,7 @@ function CapSudListPage({ setPage }) {
             {rest.map((a) => (
               <article key={a.id} className="capsud-card" onClick={() => setPage({ name: "capsud-article", id: a.id })}>
                 <div className="capsud-card-img">
-                  <img src={a.cover} alt={a.title} loading="lazy" decoding="async" />
+                  <img src={asset(a.cover)} alt={a.title} loading="lazy" decoding="async" />
                 </div>
                 <div className="capsud-card-body">
                   <span className="capsud-date">{fmtArticleDate(a.date, t.lang)}</span>
@@ -2169,7 +2169,7 @@ function CapSudArticlePage({ id, setPage }) {
           </p>
         </header>
         <div className="article-cover">
-          <img src={article.cover} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} fetchpriority="high" decoding="async" />
+          <img src={asset(article.cover)} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} fetchpriority="high" decoding="async" />
         </div>
         <div className="article-body">
           {(article.content || []).map((p, i) => {
@@ -2326,6 +2326,385 @@ function ItineraryPage({ id, setPage }) {
 }
 
 // ============ FOOTER ============
+// ============ PAGES LÉGALES ============
+function LegalShell({ setPage, eyebrow, title, updated, children }) {
+  const t = window.useT();
+  return (
+    <main className="legal-page">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: eyebrow },
+      ]} />
+      <p className="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      {updated && <p className="legal-updated">{updated}</p>}
+      {children}
+      <Footer />
+    </main>);
+}
+
+function MentionsLegalesPage({ setPage }) {
+  const t = window.useT();
+  return (
+    <LegalShell
+      setPage={setPage}
+      eyebrow={t("Mentions légales", "Legal notice")}
+      title={t("Mentions légales", "Legal notice")}
+      updated={t("Conformément à la loi n° 2004-575 du 21 juin 2004 (LCEN).", "Pursuant to French law n° 2004-575 of 21 June 2004 (LCEN).")}>
+      <section>
+        <h2>Article 1 — Éditeur du site</h2>
+        <div className="legal-card">
+          <p><strong>Dénomination sociale :</strong> SOUTH BOAT</p>
+          <p><strong>Siège social :</strong> 4 rue des Grillons, 06130 Grasse</p>
+          <p><strong>RCS :</strong> Grasse — 102 042 082</p>
+          <p><strong>Co-dirigeants :</strong> Maxim Camilo et Vincent Condo</p>
+          <p><strong>Téléphone :</strong> 06 34 49 16 21 (Maxim) / 07 86 23 78 48 (Vincent)</p>
+          <p><strong>Email :</strong> <a href="mailto:contact@south-boat.com">contact@south-boat.com</a></p>
+          <p><strong>Site internet :</strong> <a href="https://south-boat.com">south-boat.com</a></p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Article 2 — Hébergeur</h2>
+        <div className="legal-card">
+          <p><strong>Hostinger International Ltd</strong></p>
+          <p>61 Lordou Vironos Street, 6023 Larnaca, Chypre</p>
+          <p>Site web : <a href="https://www.hostinger.fr" target="_blank" rel="noopener noreferrer">www.hostinger.fr</a></p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Article 3 — Propriété intellectuelle</h2>
+        <p>L'ensemble des contenus présents sur le site de SOUTH BOAT (textes, images, photographies, vidéos, logos, graphismes, etc.) sont protégés par le droit de la propriété intellectuelle et sont la propriété exclusive de SOUTH BOAT ou de leurs auteurs respectifs.</p>
+        <p>Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie de ces éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation préalable et écrite de SOUTH BOAT, sous peine de poursuites judiciaires.</p>
+      </section>
+
+      <section>
+        <h2>Article 4 — Responsabilité</h2>
+        <p>SOUTH BOAT s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur son site. Toutefois, SOUTH BOAT ne peut garantir l'exactitude, la précision ou l'exhaustivité des informations mises à disposition.</p>
+        <p>SOUTH BOAT décline toute responsabilité pour toute imprécision, inexactitude ou omission portant sur des informations disponibles sur le site, ainsi que pour tous dommages résultant d'une intrusion frauduleuse d'un tiers ayant entraîné une modification des informations publiées.</p>
+      </section>
+
+      <section>
+        <h2>Article 5 — Liens hypertextes</h2>
+        <p>Le site de SOUTH BOAT peut contenir des liens hypertextes vers d'autres sites internet. SOUTH BOAT n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu ou aux pratiques de ces tiers en matière de protection des données personnelles.</p>
+        <p>La création de liens hypertextes pointant vers le site de SOUTH BOAT est soumise à l'accord préalable et écrit de SOUTH BOAT.</p>
+      </section>
+
+      <section>
+        <h2>Article 6 — Cookies</h2>
+        <p>Le site de SOUTH BOAT est susceptible d'utiliser des cookies afin d'améliorer l'expérience utilisateur. L'utilisateur peut configurer son navigateur pour refuser les cookies ou être alerté de leur utilisation.</p>
+        <p>Pour plus d'informations sur l'utilisation des cookies et des données personnelles, veuillez consulter notre <a onClick={() => setPage({ name: "privacy" })} style={{ cursor: "pointer" }}>Politique de Confidentialité</a>.</p>
+      </section>
+
+      <section>
+        <h2>Article 7 — Droit applicable et juridiction compétente</h2>
+        <p>Les présentes mentions légales sont régies par le droit français. En cas de litige, et après tentative de résolution amiable, les tribunaux français seront seuls compétents. Pour tout différend, compétence est donnée au Tribunal de Grasse.</p>
+      </section>
+
+      <section>
+        <h2>Article 8 — Contact</h2>
+        <div className="legal-card">
+          <p>Par email : <a href="mailto:contact@south-boat.com">contact@south-boat.com</a></p>
+          <p>Par téléphone : 06 34 49 16 21 ou 07 86 23 78 48</p>
+          <p>Par courrier : SOUTH BOAT — 4 rue des Grillons, 06130 Grasse</p>
+        </div>
+      </section>
+    </LegalShell>);
+}
+
+function CGVPage({ setPage }) {
+  const t = window.useT();
+  return (
+    <LegalShell
+      setPage={setPage}
+      eyebrow={t("Conditions Générales de Vente", "Terms & Conditions")}
+      title={t("Conditions Générales de Vente", "Terms & Conditions")}
+      updated={t("Applicables à toute réservation auprès de SOUTH BOAT.", "Applicable to all bookings with SOUTH BOAT.")}>
+      <section>
+        <h2>Article 1 — Application des conditions</h2>
+        <p>Le loueur est défini ci-dessous comme étant la Société SOUTH BOAT, dont le siège social se trouve à l'adresse suivante : 4 rue des Grillons, 06130 Grasse. Société inscrite au RCS de Grasse sous le numéro 102 042 082.</p>
+        <p>Le locataire est défini ci-dessous comme étant la société ou la personne signataire et acceptant les présentes conditions générales de location. Le locataire reconnaît avoir la capacité de contracter aux conditions décrites ci-après, c'est-à-dire avoir la majorité légale et ne pas être sous tutelle ou curatelle. Le locataire reconnaît avoir pris connaissance des présentes CGV avant d'avoir passé commande.</p>
+        <p>Les présentes conditions générales peuvent être modifiées à tout moment et sans préavis par la société South Boat, les modifications étant alors applicables à toutes commandes postérieures.</p>
+      </section>
+
+      <section>
+        <h2>Article 2 — Tarification</h2>
+        <p>Le montant de la location reste acquis au loueur, que le locataire ait fait ou non usage du bateau pendant la période de location quel que soit le motif de cette vacance.</p>
+        <p>Les méthodes de paiement peuvent se faire directement sur le site de la société South Boat, par virement ou lien de paiement avant toute prise en charge du bateau.</p>
+      </section>
+
+      <section>
+        <h2>Article 3 — Résiliation du contrat par le loueur</h2>
+        <p>Si suite à une avarie survenue pendant la location précédente ou à un empêchement indépendant de sa volonté le loueur ne peut donner la jouissance du bateau désigné, il a pleine faculté de mettre à la disposition du locataire une unité de taille équivalente ou plus importante. S'il ne peut le faire 48 heures après la date prévue de départ, les sommes versées sont restituées sans que le locataire ne puisse prétendre à des dommages et intérêts.</p>
+      </section>
+
+      <section>
+        <h2>Article 4 — Absence de droit de rétractation</h2>
+        <p>Conformément aux dispositions de l'article L.221-28, 12° du Code de la consommation, le Client est informé que le droit de rétractation de quatorze (14) jours prévu pour les contrats conclus à distance ou hors établissement ne s'applique pas aux contrats portant sur des prestations d'activités de loisirs devant être fournies à une date ou selon une période déterminée.</p>
+        <p>Les prestations de location de bateau proposées par SOUTH BOAT étant des activités de loisirs exécutées à une date et sur un créneau horaire convenus lors de la réservation, le Client ne bénéficie d'aucun droit de rétractation après la conclusion du contrat.</p>
+        <p>Toute réservation est donc ferme et définitive. En cas d'annulation par le Client, les conditions d'annulation et de remboursement prévues aux présentes Conditions Générales de Vente s'appliquent.</p>
+      </section>
+
+      <section>
+        <h2>Article 5 — Résiliation du contrat par le locataire</h2>
+        <p>En cas d'annulation de la réservation par le locataire, les sommes versées restent acquises au LOUEUR au titre d'indemnités de résiliation, sauf si l'annulation est effectuée dans un délai de 7 jours avant la date prévue.</p>
+      </section>
+
+      <section>
+        <h2>Article 6 — Prise en charge du bateau</h2>
+        <p>Le loueur s'engage à confier au locataire un bateau dans un parfait état de fonctionnement, d'ordre et de propreté ; les piles, le gaz, le carburant, ainsi que les frais de transport sont à la charge du locataire, la recharge de gaz pleine, les pleins de carburant et d'eau faits.</p>
+        <p>Un inventaire signé par le locataire et le loueur vaut reconnaissance du matériel mis à disposition. Le locataire doit dès la prise en mains du bateau contrôler cet inventaire pour vérifier le bon état du bateau et de son équipement. En cas d'arrivée la veille au soir de la location ou de non-signature de l'inventaire, si aucune remarque ou réserve n'est faite préalablement à son départ en location, le locataire reconnaît expressément accepter l'inventaire établi par le loueur.</p>
+      </section>
+
+      <section>
+        <h2>Article 8 — Obligations du locataire</h2>
+        <p>Le locataire certifie que le chef de bord a les connaissances nécessaires pour accomplir la navigation envisagée.</p>
+        <p>Le locataire d'un bateau à moteur au-dessus de 6 CV certifie être titulaire du permis mer (carte Mer, permis Côtier ou Hauturier) dont il doit fournir une photocopie. Le locataire s'engage à n'embarquer que le nombre de personnes correspondant à la réglementation. Il s'engage à n'utiliser le bateau que pour une navigation de plaisance dans le cadre de la législation maritime et douanière en vigueur, en correspondance avec le type et l'armement du bateau désigné, à l'exclusion de toutes opérations de commerce, pêche professionnelle, transport ou autre.</p>
+        <p>Le locataire décharge expressément le loueur de toute responsabilité en qualité d'armateur ou autre du fait d'un manquement à ces interdictions, et répond seul vis-à-vis des services maritimes ou des douanes, des procès, poursuites, amendes et confiscations encourus par lui de ce chef même en cas de faute involontaire de sa part.</p>
+        <p>En cas de saisie du bateau loué, le locataire est tenu de rembourser sa valeur dans un délai d'un mois. Il est formellement interdit au locataire de laisser le bateau en mouillage forain ou sans surveillance, sans personne à bord capable de le manœuvrer. En cas de sinistre dans de telles circonstances, la responsabilité du locataire serait irrévocablement engagée.</p>
+      </section>
+
+      <section>
+        <h2>Article 9 — Contrat de location-affrètement et assurances</h2>
+        <p>Le loueur est tenu de lire et de comprendre le contrat de location suivant avant le départ.</p>
+      </section>
+
+      <section>
+        <h2>Article 10 — Caution</h2>
+        <p>La caution est versée par le locataire au moment de la prise en charge du bateau. À hauteur de <strong>2 000 €</strong>, elle a pour objet de garantir les détériorations du bien loué ou les pertes d'objets imputables au locataire et non couvertes par l'assurance. Elle est restituée entre huit et trente jours après le retour du bateau. En cas de détérioration du bien loué ou de pertes non couvertes par l'assurance imputables au locataire, ou sur lesquelles un doute subsiste, le remboursement de la caution peut être différé jusqu'au règlement des frais correspondants par le locataire. Le loueur est tenu de rembourser un règlement versé postérieurement par l'assurance.</p>
+        <p>La franchise, fixée à <strong>370 €</strong>, doit être réglée par le locataire dans un délai de 30 jours ouvrables suivant la date du sinistre.</p>
+      </section>
+
+      <section>
+        <h2>Article 11 — Avaries survenant en cours de location</h2>
+        <h3>1. Obligation d'information</h3>
+        <p>Le locataire s'engage à informer immédiatement le loueur de toute avarie, panne, anomalie de fonctionnement, échouement, collision, perte d'accessoire ou incident survenu pendant la durée de la location, même si celui-ci semble mineur.</p>
+        <h3>2. Avarie mineure</h3>
+        <p>En cas d'avarie ne compromettant pas la sécurité du bateau ni la poursuite de la navigation, le locataire doit contacter le loueur. Aucune réparation, remplacement de pièce ou intervention d'un tiers ne pourra être engagé sans l'accord préalable du loueur, sauf en cas d'urgence absolue mettant en danger les personnes ou le navire.</p>
+        <h3>3. Avarie grave</h3>
+        <p>En cas d'avarie grave (voie d'eau, incendie, collision, échouement, perte de propulsion, perte de direction ou tout autre événement compromettant la sécurité), le locataire devra :</p>
+        <ul>
+          <li>assurer en priorité la sécurité des personnes embarquées ;</li>
+          <li>prévenir immédiatement le loueur par téléphone ;</li>
+          <li>suivre les instructions données par le loueur ;</li>
+          <li>contacter les services de secours si la situation l'exige ;</li>
+          <li>ne pas abandonner le navire sauf en cas de danger immédiat.</li>
+        </ul>
+        <h3>4. Responsabilité du locataire</h3>
+        <p>Le locataire est responsable de toute avarie résultant d'une mauvaise utilisation du bateau, d'une faute de navigation, du non-respect de la réglementation maritime, d'une négligence ou d'un usage contraire aux consignes remises lors de la prise en main.</p>
+        <p>Les frais de réparation, de remorquage, de récupération du bateau, d'immobilisation ainsi que les éventuels dommages causés à des tiers pourront être mis à sa charge dans la limite des dispositions du contrat, des garanties d'assurance et du dépôt de garantie.</p>
+        <h3>5. Avarie non imputable au locataire</h3>
+        <p>Lorsqu'une panne ou une avarie résulte d'un vice caché, d'une usure normale ou d'une défaillance technique indépendante de toute faute du locataire, celui-ci ne pourra être tenu responsable des réparations.</p>
+        <h3>6. Restitution</h3>
+        <p>Toute avarie, même réparée pendant la location, devra être signalée au retour du bateau. Le locataire s'engage à fournir un récit précis des circonstances de l'incident afin de faciliter les démarches d'assurance si nécessaire.</p>
+        <p>Toute dissimulation volontaire d'une avarie pourra entraîner la retenue totale ou partielle du dépôt de garantie, sans préjudice des poursuites ou demandes d'indemnisation qui pourraient être engagées. Le loueur fera alors ses meilleurs efforts pour proposer une solution adaptée (assistance, remplacement du bateau si possible ou remboursement partiel de la prestation en fonction du temps de navigation réellement effectué).</p>
+      </section>
+
+      <section>
+        <h2>Article 12 — Restitution du bateau</h2>
+        <p>Le locataire est tenu de restituer le bateau au port d'embarquement au jour et à l'heure convenus. Tout retard non justifié et non autorisé par le loueur donnera lieu à l'application d'une pénalité forfaitaire de <strong>50 €</strong> pour la première heure de retard entamée. Au-delà, chaque heure de retard sera facturée au double du tarif horaire de location en vigueur.</p>
+        <p>De plus, si ce retard entraîne l'annulation ou la modification de la location du client suivant, le locataire sortant sera tenu de rembourser l'intégralité du préjudice commercial subi par le loueur, ainsi que les frais annexes générés (frais de recherche, déplacements, etc.). En cas de force majeure empêchant le retour à l'heure, le locataire doit immédiatement contacter le loueur pour convenir de la marche à suivre.</p>
+      </section>
+
+      <section>
+        <h2>Article 13 — Réserves</h2>
+        <p>La sous-location et le prêt sont rigoureusement interdits, sous peine de poursuites, tous frais étant alors à la charge du locataire. L'utilisation en course ou en régate ne peut être effectuée qu'en accord avec LE LOUEUR, avec un supplément au tarif, franchise et caution doublées.</p>
+      </section>
+
+      <section>
+        <h2>Article 14 — Livre de bord</h2>
+        <p>Le locataire du bateau est responsable, en vertu des lois et règlements sur la navigation de plaisance, de la tenue du livre de bord pendant toute la durée de l'affrètement (en 3ᵉ, 2ᵉ et 1ʳᵉ catégorie). Sur ce livre de bord fourni par le loueur doivent figurer les indications sur la navigation et tous les incidents et avaries relatifs au bateau et à la navigation.</p>
+      </section>
+
+      <section>
+        <h2>Article 15 — Litiges</h2>
+        <p>Tous frais quelconques de procédure consécutifs à la présente location seraient à la charge du locataire responsable, sauf décision contraire du tribunal. Pour toutes contestations relatives à l'exécution du présent contrat, l'attribution de juridiction est faite au tribunal de Grasse.</p>
+      </section>
+
+      <section>
+        <h2>Article 16 — Cas de force majeure</h2>
+        <p>La Société se dégage de toute responsabilité pour tout manquement quelconque à ses obligations contractuelles dans les cas de force majeure ou fortuits, y compris et à titre non limitatif, guerre, catastrophes, incendies, grève interne ou externe, défaillance ou pannes internes ou externes, et d'une manière générale tout événement ne permettant pas la bonne exécution des commandes.</p>
+      </section>
+
+      <section>
+        <h2>Article 17 — Processus de médiation des litiges de consommation</h2>
+        <p>Conformément à l'article L612-1 du Code de la consommation, tout consommateur a le droit de recourir gratuitement à un médiateur de la consommation en vue de la résolution amiable du litige qui l'oppose à un professionnel.</p>
+        <p>Après avoir écrit à South Boat, le consommateur pourra saisir le Service du Médiateur pour tout litige de consommation dont le règlement n'aurait pas abouti :</p>
+        <div className="legal-card">
+          <p><strong>MEDIATION-NET Consommation</strong></p>
+          <p>3, rue des Morillons — 75015 Paris</p>
+          <p><a href="https://www.mediation-net.com" target="_blank" rel="noopener noreferrer">www.mediation-net.com</a></p>
+        </div>
+        <p>Conformément à l'article 14 du Règlement (UE) n° 524/2013, la Commission européenne a mis en place une plateforme de règlement en ligne des litiges (RLL), accessible à l'adresse suivante : <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a>.</p>
+      </section>
+
+      <section>
+        <h2>Article 18 — Territorialité</h2>
+        <p>Les présentes conditions générales sont soumises au droit français. Le client peut, à tout moment, consulter ses droits sur les sites suivants : <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener noreferrer">www.legifrance.gouv.fr</a> et <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a>.</p>
+        <p>Tout différend relatif à la validité, à l'interprétation, à l'exécution ou à la non-exécution des présentes conditions générales sera soumis aux juridictions compétentes conformément aux dispositions du Code de la consommation et du Code de procédure civile.</p>
+        <p>Conformément à l'article R631-3 du Code de la consommation, le consommateur peut saisir, soit l'une des juridictions territorialement compétentes en vertu du Code de procédure civile, soit la juridiction du lieu où il demeurait au moment de la conclusion du contrat ou de la survenance du fait dommageable.</p>
+      </section>
+
+      <section>
+        <h2>Article 19 — Protection des données personnelles (RGPD)</h2>
+        <p>Conformément au Règlement (UE) 2016/679 du 27 avril 2016 (RGPD) et à la Loi Informatique et Libertés du 6 janvier 1978 modifiée, la société SOUTH BOAT est responsable du traitement des données personnelles collectées dans le cadre des réservations et de l'exécution du contrat de location.</p>
+        <p>Pour le détail des traitements, durées de conservation et de vos droits, consultez notre <a onClick={() => setPage({ name: "privacy" })} style={{ cursor: "pointer" }}>Politique de Confidentialité</a>.</p>
+      </section>
+
+      <section>
+        <h2>Article 20 — Conditions météorologiques et sécurité</h2>
+        <p>La navigation est soumise aux conditions météorologiques et à l'appréciation du loueur, dont la priorité est la sécurité des personnes et des biens.</p>
+        <p>Le loueur se réserve le droit de refuser le départ, de retarder la prise en charge du bateau, d'interrompre ou d'annuler la location en cas de conditions météorologiques défavorables, d'alerte émise par les autorités compétentes, de vent fort, de mer dangereuse ou de tout événement susceptible de compromettre la sécurité de la navigation.</p>
+        <p>En cas d'annulation avant le départ pour des raisons de sécurité liées aux conditions météorologiques, le locataire pourra, selon les disponibilités, bénéficier soit :</p>
+        <ul>
+          <li>d'un report de la location à une date ultérieure ;</li>
+          <li>d'un avoir valable pendant une durée de douze (12) mois ;</li>
+          <li>ou du remboursement des sommes versées, à l'exclusion de toute autre indemnité.</li>
+        </ul>
+        <p>Si les conditions météorologiques se dégradent après le départ du bateau, aucun remboursement, total ou partiel, ne pourra être exigé lorsque la prestation a déjà débuté, sauf décision commerciale du loueur.</p>
+        <p>Le chef de bord demeure responsable du respect des règles de navigation et s'engage à suivre les consignes de sécurité données par SOUTH BOAT. Le port des équipements de sécurité obligatoires, le respect des limitations de navigation, des zones réglementées et des consignes des autorités maritimes sont impératifs.</p>
+        <p>Le loueur pourra mettre fin immédiatement à la location sans indemnité ni remboursement en cas de comportement dangereux, de non-respect des consignes de sécurité, de navigation sous l'emprise de l'alcool ou de produits stupéfiants, ou de toute utilisation du bateau susceptible de mettre en danger les personnes ou le matériel.</p>
+      </section>
+    </LegalShell>);
+}
+
+function PrivacyPage({ setPage }) {
+  const t = window.useT();
+  return (
+    <LegalShell
+      setPage={setPage}
+      eyebrow={t("Confidentialité", "Privacy")}
+      title={t("Politique de confidentialité", "Privacy policy")}
+      updated={t("Dernière mise à jour : juillet 2026 — Conformité RGPD.", "Last updated: July 2026 — GDPR compliant.")}>
+      <section>
+        <h2>Article 1 — Responsable du traitement</h2>
+        <p>Conformément au Règlement (UE) 2016/679 du 27 avril 2016 (RGPD) et à la Loi Informatique et Libertés du 6 janvier 1978 modifiée, le responsable du traitement des données personnelles collectées via le site et dans le cadre des contrats de location est :</p>
+        <div className="legal-card">
+          <p><strong>SOUTH BOAT</strong></p>
+          <p>4 rue des Grillons, 06130 Grasse</p>
+          <p>RCS Grasse — 102 042 082</p>
+          <p>Email : <a href="mailto:contact@south-boat.com">contact@south-boat.com</a></p>
+          <p>Téléphone : 06 34 49 16 21 / 07 86 23 78 48</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Article 2 — Données collectées</h2>
+        <p>Dans le cadre de la réservation et de l'exécution du contrat de location, SOUTH BOAT collecte les données personnelles suivantes :</p>
+        <ul>
+          <li><strong>Identité :</strong> nom, prénom, date de naissance</li>
+          <li><strong>Coordonnées :</strong> adresse postale, numéro de téléphone, adresse e-mail</li>
+          <li><strong>Documents officiels :</strong> copie du permis bateau, copie de la pièce d'identité</li>
+          <li><strong>Informations de paiement :</strong> coordonnées bancaires, caution</li>
+          <li><strong>Données de navigation :</strong> adresse IP, cookies, données de connexion au site internet</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Article 3 — Finalités du traitement</h2>
+        <p>Les données personnelles collectées sont utilisées exclusivement pour les finalités suivantes :</p>
+        <ul>
+          <li>La gestion des réservations et des contrats de location ;</li>
+          <li>L'exécution des prestations de location de bateau ;</li>
+          <li>La gestion des paiements, cautions et franchises ;</li>
+          <li>Le suivi et la gestion des sinistres et avaries ;</li>
+          <li>Le respect des obligations légales et réglementaires (autorités maritimes, douanes, assurances) ;</li>
+          <li>La gestion des litiges et des demandes de médiation ;</li>
+          <li>L'amélioration de nos services et de l'expérience utilisateur sur le site.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Article 4 — Base légale du traitement</h2>
+        <ul>
+          <li><strong>Exécution d'un contrat :</strong> les données sont nécessaires à la réalisation de la prestation de location.</li>
+          <li><strong>Obligation légale :</strong> certaines données sont collectées pour répondre aux obligations imposées par la réglementation maritime, fiscale et administrative.</li>
+          <li><strong>Intérêt légitime :</strong> amélioration des services, gestion des sinistres et de la sécurité.</li>
+          <li><strong>Consentement :</strong> pour l'utilisation de cookies non essentiels.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Article 5 — Durée de conservation</h2>
+        <ul>
+          <li><strong>Données contractuelles :</strong> 5 ans à compter de la fin du contrat de location.</li>
+          <li><strong>Données de paiement :</strong> conformément aux obligations légales en vigueur (5 ans).</li>
+          <li><strong>Données de navigation (cookies) :</strong> 13 mois maximum à compter du dépôt du cookie.</li>
+          <li><strong>Documents d'identité et permis :</strong> durée du contrat + 1 an.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Article 6 — Destinataires des données</h2>
+        <p>Vos données personnelles ne sont ni vendues ni cédées à des tiers à des fins commerciales. Elles peuvent être transmises aux destinataires suivants, dans la stricte limite des finalités définies ci-dessus :</p>
+        <ul>
+          <li>Les compagnies d'assurance dans le cadre de la couverture du contrat de location ;</li>
+          <li>Les autorités maritimes, douanières et judiciaires si la réglementation l'exige ;</li>
+          <li>Les prestataires techniques assurant l'hébergement du site (Hostinger International Ltd) ;</li>
+          <li>Les organismes de médiation en cas de litige (MEDIATION-NET Consommation).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Article 7 — Vos droits</h2>
+        <p>Conformément au RGPD, vous disposez des droits suivants concernant vos données personnelles :</p>
+        <ul>
+          <li><strong>Droit d'accès :</strong> obtenir une copie de vos données personnelles.</li>
+          <li><strong>Droit de rectification :</strong> corriger des données inexactes ou incomplètes.</li>
+          <li><strong>Droit à l'effacement :</strong> demander la suppression de vos données (sous réserve des obligations légales).</li>
+          <li><strong>Droit à la limitation :</strong> limiter le traitement de vos données.</li>
+          <li><strong>Droit d'opposition :</strong> vous opposer au traitement de vos données.</li>
+          <li><strong>Droit à la portabilité :</strong> recevoir vos données dans un format structuré et lisible.</li>
+        </ul>
+        <p>Pour exercer ces droits, contactez SOUTH BOAT par email à <a href="mailto:contact@south-boat.com">contact@south-boat.com</a> ou par courrier à l'adresse du siège social. Une réponse vous sera adressée dans un délai d'un mois.</p>
+      </section>
+
+      <section>
+        <h2>Article 8 — Réclamation auprès de la CNIL</h2>
+        <p>Si vous estimez que le traitement de vos données personnelles n'est pas conforme à la réglementation, vous disposez du droit d'introduire une réclamation auprès de l'autorité de contrôle compétente :</p>
+        <div className="legal-card">
+          <p><strong>Commission Nationale de l'Informatique et des Libertés (CNIL)</strong></p>
+          <p>3 place de Fontenoy — TSA 80715 — 75334 Paris Cedex 07</p>
+          <p>Téléphone : 01 53 73 22 22</p>
+          <p><a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">www.cnil.fr</a></p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Article 9 — Cookies</h2>
+        <p>Le site de SOUTH BOAT utilise des cookies afin d'améliorer l'expérience de navigation et d'analyser le trafic. Un cookie est un petit fichier texte déposé sur votre terminal lors de la visite d'un site.</p>
+        <p><strong>Types de cookies utilisés :</strong></p>
+        <ul>
+          <li><strong>Cookies essentiels :</strong> nécessaires au fonctionnement du site (session, sécurité). Ils ne nécessitent pas votre consentement.</li>
+          <li><strong>Cookies analytiques :</strong> permettent d'analyser la fréquentation et l'utilisation du site (ex. : Google Analytics). Déposés avec votre consentement.</li>
+          <li><strong>Cookies de préférences :</strong> mémorisent vos choix de navigation.</li>
+        </ul>
+        <p>Vous pouvez gérer vos préférences en matière de cookies à tout moment via les paramètres de votre navigateur ou via le bandeau de gestion des cookies présent sur notre site.</p>
+      </section>
+
+      <section>
+        <h2>Article 10 — Sécurité des données</h2>
+        <p>SOUTH BOAT met en œuvre les mesures techniques et organisationnelles appropriées pour protéger vos données personnelles contre toute perte, destruction, altération ou accès non autorisé.</p>
+        <p>En cas de violation de données susceptible d'engendrer un risque pour vos droits et libertés, SOUTH BOAT s'engage à notifier la CNIL dans les 72 heures et à vous en informer dans les meilleurs délais si le risque est élevé.</p>
+      </section>
+
+      <section>
+        <h2>Article 11 — Modifications de la politique de confidentialité</h2>
+        <p>SOUTH BOAT se réserve le droit de modifier la présente Politique de Confidentialité à tout moment afin de la mettre en conformité avec la réglementation en vigueur. Les modifications prennent effet dès leur publication sur le site.</p>
+      </section>
+
+      <section>
+        <h2>Article 12 — Contact</h2>
+        <div className="legal-card">
+          <p>Par email : <a href="mailto:contact@south-boat.com">contact@south-boat.com</a></p>
+          <p>Par téléphone : 06 34 49 16 21 ou 07 86 23 78 48</p>
+          <p>Par courrier : SOUTH BOAT — 4 rue des Grillons, 06130 Grasse</p>
+        </div>
+      </section>
+    </LegalShell>);
+}
+
 function Footer() {
   const t = window.useT();
   const go = (name) => {
@@ -2365,9 +2744,9 @@ function Footer() {
           </div>
           <div>
             <h5>{t("Légal", "Legal")}</h5>
-            <a style={linkStyle} onClick={() => go("contact")}>{t("CGV", "Terms")}</a>
-            <a style={linkStyle} onClick={() => go("contact")}>{t("Mentions légales", "Legal notice")}</a>
-            <a style={linkStyle} onClick={() => go("contact")}>{t("Confidentialité", "Privacy")}</a>
+            <a style={linkStyle} onClick={() => go("cgv")}>{t("CGV", "Terms")}</a>
+            <a style={linkStyle} onClick={() => go("legal")}>{t("Mentions légales", "Legal notice")}</a>
+            <a style={linkStyle} onClick={() => go("privacy")}>{t("Confidentialité", "Privacy")}</a>
           </div>
         </div>
       </div>
@@ -2381,5 +2760,6 @@ function Footer() {
 
 Object.assign(window, {
   HomePage, BoatCard, CatalogPage, DetailPage, BookingPage, AboutPage, ContactPage,
-  CapSudListPage, CapSudArticlePage, Footer, Calendar, fmtArticleDate
+  CapSudListPage, CapSudArticlePage, Footer, Calendar, fmtArticleDate,
+  MentionsLegalesPage, CGVPage, PrivacyPage
 });
