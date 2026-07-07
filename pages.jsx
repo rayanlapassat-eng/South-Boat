@@ -939,6 +939,29 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
         setErrorMsg(t("Le créneau n'a pas pu être bloqué. Essayez une autre date.", "The slot could not be locked. Try another date."));
         return;
       }
+      // Envoi du justificatif de virement par email à South Boat
+      if (data.transferProof && data.paymentMethod === "virement") {
+        try {
+          const formData = new FormData();
+          formData.append("access_key", "867b6825-3025-4db9-88a7-56b7f25342f8");
+          formData.append("subject", `[South Boat] Justificatif de virement — ${boat.name} — ${fullName}`);
+          formData.append("from_name", fullName);
+          formData.append("email", data.billing.email);
+          formData.append("message",
+            `Nouveau justificatif de virement reçu.\n\n` +
+            `Bateau : ${boat.name}\n` +
+            `Date : ${data.calStart}\n` +
+            `Créneau : ${data.slot === "day" ? "Journée" : "Demi-journée (" + data.period + ")"}\n` +
+            `Adultes : ${data.adults} — Enfants : ${data.children}\n` +
+            `Skipper : ${data.crew === "with" ? "Oui" : "Non"}\n\n` +
+            `Client : ${fullName}\n` +
+            `Email : ${data.billing.email}\n` +
+            `Tél : ${data.billing.phone}\n`
+          );
+          formData.append("attachment", data.transferProof, data.transferProof.name);
+          await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
+        } catch (_) { /* l'email de confirmation Cal.com reste envoyé même si ceci échoue */ }
+      }
     }
     setStep((s) => Math.min(7, s + 1)); setErrorMsg(""); setFieldErrors({});
   };
