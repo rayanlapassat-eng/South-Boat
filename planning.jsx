@@ -3,30 +3,13 @@
 var { useState, useMemo } = React;
 
 // ============ DATA ============
-// Per-boat reservations keyed by ISO day. status: "booked" | "option" | "maintenance"
-// Multi-boat ready : add a key per boat id, with an array of { date, status } items.
-const todayMidnight = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
-const offsetISO = (offset) => {
-  const d = new Date(todayMidnight);
-  d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
-};
-
-// slot: "am" (matin) | "pm" (après-midi) | "full" (journée entière)
-// Si slot omis, considéré comme "full" pour rétrocompatibilité.
-const RESERVATIONS = {
-  1: [ // Mochi
-    { date: offsetISO(2), slot: "full", status: "booked", client: "Famille Lambert" },
-    { date: offsetISO(3), slot: "am",   status: "booked", client: "Sortie M. Durand" },
-    { date: offsetISO(4), slot: "pm",   status: "booked", client: "Couple Petit" },
-    { date: offsetISO(8), slot: "full", status: "option", client: "Pré-réservation" },
-    { date: offsetISO(10), slot: "am",  status: "booked", client: "Anniversaire" },
-    { date: offsetISO(14), slot: "full", status: "booked", client: "Société Marlow" },
-    { date: offsetISO(15), slot: "full", status: "booked", client: "Société Marlow" },
-    { date: offsetISO(22), slot: "full", status: "maintenance", client: "Entretien moteur" },
-    { date: offsetISO(28), slot: "pm",  status: "booked", client: "EVJF" },
-  ],
-};
+// Réservations réelles par bateau, indexées par jour ISO. status: "booked" | "option" | "maintenance"
+// slot: "am" (matin) | "pm" (après-midi) | "full" (journée entière). Si slot omis, considéré "full".
+// À BRANCHER sur Cal.com (même source que le tunnel de réservation) pour refléter la vraie disponibilité.
+// Tant que la source réelle n'est pas connectée, on n'affiche AUCUNE réservation fictive :
+// pas de faux noms de clients ni de fausses indisponibilités. Exemple de format :
+//   const RESERVATIONS = { 1: [{ date: "2026-07-15", slot: "full", status: "booked", client: "…" }] };
+const RESERVATIONS = {};
 
 const SLOTS = [
   { id: "am", label: "Matin", hours: "9h – 13h" },
@@ -46,6 +29,10 @@ const STATUS_LABEL = {
 };
 
 // ============ HELPERS ============
+// Format ISO local (YYYY-MM-DD) SANS conversion UTC : évite le décalage d'un jour que
+// provoque toISOString() sur un fuseau en avance (Europe/Paris = UTC+1/+2), qui envoyait
+// la veille comme date de réservation quand on cliquait un jour dans le planning.
+const isoLocal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const startOfWeek = (d) => {
   const x = new Date(d); x.setHours(0, 0, 0, 0);
   const dow = (x.getDay() + 6) % 7; // 0 = Lundi
@@ -100,7 +87,7 @@ function PlanningPage({ setPage, initialDate }) {
     const daysInMonth = last.getDate();
     let availableDays = 0, bookedDays = 0;
     for (let i = 1; i <= daysInMonth; i++) {
-      const iso = new Date(view.y, view.m, i).toISOString().slice(0, 10);
+      const iso = isoLocal(new Date(view.y, view.m, i));
       const items = dayMap.get(iso) || [];
       const blockedBoats = new Set(items.map((it) => it.boatId));
       const availableCount = considered.filter((b) => !blockedBoats.has(b.id)).length;
@@ -135,7 +122,7 @@ function PlanningPage({ setPage, initialDate }) {
 
   // For a given date + slot, return list of items occupying that slot
   const itemsForSlot = (d, slotId) => {
-    const iso = d.toISOString().slice(0, 10);
+    const iso = isoLocal(d);
     const items = dayMap.get(iso) || [];
     if (slotId === "full") return items;
     return items.filter((it) => it.slot === "full" || it.slot === slotId);
@@ -150,12 +137,12 @@ function PlanningPage({ setPage, initialDate }) {
   const handleSlotClick = (d, slotId, info) => {
     if (info.isPast || info.fullyBooked) return;
     const boat = info.availableBoats[0];
-    if (boat) setPage({ name: "booking", id: boat.id, date: d.toISOString().slice(0, 10), slot: slotId });
+    if (boat) setPage({ name: "booking", id: boat.id, date: isoLocal(d), slot: slotId });
   };
 
   const dayStatus = (d) => {
     if (!d) return null;
-    const iso = d.toISOString().slice(0, 10);
+    const iso = isoLocal(d);
     const items = dayMap.get(iso) || [];
     const isPast = d < today;
     const blocked = new Set(items.map((it) => it.boatId));

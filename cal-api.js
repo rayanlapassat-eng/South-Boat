@@ -56,12 +56,13 @@
         if (!r.ok) throw new Error("Cal.com slots fetch failed (" + r.status + ")");
         return r.json();
       }).then(function (data) {
-        // L'API Cal.com v2 renvoie { data: { 'YYYY-MM-DD': [{ time: 'ISO' }, ...] } }
+        // L'API Cal.com v2 (2024-09-04) renvoie { data: { 'YYYY-MM-DD': [{ start: 'ISO' }, ...] } }
+        // (anciennes versions : champ 'time' — on garde un fallback).
         var slots = (data && data.data) || {};
         var out = {};
         Object.keys(slots).forEach(function (day) {
           var arr = slots[day];
-          if (Array.isArray(arr) && arr.length > 0) out[day] = arr[0].time;
+          if (Array.isArray(arr) && arr.length > 0) out[day] = arr[0].start || arr[0].time;
         });
         return out;
       });

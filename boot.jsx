@@ -1,4 +1,4 @@
-/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage, MentionsLegalesPage, CGVPage, PrivacyPage */
+/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, EntretienPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage, MentionsLegalesPage, CGVPage, PrivacyPage */
 /* ============================================================
    boot.jsx — Amorçage de l'application South Boat
    SOURCE JSX : à recompiler en boot.js via `npm run build`
@@ -83,6 +83,9 @@ function App() {
     } else if (page.name === "fireworks") {
       title = `Feux d'artifice 2026 — Cannes, Antibes, Juan-les-Pins | ${SITE}`;
       desc  = "Calendrier des feux d'artifice 2026 sur la Côte d'Azur. Réservez un bateau pour les vivre depuis la baie, loin de la foule.";
+    } else if (page.name === "entretien") {
+      title = `Entretien et nettoyage de bateau à Mandelieu | ${SITE}`;
+      desc  = "Nettoyage extérieur et intérieur, lustrage et polish, antifouling, gelcoat et chromes : South Boat entretient votre bateau jusqu'à ~25 m. Tarifs sur devis, forfaits au mois ou à l'année.";
     } else if (page.name === "detail" && page.id) {
       const b = BOATS.find(x => x.id === page.id);
       if (b) {
@@ -133,16 +136,29 @@ function App() {
     if (!m) { m = document.createElement('meta'); m.setAttribute('name','description'); document.head.appendChild(m); }
     m.setAttribute('content', desc);
 
-    const canonicalUrl = window.location.origin + window.pageToPath(page);
+    // Canonical SANS paramètres de requête (évite les URL dupliquées type ?date=…&slot=…)
+    const canonicalUrl = window.location.origin + window.pageToPath(page).split("?")[0];
     let link = document.querySelector('link[rel="canonical"]');
     if (!link) { link = document.createElement('link'); link.setAttribute('rel', 'canonical'); document.head.appendChild(link); }
     link.setAttribute('href', canonicalUrl);
 
-    // Mise à jour OG title/description pour le partage social en cours de navigation
+    // robots : ne pas indexer le tunnel de réservation (page transactionnelle, contenu mince) ;
+    // sinon on garde les directives riches définies dans index.html.
+    const robotsContent = page.name === "booking"
+      ? "noindex, follow"
+      : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+    let robotsMeta = document.querySelector('meta[name="robots"]');
+    if (!robotsMeta) { robotsMeta = document.createElement('meta'); robotsMeta.setAttribute('name', 'robots'); document.head.appendChild(robotsMeta); }
+    robotsMeta.setAttribute('content', robotsContent);
+
+    // Mise à jour OG (title / description / url) pour le partage social en cours de navigation
     const ogT = document.querySelector('meta[property="og:title"]');
     const ogD = document.querySelector('meta[property="og:description"]');
+    let ogU = document.querySelector('meta[property="og:url"]');
     if (ogT) ogT.setAttribute('content', title);
     if (ogD) ogD.setAttribute('content', desc);
+    if (!ogU) { ogU = document.createElement('meta'); ogU.setAttribute('property', 'og:url'); document.head.appendChild(ogU); }
+    ogU.setAttribute('content', canonicalUrl);
   }, [page.name, page.id]);
 
   return (
@@ -152,6 +168,7 @@ function App() {
       {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} />}
       {page.name === "planning" && <PlanningPage setPage={setPage} initialDate={page.date} />}
       {page.name === "fireworks" && <FireworksPage setPage={setPage} />}
+      {page.name === "entretien" && <EntretienPage setPage={setPage} />}
       {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
       {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} initialSlot={page.slot} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}

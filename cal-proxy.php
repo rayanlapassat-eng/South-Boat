@@ -53,9 +53,23 @@ if ($action === "ping") {
     exit;
 }
 
+// ---------- Normalisation téléphone → format international E.164 ----------
+// Cal.com exige un numéro au format international (+33...) ; un « 06... » brut
+// serait rejeté (invalid_number) et bloquerait la réservation.
+function normalize_phone($raw) {
+    $p = preg_replace('/[\s.\-()]/', '', (string) $raw);
+    if ($p === "") return "";
+    if (strpos($p, "00") === 0) { $p = "+" . substr($p, 2); }        // 0033... → +33...
+    if (isset($p[0]) && $p[0] === "+") {
+        return "+" . preg_replace('/\D/', "", substr($p, 1));         // garde + et chiffres
+    }
+    if (preg_match('/^0\d{9}$/', $p)) { return "+33" . substr($p, 1); } // FR 10 chiffres
+    return $p;                                                        // au mieux : tel quel
+}
+
 // ---------- Helper cURL ----------
 function cal_request($method, $path, $body = null, $apiVersion = "2024-09-04") {
-    $ch = curl_init("https://api.cal.com/v2" . $path);
+    $ch = curl_init("https://api.cal.eu/v2" . $path);
     $headers = [
         "Authorization: Bearer " . CAL_API_KEY,
         "Content-Type: application/json",
@@ -94,8 +108,8 @@ if ($action === "slots" && $method === "GET") {
     }
     $q = http_build_query([
         "eventTypeId" => $EVENT_TYPE_IDS[$key],
-        "startTime"   => $from,
-        "endTime"     => $to,
+        "start"       => $from,
+        "end"         => $to,
         "timeZone"    => "Europe/Paris",
     ]);
     list($code, $resp) = cal_request("GET", "/slots?" . $q);
@@ -125,6 +139,18 @@ if ($action === "book" && $method === "POST") {
         exit;
     }
 
+    // Cal.com v2 exige des métadonnées dont TOUTES les valeurs sont des chaînes.
+    // On stringifie donc chaque valeur (les nombres comme boatId/adults échoueraient sinon).
+    $metadata = new stdClass();
+    if (isset($input["metadata"]) && is_array($input["metadata"]) && count($input["metadata"]) > 0) {
+        $metadata = [];
+        foreach ($input["metadata"] as $k => $v) {
+            if (is_bool($v))        { $metadata[$k] = $v ? "true" : "false"; }
+            elseif (is_scalar($v))  { $metadata[$k] = (string) $v; }
+            else                    { $metadata[$k] = json_encode($v); }
+        }
+    }
+
     $body = [
         "eventTypeId" => $EVENT_TYPE_IDS[$key],
         "start"       => $input["start"], // ISO 8601 UTC
@@ -133,9 +159,9 @@ if ($action === "book" && $method === "POST") {
             "email"       => $input["email"],
             "timeZone"    => "Europe/Paris",
             "language"    => "fr",
-            "phoneNumber" => isset($input["phone"]) ? $input["phone"] : "",
+            "phoneNumber" => normalize_phone(isset($input["phone"]) ? $input["phone"] : ""),
         ],
-        "metadata"    => isset($input["metadata"]) && is_array($input["metadata"]) ? $input["metadata"] : new stdClass(),
+        "metadata"    => $metadata,
     ];
     list($code, $resp) = cal_request("POST", "/bookings", $body, "2024-08-13");
     http_response_code($code);

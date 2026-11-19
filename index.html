@@ -15,6 +15,33 @@
 })();
 </script>
 
+<!-- Perf : précharge l'image hero (élément LCP) uniquement sur la page d'accueil -->
+<script>
+(function () {
+  var p = location.pathname;
+  if (p === "/" || p === "/South-Boat/" || p === "/South-Boat") {
+    var base = p.indexOf("/South-Boat") === 0 ? "/South-Boat/" : "/";
+    var l = document.createElement("link");
+    // Même srcset ET même point de bascule que la balise <picture> du hero,
+    // sinon le téléphone précharge une image que le rendu n'utilisera pas :
+    // deux fois le trafic, et le LCP n'y gagne rien.
+    var portrait = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
+    var nom = "images/drone/bateau-eau-turquoise-esterel-vue-drone";
+    l.rel = "preload"; l.as = "image";
+    if (portrait) {
+      l.href = base + nom + "-portrait.jpg";
+      l.setAttribute("imagesrcset", base + nom + "-portrait-800.jpg 800w, " + base + nom + "-portrait.jpg 1200w");
+    } else {
+      l.href = base + nom + ".jpg";
+      l.setAttribute("imagesrcset", base + nom + "-800.jpg 800w, " + base + nom + ".jpg 2400w");
+    }
+    l.setAttribute("imagesizes", "100vw");
+    l.setAttribute("fetchpriority", "high");
+    document.head.appendChild(l);
+  }
+})();
+</script>
+
 <title>South Boat — Location de bateaux à Mandelieu, Côte d'Azur</title>
 <meta name="description" content="Location de bateaux à Mandelieu-la-Napoule sur la Côte d'Azur. Bateaux familiaux vérifiés, avec ou sans skipper, au départ vers l'Estérel, Cannes et les îles de Lérins. Réservation simple et transparente."/>
 <meta name="author" content="South Boat"/>
@@ -48,13 +75,19 @@
 <meta name="twitter:description" content="Bateaux familiaux au départ de Mandelieu vers l'Estérel, Cannes et les îles de Lérins."/>
 <meta name="twitter:image" content="https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg"/>
 
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preconnect" href="https://images.unsplash.com"/>
 <link rel="dns-prefetch" href="https://images.unsplash.com"/>
-<link rel="dns-prefetch" href="https://unpkg.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="styles.css?v=20260629j"/>
+<!-- Polices auto-hébergées (Inter + Fraunces) : plus aucune requête vers Google,
+     donc 2 connexions externes en moins sur le chemin critique. Le navigateur
+     ne télécharge que le sous-ensemble « latin » (~113 Ko) pour du texte français. -->
+<!-- Les deux polices réellement utilisées en français (les variantes « latin-ext »
+     ne sont jamais téléchargées grâce à unicode-range). Sans ce preload, le
+     navigateur ne les découvre qu'après avoir lu fonts.css : le texte s'affiche
+     alors avec un temps de retard. -->
+<link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin.woff2" crossorigin/>
+<link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin/>
+<link rel="stylesheet" href="fonts.css?v=20260714b"/>
+<link rel="stylesheet" href="styles.css?v=20261119a"/>
 
 <!-- JSON-LD : LocalBusiness (Google Business, Maps, SERP enrichi) -->
 <script type="application/ld+json">
@@ -158,23 +191,28 @@
 <li>Îles de Lérins (Sainte-Marguerite, Saint-Honorat)</li>
 <li>Cap d'Antibes et la Côte d'Azur</li>
 </ul>
+<h2>Entretien et nettoyage de bateaux</h2>
+<p>Nettoyage extérieur et intérieur, lustrage et polish, traitement antifouling, réfection du gelcoat et des chromes. Bateaux jusqu'à ~25 m (plus sur demande), entretien intérieur des bateaux de plus de 10 m. Tarifs sur devis, forfaits d'entretien au mois ou à l'année : <a href="/entretien-bateau">south-boat.com/entretien-bateau</a>.</p>
 <h2>Réserver une sortie en bateau</h2>
 <p>Location à la journée ou demi-journée, options à bord (bouée tractée, wakeboard, paddle, apéritif gourmand). Réservez en ligne après avoir activé JavaScript, ou contactez la conciergerie 7j/7 de 8h à 19h au 06 34 49 16 21 — contact@south-boat.com.</p>
 </main>
 </noscript>
 
-<script defer src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
-<script defer src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script defer src="vendor/react.production.min.js?v=18.3.1"></script>
+<script defer src="vendor/react-dom.production.min.js?v=18.3.1"></script>
 
 <!-- Application précompilée : sources *.jsx → `npm run build` → /dist/*.js.
      Plus de Babel dans le navigateur : chargement beaucoup plus rapide (Core Web Vitals). -->
-<script defer src="cal-api.js?v=20260629k"></script>
-<script defer src="articles.js?v=20260629k"></script>
-<script defer src="dist/tweaks-panel.js?v=20260629k"></script>
-<script defer src="dist/app.js?v=20260629k"></script>
-<script defer src="dist/pages.js?v=20260629k"></script>
-<script defer src="dist/planning.js?v=20260629k"></script>
-<script defer src="dist/fireworks.js?v=20260629k"></script>
-<script defer src="dist/boot.js?v=20260629k"></script>
+<script defer src="cal-api.js?v=20260716a"></script>
+<script defer src="mollie-api.js?v=20260716a"></script>
+<script defer src="articles.js?v=20260907b"></script>
+<script defer src="entretien-prestations.js?v=20261119a"></script>
+<script defer src="dist/tweaks-panel.js?v=20260716a"></script>
+<script defer src="dist/app.js?v=20261119c"></script>
+<script defer src="dist/pages.js?v=20261119b"></script>
+<script defer src="dist/planning.js?v=20260716a"></script>
+<script defer src="dist/fireworks.js?v=20260730b"></script>
+<script defer src="dist/entretien.js?v=20261119d"></script>
+<script defer src="dist/boot.js?v=20261119c"></script>
 </body>
 </html>

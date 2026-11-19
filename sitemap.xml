@@ -4,11 +4,31 @@
 
   <url>
     <loc>https://south-boat.com/</loc>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg</image:loc>
       <image:title>South Boat — Location de bateau à Mandelieu</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/bateau-vue-drone-zenith-mandelieu-v2.jpg</image:loc>
+      <image:title>Bateau South Boat vu du ciel au large de Mandelieu-la-Napoule</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/baie-mandelieu-drone-coucher-soleil.jpg</image:loc>
+      <image:title>Le port de La Napoule et la baie de Mandelieu au coucher du soleil</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/entretien-bateau</loc>
+    <lastmod>2026-11-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://south-boat.com/images/mochi/entretien-nettoyage-bateau-mandelieu.jpg</image:loc>
+      <image:title>Entretien et nettoyage de bateau par South Boat à Mandelieu</image:title>
     </image:image>
   </url>
 
@@ -20,11 +40,16 @@
 
   <url>
     <loc>https://south-boat.com/bateau/1</loc>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
       <image:loc>https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg</image:loc>
       <image:title>Mochi — Day cruiser à louer à Mandelieu</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/bateau-mouillage-coucher-soleil-theoule.jpg</image:loc>
+      <image:title>Le Mochi au mouillage au large de Théoule-sur-Mer</image:title>
     </image:image>
   </url>
 
@@ -35,9 +60,44 @@
   </url>
 
   <url>
-    <loc>https://south-boat.com/cap-sud</loc>
+    <loc>https://south-boat.com/feux-artifice</loc>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://south-boat.com/images/mochi/coucher-soleil-bateau-esterel.jpg</image:loc>
+      <image:title>Feux d'artifice depuis un bateau sur la Côte d'Azur</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/feux-artifice-cannes-bateau-mer.jpg</image:loc>
+      <image:title>Feux d'artifice de la Côte d'Azur vus depuis un bateau</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/feux-artifice-baie-bateau-spectateurs.jpg</image:loc>
+      <image:title>Spectacle pyrotechnique vu depuis la baie</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/cap-sud</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/cap-sud/cannes-yachting-festival-2026</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://south-boat.com/images/mochi/yachting-cote-azur-bateau-location-mandelieu.jpg</image:loc>
+      <image:title>Bateau South Boat devant les yachts du Port de Mandelieu, a une dizaine de kilometres du Cannes Yachting Festival</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://south-boat.com/images/mochi/entretien-nettoyage-bateau-mandelieu.jpg</image:loc>
+      <image:title>Entretien et nettoyage de bateau a Mandelieu-la-Napoule</image:title>
+    </image:image>
   </url>
 
   <url>
@@ -74,14 +134,37 @@
 
   <url>
     <loc>https://south-boat.com/a-propos</loc>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://south-boat.com/images/drone/panorama-baie-theoule-coucher-soleil.jpg</image:loc>
+      <image:title>Panorama de la baie de Théoule au coucher du soleil</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://south-boat.com/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/cgv</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/mentions-legales</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://south-boat.com/confidentialite</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 
 </urlset>

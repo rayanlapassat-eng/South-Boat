@@ -6,39 +6,56 @@ var { useState, useMemo } = React;
 // Liste des feux d'artifice prévus sur la Côte d'Azur (été 2026).
 // Pour ajouter / modifier une date : éditez ce tableau, puis lancez `npm run build`.
 const FIREWORKS = [
-  { date: "2026-07-04", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          time: "22h00", place: "Baie de Cannes" },
-  { date: "2026-07-13", city: "Antibes",       event: "Fête nationale",                         time: "22h00", place: "Entre le Fort Carré et la Siesta" },
-  { date: "2026-07-14", city: "Juan-les-Pins", event: "Fête nationale",                         time: "23h00", place: "Baie de Juan-les-Pins" },
-  { date: "2026-07-14", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          time: "23h00", place: "Baie de Cannes" },
-  { date: "2026-07-22", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          time: "22h00", place: "Baie de Cannes" },
-  { date: "2026-08-04", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          time: "22h00", place: "Baie de Cannes" },
-  { date: "2026-08-06", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 time: "22h00", place: "Baie de Juan-les-Pins" },
-  { date: "2026-08-13", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 time: "22h00", place: "Baie de Juan-les-Pins" },
-  { date: "2026-08-15", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          time: "22h00", place: "Baie de Cannes" },
-  { date: "2026-08-20", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 time: "22h00", place: "Baie de Juan-les-Pins" },
-  { date: "2026-08-24", city: "Antibes",       event: "Festival Pyromélodique de clôture",      time: "22h00", place: "Route du bord de mer" },
-  { date: "2026-08-24", city: "Cannes",        event: "Festival d'Art Pyrotechnique (finale)", time: "22h00", place: "Baie de Cannes" },
-  { date: "2026-07-15", city: "Golfe-Juan",    event: "Feu d'artifice",                         time: "22h15", place: "Baie de Golfe-Juan" },
-  { date: "2026-08-16", city: "Golfe-Juan",    event: "Feu d'artifice",                         time: "22h15", place: "Baie de Golfe-Juan" },
+  { date: "2026-07-04", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          event_en: "Pyrotechnic Art Festival",          time: "22h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-07-13", city: "Antibes",       event: "Fête nationale",                         event_en: "Bastille Day",                       time: "22h00", place: "Entre le Fort Carré et la Siesta", place_en: "Between Fort Carré and La Siesta" },
+  { date: "2026-07-14", city: "Juan-les-Pins", event: "Fête nationale",                         event_en: "Bastille Day",                       time: "23h00", place: "Baie de Juan-les-Pins",           place_en: "Bay of Juan-les-Pins" },
+  { date: "2026-07-14", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          event_en: "Pyrotechnic Art Festival",          time: "23h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-07-22", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          event_en: "Pyrotechnic Art Festival",          time: "22h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-08-04", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          event_en: "Pyrotechnic Art Festival",          time: "22h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-08-06", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 event_en: "Pyromelodic Festival",               time: "22h00", place: "Baie de Juan-les-Pins",           place_en: "Bay of Juan-les-Pins" },
+  { date: "2026-08-13", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 event_en: "Pyromelodic Festival",               time: "22h00", place: "Baie de Juan-les-Pins",           place_en: "Bay of Juan-les-Pins" },
+  { date: "2026-08-15", city: "Cannes",        event: "Festival d'Art Pyrotechnique",          event_en: "Pyrotechnic Art Festival",          time: "22h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-08-20", city: "Juan-les-Pins", event: "Festival Pyromélodique",                 event_en: "Pyromelodic Festival",               time: "22h00", place: "Baie de Juan-les-Pins",           place_en: "Bay of Juan-les-Pins" },
+  { date: "2026-08-24", city: "Antibes",       event: "Festival Pyromélodique de clôture",      event_en: "Closing Pyromelodic Festival",       time: "22h00", place: "Route du bord de mer",            place_en: "Seafront road" },
+  { date: "2026-08-24", city: "Cannes",        event: "Festival d'Art Pyrotechnique (finale)", event_en: "Pyrotechnic Art Festival (finale)", time: "22h00", place: "Baie de Cannes",                  place_en: "Bay of Cannes" },
+  { date: "2026-07-15", city: "Golfe-Juan",    event: "Feu d'artifice",                         event_en: "Fireworks display",                  time: "22h15", place: "Baie de Golfe-Juan",              place_en: "Bay of Golfe-Juan" },
+  { date: "2026-08-16", city: "Golfe-Juan",    event: "Feu d'artifice",                         event_en: "Fireworks display",                  time: "22h15", place: "Baie de Golfe-Juan",              place_en: "Bay of Golfe-Juan" },
 ];
 
-const fwFmtDate = (iso) => {
+const fwLocale = (lang) => (lang === "en" ? "en-GB" : "fr-FR");
+const fwFmtDate = (iso, lang) => {
   const d = new Date(iso + "T12:00:00");
-  return d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString(fwLocale(lang), { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 };
-const fwFmtShortDate = (iso) => {
+const fwFmtShortDate = (iso, lang) => {
   const d = new Date(iso + "T12:00:00");
   return {
     day: d.getDate(),
-    month: d.toLocaleDateString("fr-FR", { month: "short" }).replace(".", ""),
-    weekday: d.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", ""),
+    month: d.toLocaleDateString(fwLocale(lang), { month: "short" }).replace(".", ""),
+    weekday: d.toLocaleDateString(fwLocale(lang), { weekday: "short" }).replace(".", ""),
   };
 };
 
 // ============ COMPONENT ============
 function FireworksPage({ setPage }) {
+  const t = window.useT();
   const [cityFilter, setCityFilter] = useState("all");
   const [selected, setSelected] = useState(null);
+  // Vidéo du spectacle en fond du bandeau (grand écran uniquement).
+  const videoFond = window.useVideoFond();
+  const [videoPrete, setVideoPrete] = useState(false);
+  // SEO : VideoObject du spectacle vu depuis la mer.
+  window.useJsonLd("ld-video-feux", window.ficheVideo({
+    nom: "Feux d'artifice de la Côte d'Azur vus depuis la mer",
+    description: "Spectacle pyrotechnique filmé depuis un bateau au mouillage dans la baie, au large de Cannes. Sorties en bateau les soirs de feux d'artifice avec South Boat.",
+    fichier: "videos/feux-artifice-mer.mp4",
+    vignette: "images/drone/feux-artifice-poster-video.jpg",
+    duree: "PT9S",
+  }));
+
+  // Nom d'événement / lieu selon la langue (fallback FR si l'anglais manque)
+  const evName = (f) => t(f.event, f.event_en || f.event);
+  const plName = (f) => t(f.place, f.place_en || f.place);
 
   const cities = useMemo(() => {
     const set = new Set(FIREWORKS.map((f) => f.city));
@@ -80,7 +97,7 @@ function FireworksPage({ setPage }) {
         .fw-meta span { display: inline-flex; align-items: center; gap: 4px; }
         .fw-meta svg { color: #5BAEDC; }
 
-        .fw-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+        .fw-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-top: 40px; margin-bottom: 18px; }
         .fw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .fw-chip { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line, rgba(10,37,64,0.12)); background: transparent; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--ink-soft, #3B5872); cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease; }
         .fw-chip:hover { border-color: var(--ink, #0A2540); color: var(--ink, #0A2540); }
@@ -99,6 +116,7 @@ function FireworksPage({ setPage }) {
         .fw-price-card.featured .fw-price-hours { color: rgba(255,255,255,0.78); }
         .fw-price-amount { font-size: 34px; font-weight: 800; letter-spacing: -0.01em; line-height: 1; margin-top: 4px; color: var(--ink, #0A2540); }
         .fw-price-card.featured .fw-price-amount { color: #fff; }
+        .fw-price-from { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.72; margin-bottom: 3px; }
         .fw-price-list { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; color: var(--ink-soft, #3B5872); }
         .fw-price-card.featured .fw-price-list { color: rgba(255,255,255,0.85); }
         .fw-price-list li { display: flex; align-items: flex-start; gap: 8px; }
@@ -141,32 +159,84 @@ function FireworksPage({ setPage }) {
       `}</style>
 
       <Breadcrumb setPage={setPage} trail={[
-        { label: "Accueil", page: { name: "home" } },
-        { label: "Feux d'artifice" },
+        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Feux d'artifice", "Fireworks") },
       ]} />
+
+      {/* Bandeau : vraies images du spectacle vu depuis la baie. La photo
+          s'affiche tout de suite, la vidéo prend le relais en fondu sur
+          grand écran uniquement. */}
+      <section className="fw-hero">
+        <div className="fw-hero-media">
+          <img src={asset("images/drone/feux-artifice-cannes-bateau-mer.jpg")}
+               alt={t("Feux d'artifice au-dessus de la baie, vus depuis un bateau au mouillage", "Fireworks above the bay, seen from a boat at anchor")}
+               fetchpriority="high" decoding="async" />
+          {videoFond && (
+            <video
+              className={videoPrete ? "pret" : ""}
+              autoPlay muted loop playsInline preload="auto"
+              poster={asset("images/drone/feux-artifice-poster-video.jpg")}
+              onCanPlay={() => setVideoPrete(true)}
+              aria-hidden="true" tabIndex={-1}>
+              <source src={asset("videos/feux-artifice-mer.mp4")} type="video/mp4" />
+            </video>
+          )}
+        </div>
 
       <section className="planning-head">
         <div>
-          <p className="eyebrow">Feux d'artifice</p>
-          <h1>Vivez les feux d'artifice depuis la mer</h1>
-          <p className="lead">Le calendrier des grands rendez-vous pyrotechniques de la Côte d'Azur — Cannes, Antibes, Juan-les-Pins. Réservez votre bateau pour les admirer depuis la baie.</p>
+          <p className="eyebrow">{t("Feux d'artifice", "Fireworks")}</p>
+          <h1>{t("Vivez les feux d'artifice depuis la mer", "Experience the fireworks from the sea")}</h1>
+          <p className="lead">{t(
+            "Le calendrier des grands rendez-vous pyrotechniques de la Côte d'Azur — Cannes, Antibes, Juan-les-Pins. Réservez votre bateau pour les admirer depuis la baie.",
+            "The calendar of the French Riviera's great fireworks nights — Cannes, Antibes, Juan-les-Pins. Book your boat to watch them from the bay."
+          )}</p>
         </div>
 
         <div className="planning-stats">
           <div className="pstat">
             <span className="pstat-num">{stats.total}</span>
-            <span className="pstat-lbl">Soirées à venir</span>
+            <span className="pstat-lbl">{t("Soirées à venir", "Upcoming nights")}</span>
           </div>
           <div className="pstat">
             <span className="pstat-num">{stats.cities}</span>
-            <span className="pstat-lbl">Villes</span>
+            <span className="pstat-lbl">{t("Villes", "Towns")}</span>
           </div>
+        </div>
+      </section>
+      </section>
+
+      <section className="planning-calendar">
+        <div className="fw-pricing">
+          <article className="fw-price-card">
+            <span className="fw-price-eyebrow">{t("Sortie Sunset", "Sunset trip")}</span>
+            <span className="fw-price-title">{t("Coucher de soleil en mer", "Sunset at sea")}</span>
+            <span className="fw-price-hours"><Icon name="cal" size={14} /> 19h00 — 22h30</span>
+            <span className="fw-price-amount">250 €</span>
+            <ul className="fw-price-list">
+              <li>{t("Essence incluse", "Fuel included")}</li>
+              <li>{t("Boissons incluses (sur demande)", "Drinks included (on request)")}</li>
+            </ul>
+          </article>
+          <article className="fw-price-card featured">
+            <span className="fw-price-eyebrow">{t("Soirée Feu d'artifice", "Fireworks evening")}</span>
+            <span className="fw-price-title">{t("Spectacle pyrotechnique depuis la baie", "Fireworks show from the bay")}</span>
+            <span className="fw-price-hours"><Icon name="cal" size={14} /> 19h00 — 23h00</span>
+            <span className="fw-price-amount"><small className="fw-price-from">{t("à partir de", "from")}</small>390 €</span>
+            <ul className="fw-price-list">
+              <li>{t("Forfait 4 personnes — 390 €", "4-person package — €390")}</li>
+              <li>{t("Forfait 6 personnes — 490 €", "6-person package — €490")}</li>
+              <li>{t("Skipper inclus", "Skipper included")}</li>
+              <li>{t("Essence incluse", "Fuel included")}</li>
+              <li>{t("Boissons incluses (sur demande)", "Drinks included (on request)")}</li>
+            </ul>
+          </article>
         </div>
       </section>
 
       <section className="planning-calendar">
         <div className="fw-toolbar">
-          <div className="fw-chips" role="tablist" aria-label="Filtrer par ville">
+          <div className="fw-chips" role="tablist" aria-label={t("Filtrer par ville", "Filter by town")}>
             {cities.map((c) => (
               <button
                 key={c}
@@ -174,20 +244,20 @@ function FireworksPage({ setPage }) {
                 aria-selected={cityFilter === c}
                 className={"fw-chip" + (cityFilter === c ? " active" : "")}
                 onClick={() => setCityFilter(c)}>
-                {c === "all" ? "Toutes les villes" : c}
+                {c === "all" ? t("Toutes les villes", "All towns") : c}
               </button>
             ))}
           </div>
         </div>
 
         {upcoming.length === 0 ? (
-          <div className="fw-empty">Aucun feu d'artifice à venir pour ce filtre.</div>
+          <div className="fw-empty">{t("Aucun feu d'artifice à venir pour ce filtre.", "No upcoming fireworks for this filter.")}</div>
         ) : (
           <div className="fw-grid">
             {upcoming.map((f, i) => {
-              const sd = fwFmtShortDate(f.date);
+              const sd = fwFmtShortDate(f.date, t.lang);
               return (
-                <article key={i} className="fw-card" title={"Réserver pour le " + fwFmtDate(f.date)} role="button" tabIndex={0} onClick={() => setSelected(f)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(f); } }} style={{ cursor: "pointer" }}>
+                <article key={i} className="fw-card" title={t("Réserver pour le ", "Book for ") + fwFmtDate(f.date, t.lang)} role="button" tabIndex={0} onClick={() => setSelected(f)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(f); } }} style={{ cursor: "pointer" }}>
                   <div className="fw-date" aria-hidden="true">
                     <span className="fw-d-weekday">{sd.weekday}</span>
                     <span className="fw-d-day">{sd.day}</span>
@@ -195,10 +265,10 @@ function FireworksPage({ setPage }) {
                   </div>
                   <div className="fw-body">
                     <span className="fw-city">{f.city}</span>
-                    <span className="fw-event">{f.event}</span>
+                    <span className="fw-event">{evName(f)}</span>
                     <div className="fw-meta">
                       <span><Icon name="cal" size={14} /> {f.time}</span>
-                      <span><Icon name="pin" size={14} /> {f.place}</span>
+                      <span><Icon name="pin" size={14} /> {plName(f)}</span>
                     </div>
                   </div>
                 </article>
@@ -208,38 +278,13 @@ function FireworksPage({ setPage }) {
         )}
       </section>
 
-      <section className="planning-calendar">
-        <div className="fw-pricing">
-          <article className="fw-price-card">
-            <span className="fw-price-eyebrow">Sortie Sunset</span>
-            <span className="fw-price-title">Coucher de soleil en mer</span>
-            <span className="fw-price-hours"><Icon name="cal" size={14} /> 19h00 — 22h30</span>
-            <span className="fw-price-amount">250 €</span>
-            <ul className="fw-price-list">
-              <li>Essence incluse</li>
-              <li>Boissons incluses (sur demande)</li>
-            </ul>
-          </article>
-          <article className="fw-price-card featured">
-            <span className="fw-price-eyebrow">Soirée Feu d'artifice</span>
-            <span className="fw-price-title">Spectacle pyrotechnique depuis la baie</span>
-            <span className="fw-price-hours"><Icon name="cal" size={14} /> 19h00 — 23h00</span>
-            <span className="fw-price-amount">350 €</span>
-            <ul className="fw-price-list">
-              <li>Essence incluse</li>
-              <li>Boissons incluses (sur demande)</li>
-            </ul>
-          </article>
-        </div>
-      </section>
-
       <section className="planning-cta">
         <div>
-          <h3>Une soirée feu d'artifice en mer ?</h3>
-          <p>Réservez votre bateau pour profiter du spectacle depuis la baie, loin de la foule.</p>
+          <h3>{t("Une soirée feu d'artifice en mer ?", "A fireworks evening at sea?")}</h3>
+          <p>{t("Réservez votre bateau pour profiter du spectacle depuis la baie, loin de la foule.", "Book your boat to enjoy the show from the bay, away from the crowds.")}</p>
         </div>
         <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })}>
-          Voir les bateaux <Icon name="arrow" size={16} />
+          {t("Voir les bateaux", "See the boats")} <Icon name="arrow" size={16} />
         </button>
       </section>
 
@@ -249,15 +294,15 @@ function FireworksPage({ setPage }) {
         <div className="fw-modal-backdrop" onClick={() => setSelected(null)}>
           <div className="fw-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
             <div className="fw-modal-eyebrow">{selected.city}</div>
-            <h3 className="fw-modal-title">{selected.event}</h3>
-            <p className="fw-modal-date">{fwFmtDate(selected.date)} · {selected.time} · {selected.place}</p>
+            <h3 className="fw-modal-title">{evName(selected)}</h3>
+            <p className="fw-modal-date">{fwFmtDate(selected.date, t.lang)} · {selected.time} · {plName(selected)}</p>
 
             <div className="fw-modal-hours">
-              <div className="fw-modal-hours-row"><span className="fmh-label">Soirée feu d'artifice</span><span className="fmh-val">19h00 — 23h00</span></div>
+              <div className="fw-modal-hours-row"><span className="fmh-label">{t("Soirée feu d'artifice", "Fireworks evening")}</span><span className="fmh-val">19h00 — 23h00</span></div>
             </div>
 
             <div className="fw-modal-contact">
-              <div className="fw-modal-contact-head">Réserver par téléphone</div>
+              <div className="fw-modal-contact-head">{t("Réserver par téléphone", "Book by phone")}</div>
               <div className="fw-modal-phones">
                 <a href="tel:+33634491621" className="fw-modal-phone">
                   <Icon name="phone" size={18} />
@@ -269,11 +314,12 @@ function FireworksPage({ setPage }) {
                 </a>
               </div>
               <div className="fw-modal-note">
-                Les réservations se font par téléphone ou directement sur place, dans la limite des places disponibles.
+                {t("Les réservations se font par téléphone ou directement sur place, dans la limite des places disponibles.",
+                   "Bookings are made by phone or directly on site, subject to availability.")}
               </div>
             </div>
 
-            <button className="fw-modal-close" onClick={() => setSelected(null)}>Fermer</button>
+            <button className="fw-modal-close" onClick={() => setSelected(null)}>{t("Fermer", "Close")}</button>
           </div>
         </div>
       )}

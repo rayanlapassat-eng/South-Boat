@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+# Clés d'API (paiement / réservation) : à recréer sur le serveur à partir des
+# fichiers *.example.php, jamais publiées.
+cal-config.php
+mollie-config.php
+
+# Outils locaux (non nécessaires sur GitHub)
+.claude/

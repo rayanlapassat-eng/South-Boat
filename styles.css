@@ -68,17 +68,50 @@ p { margin: 0; color: var(--ink-soft); }
 .mobile-menu-link { display: block; width: 100%; text-align: left; background: none; border: none; padding: 14px 12px; font-size: 16px; font-weight: 500; color: var(--ink-soft); border-radius: 12px; transition: all .15s; }
 .mobile-menu-link:hover { background: var(--surface-2); color: var(--ink); }
 .mobile-menu-link.active { color: var(--ink); background: var(--accent-soft); }
+/* Le menu compte 8 rubriques + Météo Marine : il ne tient sur une ligne qu'à
+   partir de ~1200 px, en resserrant les liens. En dessous, on passe au menu
+   burger, sinon les liens passent sur deux lignes et poussent le sélecteur de
+   langue et « Réserver » hors de l'écran. */
+@media (min-width: 1366px) {
+  .nav-inner { max-width: 1360px; }
+  .nav-link { padding: 10px 12px; }
+}
+@media (min-width: 1200px) and (max-width: 1365px) {
+  .nav-inner { gap: 16px; }
+  .nav-links { gap: 0; }
+  .nav-link { padding: 9px 9px; font-size: 13px; }
+}
+@media (max-width: 1199px) {
+  .nav-links { display: none; }
+  .nav-actions { margin-left: auto; }
+  .hamburger-btn { display: inline-flex; }
+  .mobile-menu { display: block; }
+}
 
 /* ===== HERO ===== */
 .hero { position: relative; padding: 80px 32px 60px; min-height: 600px; display: flex; flex-direction: column; }
 .hero-bg { position: absolute; inset: 0; overflow: hidden; clip-path: inset(0); }
-.hero-bg img { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; object-position: center 40%; will-change: transform; z-index: 0; }
+/* Prise de vue à la verticale : le bateau est au centre du cadre, on garde donc
+   un cadrage centré quel que soit le recadrage imposé par la fenêtre. */
+.hero-bg img { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; object-position: center 50%; will-change: transform; z-index: 0; }
 .hero-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-.hero-overlay-grad { background: linear-gradient(180deg, rgba(10,37,64,0.15) 0%, rgba(10,37,64,0) 45%, rgba(10,37,64,0.35) 100%); }
+/* Voile de lisibilité pour le texte blanc du hero. Il est dosé au plus juste :
+   dense uniquement sur la bande de gauche où passent le titre et le texte, et
+   nul dès le tiers droit — c'est là que se trouve le sujet des photos (le
+   bateau, les fonds turquoise), et il doit garder sa couleur. */
+.hero-overlay-grad {
+  background:
+    linear-gradient(100deg, rgba(6,20,38,0.56) 0%, rgba(6,20,38,0.30) 30%, rgba(6,20,38,0.05) 56%, rgba(6,20,38,0) 72%),
+    linear-gradient(180deg, rgba(10,37,64,0.14) 0%, rgba(10,37,64,0) 45%, rgba(10,37,64,0.30) 100%);
+}
 .hero-content { position: relative; max-width: 1280px; margin: 0 auto; width: 100%; padding-top: 40px; flex: 1; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(255,255,255,0.14); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.18); border-radius: 999px; color: white; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 24px; }
 .hero-eyebrow .dot { width: 6px; height: 6px; background: #5BAEDC; border-radius: 50%; box-shadow: 0 0 0 4px rgba(91,174,220,0.3); }
-.hero-title { color: white; max-width: 720px; margin: 0 0 24px; font-size: clamp(48px, 6vw, 80px); }
+/* Le titre porte déjà un <br/> : il tient en deux lignes voulues. La largeur
+   maxi doit donc laisser passer la plus longue des deux, « à Mandelieu-la-Napoule »,
+   qui mesure 746 px à la taille maxi (80 px, Fraunces) — à 720 px elle se coupait
+   au trait d'union et le titre passait à trois lignes sur grand écran. */
+.hero-title { color: white; max-width: 780px; margin: 0 0 24px; font-size: clamp(48px, 6vw, 80px); }
 .hero-sub { color: rgba(255,255,255,0.85); max-width: 580px; font-size: 18px; line-height: 1.55; margin-bottom: 40px; }
 .hero-search { position: relative; max-width: 1080px; }
 .hero-stats { position: relative; max-width: 1280px; margin: 60px auto 0; width: 100%; display: flex; gap: 56px; }
@@ -555,7 +588,15 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 
   /* ===== HERO ===== */
   .hero { padding: 48px 18px 32px; min-height: 520px; }
-  .hero-title { font-size: clamp(36px, 9vw, 48px); margin-bottom: 16px; }
+  /* Le titre porte un <br/> : « à Mandelieu-la-Napoule » doit tenir sur UNE
+     ligne, sinon il se coupe au trait d'union et le titre passe à trois lignes.
+     Ce nom occupe environ 11,2 fois la taille de police à ces tailles-là (mesuré
+     sur la version anglaise, la plus longue) — le rapport n'est pas constant,
+     Fraunces étant une variable font à taille optique dont les lettres
+     s'élargissent quand on rapetisse. On fait donc suivre la taille de police à
+     la largeur réellement disponible (100vw moins les 2 × 18 px de marge),
+     plafonnée à 48 px comme avant. Vérifié de 320 à 640 px, en FR et en EN. */
+  .hero-title { font-size: clamp(24px, calc((100vw - 36px) / 11.2), 48px); margin-bottom: 16px; }
   .hero-sub { font-size: 15px; margin-bottom: 28px; }
   .hero-eyebrow { font-size: 11px; padding: 6px 12px; margin-bottom: 18px; }
   .hero-stats { gap: 20px; margin-top: 36px; }
@@ -658,7 +699,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 /* ===== CAP SUD ===== */
 .capsud-hero { max-width: 880px; margin: 0 auto; padding: 80px 32px 40px; text-align: center; }
 .capsud-hero h1 { margin-bottom: 16px; }
-.capsud-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+.capsud-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 28px; }
 .capsud-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; display: flex; flex-direction: column; }
 .capsud-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -16px rgba(10,37,64,0.18); }
 .capsud-card-img { aspect-ratio: 16/10; overflow: hidden; background: var(--surface-2); }
@@ -699,6 +740,25 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .article-body h3 { font-size: clamp(19px, 2vw, 22px); margin: 30px 0 10px; line-height: 1.3; color: var(--ink); font-weight: 600; }
 .article-body h2 + p, .article-body h3 + p { margin-top: 0; }
 .article-foot { margin-top: 40px; text-align: center; }
+
+/* Photos, liens et encadrés à l'intérieur d'un article */
+.article-figure { margin: 34px 0; }
+.article-figure picture { display: block; }
+.article-figure img { width: 100%; display: block; border-radius: var(--r-card); aspect-ratio: 16/9; object-fit: cover; background: var(--surface-2); }
+.article-figure figcaption { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--ink-muted); text-align: center; }
+.article-body .article-lien { margin: 28px 0 32px; }
+.article-body .article-lien a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.article-encadre { margin: 40px 0; padding: 28px 30px; background: var(--surface-2); border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--r-card); }
+.article-encadre h3 { margin: 0 0 18px; font-size: 19px; line-height: 1.3; font-weight: 600; color: var(--ink); }
+.article-encadre dl { display: grid; gap: 12px; margin: 0; }
+.article-encadre dl > div { display: grid; grid-template-columns: 170px 1fr; gap: 16px; align-items: baseline; }
+.article-encadre dt { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+.article-encadre dd { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink); }
+@media (max-width: 600px) {
+  .article-figure { margin: 26px 0; }
+  .article-encadre { padding: 22px 20px; }
+  .article-encadre dl > div { grid-template-columns: 1fr; gap: 4px; }
+}
 
 /* ===== TUNNEL DE RESERVATION ===== */
 .tunnel-stepper { display: flex; gap: 8px; padding: 16px 0; margin-bottom: 24px; overflow-x: auto; position: relative; }
@@ -996,4 +1056,201 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
   .pw-slotlabel span { font-size: 11px; }
   .pw-dayhead .pw-date { font-size: 18px; }
   .pw-cell { min-height: 56px; font-size: 11px; padding: 6px; }
+}
+
+/* ============================================================
+   MÉDIAS DU CLIENT — vidéos drone & feux d'artifice (juillet 2026)
+   ============================================================ */
+
+
+/* --- Bandeau média pleine largeur (fiche bateau, sections immersives) --- */
+.media-band {
+  position: relative; overflow: hidden;
+  border-radius: var(--r-card); background: var(--navy);
+  aspect-ratio: 16 / 9;
+}
+.media-band video, .media-band img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.media-band-legend {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 22px 24px; color: #fff; font-size: 14px; line-height: 1.5;
+  background: linear-gradient(180deg, rgba(10,37,64,0) 0%, rgba(10,37,64,0.78) 100%);
+}
+.media-band-legend strong { display: block; font-family: 'Fraunces', serif; font-size: 20px; font-weight: 400; margin-bottom: 4px; }
+/* Même légende, mais sous la vidéo : utilisée quand les contrôles de lecture
+   sont visibles (téléphone), car ils occupent déjà le bas de l'image. */
+.media-band-legend-dessous {
+  margin-top: 12px; color: var(--ink-soft); font-size: 14px; line-height: 1.5;
+}
+.media-band-legend-dessous strong { display: block; font-family: 'Fraunces', serif; font-size: 18px; font-weight: 400; color: var(--ink); margin-bottom: 2px; }
+
+/* --- Bandeau photo/vidéo de la page Feux d'artifice --- */
+.fw-hero { position: relative; overflow: hidden; display: flex; align-items: flex-end; min-height: 440px; }
+.fw-hero-media { position: absolute; inset: 0; }
+.fw-hero-media img, .fw-hero-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fw-hero-media video { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+.fw-hero-media video.pret { opacity: 1; }
+/* Les bouquets sont très lumineux : le voile doit être franc sous le texte. */
+.fw-hero-media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(4,12,26,0.50) 0%, rgba(4,12,26,0.20) 28%, rgba(4,12,26,0.74) 66%, rgba(4,12,26,0.94) 100%);
+}
+.fw-hero .planning-head { position: relative; z-index: 1; width: 100%; margin-bottom: 0; }
+.fw-hero .eyebrow { color: rgba(255,255,255,0.74); }
+.fw-hero h1 { color: #fff; }
+/* Sélecteur aussi spécifique que `.planning-v2 .planning-head .lead`, sinon
+   le texte resterait bleu-gris et illisible sur le bandeau sombre. */
+.fw-hero .planning-head .lead { color: rgba(255,255,255,0.88); }
+/* Compteurs : pastilles translucides (même vocabulaire que le hero d'accueil),
+   sinon ce sont deux cartes blanches avec du texte blanc dessus. */
+.fw-hero .pstat {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(10px);
+}
+.fw-hero .pstat-num { color: #fff; }
+.fw-hero .pstat-lbl { color: rgba(255,255,255,0.74); }
+
+@media (max-width: 900px) {
+  .media-band-legend { padding: 16px 16px; font-size: 13px; }
+  .media-band-legend strong { font-size: 17px; }
+  .fw-hero { min-height: 340px; }
+}
+
+/* Personnes ayant demandé moins d'animations : aucune vidéo ne s'anime. */
+@media (prefers-reduced-motion: reduce) {
+  .fw-hero-media video { display: none; }
+}
+
+/* ============================================================
+   ENTRETIEN — page /entretien-bateau (entretien.jsx)
+   Reprend la grammaire de la page À propos (ab-hero, ab-timeline)
+   et du formulaire Contact ; préfixe en- pour le reste.
+   ============================================================ */
+.en-anchor { scroll-margin-top: 84px; }
+/* Titre plus long que celui de la page À propos : un cran plus petit pour
+   tenir en deux lignes dans la demi-colonne. */
+.en-hero .ab-hero-text h1 { font-size: clamp(40px, 4.2vw, 56px); text-wrap: balance; }
+/* Badge : titre en Fraunces (style .ab-badge strong) + légende un peu plus grande que l'originale. */
+.en-badge span { display: block; font-size: 14px; margin-top: 4px; color: rgba(255,255,255,0.8); }
+
+/* Infos clés sous le hero */
+.en-facts { max-width: 1280px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.en-fact { padding: 32px 24px; border-left: 1px solid var(--line); }
+.en-fact:first-child { border-left: none; padding-left: 0; }
+.en-fact strong { display: block; font-family: 'Fraunces', serif; font-size: clamp(24px, 2.4vw, 32px); font-weight: 400; color: var(--ink); line-height: 1.1; letter-spacing: -0.02em; }
+.en-fact span { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 10px; line-height: 1.5; }
+
+/* Sections génériques */
+.en-section { max-width: 1280px; margin: 0 auto; padding: 100px 32px 40px; }
+.en-head { max-width: 720px; margin-bottom: 48px; }
+.en-head h2 { font-size: clamp(32px, 3.4vw, 46px); margin-top: 8px; }
+.en-head .lead { margin-top: 16px; }
+
+/* Cartes de prestations */
+.en-group { display: flex; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; margin: 0 0 20px; }
+.en-group h3 { font-size: 26px; font-weight: 500; }
+.en-group span { font-size: 13px; color: var(--ink-soft); }
+.en-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 56px; }
+.en-grid:last-child { margin-bottom: 0; }
+.en-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 32px; transition: transform .25s ease, box-shadow .25s ease; }
+.en-card:hover { transform: translateY(-4px); box-shadow: 0 24px 50px -16px rgba(10,37,64,0.18); }
+.en-card.wide { grid-column: 1 / -1; }
+.en-card.wide .en-list { columns: 2; column-gap: 40px; }
+.en-num { display: block; font-family: 'Fraunces', serif; font-size: 13px; font-weight: 600; letter-spacing: 0.18em; color: var(--accent); margin-bottom: 14px; }
+.en-card h3 { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; margin-bottom: 10px; }
+.en-card > p { font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+.en-list { list-style: none; padding: 0; margin: 0 0 24px; }
+.en-list li { position: relative; padding: 6px 0 6px 28px; font-size: 14px; color: var(--ink-soft); line-height: 1.5; break-inside: avoid; }
+.en-list li svg { position: absolute; left: 0; top: 8px; color: var(--accent); }
+.en-card > p.en-note { font-size: 13px; color: var(--ink); background: var(--accent-soft); border-radius: 14px; padding: 12px 16px; margin: -4px 0 24px; }
+.en-card-foot { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap; }
+.en-price small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+.en-price strong { display: block; font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; color: var(--ink); line-height: 1.2; }
+.en-price em { display: block; font-style: normal; font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+.en-link { background: none; border: none; padding: 4px 0; color: var(--accent); font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+.en-link:hover { text-decoration: underline; }
+
+/* Niveaux de lustrage */
+.en-levels-wrap { background: var(--bg-soft); padding: 100px 32px; margin-top: 60px; }
+.en-levels-inner { max-width: 1280px; margin: 0 auto; }
+.en-levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.en-level { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 32px; }
+.en-level-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+.en-level-bars { display: inline-flex; gap: 5px; }
+.en-level-bars i { width: 22px; height: 6px; border-radius: 999px; background: var(--line-strong); }
+.en-level-bars i.on { background: var(--accent); }
+.en-level-tag { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.en-level h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 500; margin-bottom: 10px; }
+.en-level > p { font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+
+/* Bandeau forfaits */
+.en-plan { max-width: 1280px; margin: 100px auto 0; padding: 0 32px; }
+.en-plan-inner { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--navy) 0%, #0E3A5C 100%); border-radius: 28px; padding: 56px 64px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; }
+.en-plan-inner::before { content: ''; position: absolute; top: -120px; right: -80px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(58,141,222,0.28) 0%, transparent 70%); pointer-events: none; }
+.en-plan-inner > * { position: relative; }
+.en-plan .eyebrow { color: #7CC0EA; }
+.en-plan h2 { color: #fff; font-size: clamp(28px, 2.8vw, 38px); margin-bottom: 12px; }
+.en-plan p { color: rgba(255,255,255,0.78); max-width: 560px; }
+.en-plan .en-plan-price { margin-top: 16px; font-family: 'Fraunces', serif; font-size: 22px; color: #fff; }
+.en-plan-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.en-btn-light { background: #fff; color: #0A2540; }
+.en-btn-light:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+.en-btn-ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.35); text-decoration: none; }
+.en-btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+
+/* Produits & partenaires */
+.en-eco { display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center; }
+.en-eco h2 { font-size: clamp(30px, 3vw, 40px); margin: 8px 0 16px; }
+.en-brand-label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 14px; }
+.en-brand-list { display: flex; flex-wrap: wrap; gap: 12px; }
+.en-brand { padding: 18px 26px; border: 1px solid var(--line); background: var(--surface); border-radius: 18px; font-weight: 700; letter-spacing: 0.1em; font-size: 15px; color: var(--ink); }
+.en-brand.more { font-weight: 400; letter-spacing: 0; color: var(--ink-soft); background: transparent; border-style: dashed; }
+
+/* Formulaire de devis (reprend .contact-list / .contact-form / .field) */
+.en-quote { max-width: 1280px; margin: 0 auto; padding: 100px 32px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 72px; align-items: start; }
+.en-quote h2 { font-size: clamp(32px, 3.4vw, 46px); margin: 8px 0 18px; }
+.en-fieldset { border: none; padding: 0; margin: 4px 0 0; min-width: 0; }
+.en-fieldset legend { padding: 0; margin-bottom: 10px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-soft); }
+.en-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.en-chip { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 13px; color: var(--ink-soft); background: var(--surface); cursor: pointer; user-select: none; transition: all .15s; }
+.en-chip:hover { border-color: var(--ink); color: var(--ink); }
+.en-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.en-chip.on { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.en-chip.on svg { color: var(--accent); }
+.en-chip:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.en-quote .contact-form .btn-block { margin-top: 20px; }
+.en-quote .contact-form .btn-block:disabled { opacity: 0.6; cursor: wait; transform: none; box-shadow: none; }
+.en-form-error { margin: 16px 0 0; font-size: 13px; }
+.en-form-legal { font-size: 12px; color: var(--ink-muted); margin-top: 12px; }
+
+.en-faq { padding-bottom: 0; }
+
+@media (max-width: 1024px) {
+  .en-facts { grid-template-columns: repeat(2, 1fr); }
+  .en-fact:nth-child(3) { border-left: none; padding-left: 0; border-top: 1px solid var(--line); }
+  .en-fact:nth-child(4) { border-top: 1px solid var(--line); }
+  .en-levels { grid-template-columns: 1fr; }
+  .en-plan-inner { grid-template-columns: 1fr; padding: 44px 36px; }
+  .en-plan-actions { justify-content: flex-start; }
+  .en-eco, .en-quote { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 760px) {
+  .en-grid { grid-template-columns: 1fr; }
+  .en-card.wide .en-list { columns: 1; }
+}
+@media (max-width: 640px) {
+  .entretien .ab-hero { padding: 36px 18px 48px; }
+  .entretien .ab-hero-art { height: 360px; }
+  .entretien .ab-badge { right: 8px; padding: 14px 18px; min-width: 0; }
+  .entretien .ab-story { padding: 64px 18px 40px; }
+  .en-facts { grid-template-columns: 1fr; padding: 0 18px; }
+  .en-fact, .en-fact:nth-child(3), .en-fact:nth-child(4) { border-left: none; padding: 22px 0; border-top: 1px solid var(--line); }
+  .en-fact:first-child { border-top: none; }
+  .en-section { padding: 64px 18px 24px; }
+  .en-levels-wrap { padding: 64px 18px; margin-top: 40px; }
+  .en-plan { padding: 0 18px; margin-top: 64px; }
+  .en-plan-inner { padding: 32px 22px; border-radius: 22px; }
+  .en-card, .en-level { padding: 24px 22px; border-radius: 20px; }
+  .en-quote { padding: 64px 18px; }
+  .en-brand { padding: 14px 18px; font-size: 14px; }
 }

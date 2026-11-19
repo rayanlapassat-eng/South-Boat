@@ -24,7 +24,7 @@ const BOATS = [
   price: 435,
   priceHalfDay: 320,
   deposit: 90,
-  preAuth: 2000,
+  preAuth: 1500,
   options: [
     { id: "buoy", label: "Bouée tractée", label_en: "Towed inflatable", price: 30 },
     { id: "wake", label: "Wakeboard", label_en: "Wakeboard", price: 30 },
@@ -44,7 +44,14 @@ const BOATS = [
   "images/mochi/yachts-marina-mandelieu.jpg",
   "images/mochi/cockpit-bateau-location-mandelieu.jpg",
   "images/mochi/moteur-bateau-south-boat.jpg",
-  "images/mochi/marina-port-mandelieu-location-bateau.jpg"],
+  "images/mochi/marina-port-mandelieu-location-bateau.jpg",
+  "images/drone/bateau-vue-drone-zenith-mandelieu.jpg",
+  "images/drone/bateau-mouillage-coucher-soleil-theoule.jpg",
+  "images/drone/bateau-navigation-poster-video.jpg"],
+
+  // Vidéo drone du bateau en navigation (fiche bateau, section « En navigation »).
+  video: "videos/navigation-cote-azur.mp4",
+  videoPoster: "images/drone/bateau-navigation-poster-video.jpg",
 
   description: "Élégance méditerranéenne et confort à bord. Idéal pour une journée en famille au large des calanques.",
   description_en: "Mediterranean elegance and onboard comfort. Perfect for a family day out off the coves.",
@@ -102,6 +109,129 @@ const asset = (p) =>
 // On normalise les images des bateaux une seule fois au chargement.
 BOATS.forEach((b) => { if (Array.isArray(b.images)) b.images = b.images.map(asset); });
 
+// ============ VIGNETTES ============
+// Chaque photo de galerie a deux petites versions générées à côté d'elle :
+// « -400 » et « -800 » (voir DEPLOIEMENT.md). Les vignettes de la mosaïque
+// n'affichent que ~180 px sur téléphone et ~270 px sur ordinateur : y charger
+// la photo pleine taille faisait télécharger 2,5× trop de données.
+// Renvoie undefined pour les URLs externes (Unsplash), qui n'ont pas de jumeau.
+window.srcSetVignette = function (p) {
+  const m = /^(.*)(\.(?:jpe?g|png))$/i.exec(p || "");
+  if (!m || /^(https?:)?\/\//.test(p)) return undefined;
+  return m[1] + "-400" + m[2] + " 400w, " + m[1] + "-800" + m[2] + " 800w";
+};
+// Chemin d'une taille précise, quand la balise ne sait pas gérer un srcset
+// (l'attribut « poster » d'une vidéo, une vignette de récapitulatif).
+window.photoTaille = function (p, largeur) {
+  const m = /^(.*)(\.(?:jpe?g|png))$/i.exec(p || "");
+  return m && !/^(https?:)?\/\//.test(p) ? m[1] + "-" + largeur + m[2] : p;
+};
+
+// ============ VIDÉOS DE FOND ============
+// Dit si l'on doit afficher une vidéo de fond décorative. Faux sur petit écran
+// (on ne consomme pas la data des visiteurs mobiles : la photo suffit) et faux
+// pour qui a demandé à réduire les animations. Quand c'est faux, la balise
+// <video> n'est pas rendue du tout — le fichier n'est donc jamais téléchargé.
+// La vidéo n'est montée qu'APRÈS le chargement complet de la page : elle ne
+// dispute jamais la bande passante à l'image du hero, aux polices ni au script.
+// L'affichage reste donc aussi rapide qu'avec une simple photo, et la vidéo
+// vient se superposer ensuite.
+window.useVideoFond = function useVideoFond() {
+  var [actif, setActif] = useState(false);
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const grandEcran = window.matchMedia("(min-width: 901px)");
+    const animDouces = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Connexion bridée ou visiteur en mode « économie de données » : pas de vidéo.
+    const co = navigator.connection;
+    const reseauFaible = !!co && (co.saveData === true || /^(slow-)?2g$/.test(co.effectiveType || ""));
+    let pretPourLaVideo = false;
+    const maj = () => setActif(pretPourLaVideo && !reseauFaible && grandEcran.matches && !animDouces.matches);
+    const demarrer = () => { pretPourLaVideo = true; maj(); };
+
+    if (document.readyState === "complete") {
+      // Un cran après le rendu, pour laisser respirer le fil principal.
+      setTimeout(demarrer, 350);
+    } else {
+      window.addEventListener("load", () => setTimeout(demarrer, 350), { once: true });
+    }
+    grandEcran.addEventListener("change", maj);
+    animDouces.addEventListener("change", maj);
+    return () => {
+      grandEcran.removeEventListener("change", maj);
+      animDouces.removeEventListener("change", maj);
+    };
+  }, []);
+  return actif;
+};
+
+// ============ DONNÉES STRUCTURÉES ============
+// Injecte (et retire à la sortie de page) un bloc JSON-LD identifié par `id`.
+window.useJsonLd = function useJsonLd(id, donnees) {
+  const serialise = donnees ? JSON.stringify(donnees) : "";
+  useEffect(() => {
+    if (!serialise) return;
+    const ancien = document.getElementById(id);
+    if (ancien) ancien.remove();
+    const tag = document.createElement("script");
+    tag.type = "application/ld+json";
+    tag.id = id;
+    tag.textContent = serialise;
+    document.head.appendChild(tag);
+    return () => { const e = document.getElementById(id); if (e) e.remove(); };
+  }, [id, serialise]);
+};
+
+// Fiche VideoObject : permet à Google d'afficher la vidéo en résultat enrichi.
+// Les URL doivent être absolues sur le domaine canonique.
+window.ficheVideo = function ficheVideo({ nom, description, fichier, vignette, duree }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: nom,
+    description: description,
+    thumbnailUrl: ["https://south-boat.com/" + vignette],
+    contentUrl: "https://south-boat.com/" + fichier,
+    uploadDate: "2026-07-30",
+    duration: duree,
+    isFamilyFriendly: true,
+    publisher: { "@type": "Organization", name: "South Boat", "@id": "https://south-boat.com/#business" },
+  };
+};
+
+// Démarre une vidéo quand elle approche de l'écran, la met en pause quand elle
+// en sort. C'est ici le MÉCANISME DE DÉMARRAGE : la balise n'a volontairement
+// plus d'attribut autoplay, qui lui faisait télécharger ses mégaoctets dès
+// l'ouverture de la page même si le visiteur ne descendait jamais jusqu'à elle.
+// `actif` à faux (téléphone, connexion bridée) : on ne lance rien du tout, la
+// balise affiche son image et ses contrôles, et rien ne part sans un clic.
+// Comme plus rien ne repose sur autoplay, tout échec de démarrage doit rester
+// rattrapable : on affiche alors les contrôles plutôt que de laisser une image
+// figée sans moyen de la lire.
+window.usePauseHorsEcran = function usePauseHorsEcran(actif) {
+  var ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (actif === false || !el) return;
+    const secours = () => { el.controls = true; };
+    if (!("IntersectionObserver" in window)) { secours(); return; }
+    const obs = new IntersectionObserver((entrees) => {
+      entrees.forEach((e) => {
+        if (e.isIntersecting) {
+          // AbortError = lecture interrompue par notre propre pause() quand la
+          // vidéo ressort de l'écran : ce n'est pas un échec, on l'ignore.
+          if (el.paused) el.play().catch((err) => { if (!err || err.name !== "AbortError") secours(); });
+        } else if (!el.paused) { el.pause(); }
+      });
+      // rootMargin : on démarre un écran avant que la vidéo n'arrive, le temps
+      // qu'elle se charge — sinon le visiteur voit l'affiche figée un instant.
+    }, { threshold: 0.2, rootMargin: "300px 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [actif]);
+  return ref;
+};
+
 function pageToPath(page) {
   let path = "/";
   switch (page.name) {
@@ -113,6 +243,7 @@ function pageToPath(page) {
       return BASE_PATH + path;
     }
     case "fireworks": path = "/feux-artifice"; break;
+    case "entretien": path = "/entretien-bateau"; break;
     case "detail": path = `/bateau/${page.id}`; break;
     case "booking": {
       path = `/reservation/${page.id}`;
@@ -149,6 +280,7 @@ function pathToPage(pathname, search) {
       return page;
     }
     case "feux-artifice": return { name: "fireworks" };
+    case "entretien-bateau": return { name: "entretien" };
     case "bateau": return parts[1] ? { name: "detail", id: +parts[1] || parts[1] } : { name: "catalog" };
     case "reservation": {
       if (!parts[1]) return { name: "catalog" };
@@ -257,6 +389,7 @@ function Nav({ page, setPage, dark }) {
   { id: "home", label: t("Accueil", "Home") },
   { id: "catalog", label: t("Catalogue", "Catalog") },
   { id: "planning", label: t("Disponibilités", "Availability") },
+  { id: "entretien", label: t("Entretien", "Maintenance") },
   { id: "fireworks", label: t("Feux d'artifice", "Fireworks") },
   { id: "capsud", label: "Cap Sud" },
   { id: "about", label: t("À propos", "About") },

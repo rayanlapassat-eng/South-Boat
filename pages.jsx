@@ -46,9 +46,9 @@ const FAQ_ITEMS = [
 function HomePage({ setPage, query, setQuery }) {
   const t = window.useT();
   const featured = BOATS.slice(0, 3);
-  const latestArticle = (window.ARTICLES && window.ARTICLES.length > 0)
-    ? (window.ARTICLES.find((a) => a.featured) || window.ARTICLES[0])
-    : null;
+  // L'article mis en avant change tout seul chaque lundi (voir articles.js).
+  const latestArticle = (window.articleDuMoment && window.articleDuMoment())
+    || ((window.ARTICLES && window.ARTICLES.length > 0) ? window.ARTICLES[0] : null);
   const [openFaq, setOpenFaq] = useState(0);
 
   // SEO : JSON-LD FAQPage (uniquement sur l'accueil, pour matcher le contenu visible)
@@ -76,7 +76,25 @@ function HomePage({ setPage, query, setQuery }) {
     <main className="home">
       <section className="hero">
         <div className="hero-bg">
-          <img src={asset("images/hero.jpeg")} alt={t("Bateau South Boat dans une crique de l'Estérel — location de bateau à Mandelieu", "South Boat in an Estérel cove — boat rentals in Mandelieu")} fetchpriority="high" decoding="async" />
+          {/* Prise de vue par drone du client (août 2026) : le bateau à la
+              verticale, au mouillage au-dessus des fonds turquoise de l'Estérel.
+              Sur téléphone, un recadrage vertical dédié place le bateau dans le
+              tiers bas — sinon le cadrage large le ramène au milieu de l'écran,
+              exactement là où passe le texte, et la coque blanche avale le
+              paragraphe. C'est du cadrage éditorial, pas une simple taille :
+              d'où <picture> plutôt qu'une entrée de plus dans le srcset. */}
+          <picture>
+            <source
+              media="(max-width: 700px)"
+              srcSet={asset("images/drone/bateau-eau-turquoise-esterel-vue-drone-portrait-800.jpg") + " 800w, " + asset("images/drone/bateau-eau-turquoise-esterel-vue-drone-portrait.jpg") + " 1200w"}
+              sizes="100vw" />
+            <img
+              src={asset("images/drone/bateau-eau-turquoise-esterel-vue-drone.jpg")}
+              srcSet={asset("images/drone/bateau-eau-turquoise-esterel-vue-drone-800.jpg") + " 800w, " + asset("images/drone/bateau-eau-turquoise-esterel-vue-drone.jpg") + " 2400w"}
+              sizes="100vw"
+              alt={t("Bateau South Boat vu du ciel à la verticale, au mouillage au-dessus des fonds turquoise de l'Estérel, au départ de Mandelieu-la-Napoule", "South Boat seen from directly above, at anchor over the turquoise seabed of the Estérel, departing from Mandelieu-la-Napoule")}
+              fetchpriority="high" decoding="async" />
+          </picture>
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
@@ -84,11 +102,11 @@ function HomePage({ setPage, query, setQuery }) {
             <span className="dot" /> {t("Côte d'Azur · Saison 2026", "French Riviera · 2026 Season")}
           </div>
           <h1 className="hero-title">
-            {t("Le large,", "The open sea,")}<br />{t("en toute simplicité.", "made simple.")}
+            {t("Location de bateau", "Boat rental")}<br />{t("à Mandelieu-la-Napoule", "in Mandelieu-la-Napoule")}
           </h1>
           <p className="hero-sub">
-            {t("Une sélection rigoureuse de bateaux familiaux au départ de Mandelieu. Réservation transparente, équipage à la demande.",
-               "A carefully curated selection of family boats departing from Mandelieu. Transparent booking, crew on demand.")}
+            {t("Le large, en toute simplicité — une sélection de bateaux familiaux à louer au départ de Mandelieu, avec ou sans skipper, vers l'Estérel, Cannes et les îles de Lérins.",
+               "The open sea, made simple — a curated selection of family boats for hire departing from Mandelieu, with or without a skipper, toward the Estérel, Cannes and the Lérins islands.")}
           </p>
           <div className="hero-cta-row">
             <button className="btn btn-primary" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: 20 }}>
@@ -137,6 +155,23 @@ function HomePage({ setPage, query, setQuery }) {
             <h3>{t("Sans mauvaise surprise", "No nasty surprises")}</h3>
             <p>{t("Tarifs clairs, sans frais cachés. Annulation flexible et une équipe à votre écoute pour vous accompagner avant chaque sortie.",
                   "Clear pricing, no hidden fees. Flexible cancellation and a team on hand to support you before every outing.")}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Vue par drone d'une crique de l'Estérel : elle donne à voir le décor
+          d'une sortie, ce qu'aucun texte ne remplace. */}
+      <section className="section">
+        <div className="media-band">
+          <img
+            src={asset("images/drone/crique-esterel-bateau-mouillage-mandelieu-v2.jpg")}
+            srcSet={asset("images/drone/crique-esterel-bateau-mouillage-mandelieu-v2-800.jpg") + " 800w, " + asset("images/drone/crique-esterel-bateau-mouillage-mandelieu-v2.jpg") + " 2000w"}
+            sizes="(max-width: 1280px) 100vw, 1216px"
+            alt={t("Bateau South Boat au mouillage dans une crique aux roches rouges de l'Estérel, vu du ciel", "South Boat at anchor in a red-rock cove of the Estérel, seen from above")}
+            loading="lazy" decoding="async" />
+          <div className="media-band-legend">
+            <strong>{t("Mouillage dans l'Estérel", "Anchored in the Estérel")}</strong>
+            {t("À quinze minutes de navigation du port de Mandelieu.", "Fifteen minutes' cruise from Port de Mandelieu.")}
           </div>
         </div>
       </section>
@@ -206,7 +241,7 @@ function HomePage({ setPage, query, setQuery }) {
           {[
           { id: "lerins", n: t("Îles de Lérins", "Lérins Islands"), img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80", c: t("Baignade & déjeuner en mer", "Swimming & lunch at sea") },
           { id: "cap-antibes", n: t("Cap d'Antibes", "Cap d'Antibes"), img: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=1200&q=80", c: t("Villas & criques sauvages", "Villas & wild coves") },
-          { id: "esterel", n: t("Calanques de l'Estérel", "Estérel calanques"), img: asset("images/itineraire-esterel.jpeg"), c: t("Calanques & roches rouges", "Coves & red rocks") }].
+          { id: "esterel", n: t("Calanques de l'Estérel", "Estérel calanques"), img: asset("images/drone/roches-rouges-esterel-mer-turquoise.jpg"), c: t("Calanques & roches rouges", "Coves & red rocks") }].
           map((d) =>
           <button key={d.id} className="dest-card" onClick={() => setPage({ name: "itinerary", id: d.id })}>
               <img src={d.img} alt={d.n} loading="lazy" decoding="async" />
@@ -262,7 +297,7 @@ function BoatCard({ boat, onClick }) {
     return (
       <article className="boat-card coming-soon" aria-disabled="true">
         <div className="boat-img">
-          <img src={boat.images[0]} alt="" style={{ filter: "blur(14px)", transform: "scale(1.1)" }} />
+          <img src={boat.images[0]} alt="" loading="lazy" decoding="async" style={{ filter: "blur(14px)", transform: "scale(1.1)" }} />
           <div className="coming-soon-overlay">
             <span className="coming-soon-badge">{t("Coming Soon", "Coming Soon")}</span>
             <span className="coming-soon-sub">{t("Bientôt dans la flotte", "Coming to the fleet")}</span>
@@ -300,8 +335,9 @@ function BoatCard({ boat, onClick }) {
         </p>
         <div className="boat-foot">
           <div className="price">
-            <strong>{fmtPrice(boat.price)}</strong>
-            <span> {t("/ jour", "/ day")}</span>
+            <span className="price-from">{t("à partir de", "from")} </span>
+            <strong>{fmtPrice(boat.priceHalfDay || Math.round(boat.price * 0.6))}</strong>
+            <span> {t("/ demi-journée", "/ half day")}</span>
           </div>
           <span className="boat-cta">
             {t("Découvrir", "Discover")} <Icon name="arrow" size={15} />
@@ -368,6 +404,20 @@ function DetailPage({ id, setPage }) {
   const boat = BOATS.find((b) => b.id === id);
   const [idx, setIdx] = useState(0);
   const [lightbox, setLightbox] = useState(false);
+  // Vidéo « En navigation » : lecture automatique réservée au grand écran.
+  // Sur téléphone (ou connexion bridée), on affiche l'image et un bouton de
+  // lecture : 3,5 Mo ne partent que si le visiteur le demande.
+  const lectureAuto = window.useVideoFond();
+  // Mise en pause quand elle n'est pas à l'écran — seulement en lecture auto.
+  const videoNavRef = window.usePauseHorsEcran(lectureAuto);
+  // SEO : VideoObject pour la vidéo de la fiche bateau (si ce bateau en a une).
+  window.useJsonLd("ld-video-bateau", boat && boat.video ? window.ficheVideo({
+    nom: (boat.name || "Bateau") + " en navigation au large de Mandelieu",
+    description: "Le " + (boat.name || "bateau") + " en navigation au large de Mandelieu-la-Napoule au coucher du soleil, filmé par drone. Location de bateau avec ou sans skipper sur la Côte d'Azur.",
+    fichier: boat.video,
+    vignette: boat.videoPoster,
+    duree: "PT23S",
+  }) : null);
   useEffect(() => {
     if (!lightbox || !boat) return;
     const onKey = (e) => {
@@ -379,7 +429,20 @@ function DetailPage({ id, setPage }) {
     document.body.style.overflow = "hidden";
     return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
   }, [lightbox, boat]);
-  if (!boat) return null;
+  if (!boat) {
+    return (
+      <main className="detail">
+        <section className="step-card" style={{ textAlign: "center", padding: "48px 20px", marginTop: 24 }}>
+          <h2>{t("Bateau introuvable", "Boat not found")}</h2>
+          <p className="lead">{t("Ce bateau n'existe pas ou n'est plus disponible.", "This boat does not exist or is no longer available.")}</p>
+          <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setPage({ name: "catalog" })}>
+            {t("Voir tous les bateaux", "See all boats")}
+          </button>
+        </section>
+        <Footer />
+      </main>
+    );
+  }
   const openLightbox = (i) => { setIdx(i); setLightbox(true); };
   const sideImgs = boat.images.slice(1, 5);
 
@@ -398,12 +461,12 @@ function DetailPage({ id, setPage }) {
 
       <section className={`gallery-mosaic side-${sideImgs.length}`}>
         <button className="mosaic-main" onClick={() => openLightbox(0)}>
-          <img src={boat.images[0]} alt={`${boat.name} - Location bateau Mandelieu Côte d'Azur, port et Estérel`} />
+          <img src={boat.images[0]} alt={`${boat.name} - Location bateau Mandelieu Côte d'Azur, port et Estérel`} fetchpriority="high" decoding="async" />
         </button>
         <div className="mosaic-side">
           {sideImgs.map((src, i) =>
             <button key={i} className="mosaic-cell" onClick={() => openLightbox(i + 1)}>
-              <img src={src} alt={`${boat.name} - Photo ${i + 2} location bateau Mandelieu`} />
+              <img src={src} srcSet={window.srcSetVignette(src)} sizes="(max-width: 768px) 45vw, 270px" alt={`${boat.name} - Photo ${i + 2} location bateau Mandelieu`} loading="lazy" decoding="async" />
             </button>
           )}
         </div>
@@ -462,6 +525,46 @@ function DetailPage({ id, setPage }) {
             <p className="lead">{t(boat.description, boat.description_en || boat.description)}</p>
           </div>
 
+          {boat.video && (
+            <div className="detail-section">
+              <h3>{t("En navigation", "Under way")}</h3>
+              {/* Deux réglages de poids ici :
+                  — « poster » ne gère pas les srcset, on choisit donc la taille
+                    à la main (390 px à l'écran sur téléphone, pas 2400) ;
+                  — jamais d'autoPlay, sinon la balise télécharge ses 3,5 Mo dès
+                    l'ouverture de la page même si le visiteur ne descend jamais
+                    jusqu'ici. C'est usePauseHorsEcran qui lance la lecture, et
+                    donc le téléchargement, à l'approche de la section. */}
+              <div className="media-band">
+                <video
+                  key={lectureAuto ? "auto" : "manuel"}
+                  ref={videoNavRef}
+                  src={asset(boat.video)}
+                  poster={asset(lectureAuto ? boat.videoPoster : window.photoTaille(boat.videoPoster, 800))}
+                  muted loop playsInline
+                  {...(lectureAuto
+                    ? { preload: "none" }
+                    : { controls: true, preload: "none" })}
+                  aria-label={t("Le bateau en navigation au large de la Côte d'Azur, filmé par drone", "The boat under way off the French Riviera, filmed by drone")} />
+                {/* En lecture manuelle, les contrôles natifs occupent le bas de
+                    l'image : la légende passe alors sous la vidéo au lieu de se
+                    superposer aux boutons. */}
+                {lectureAuto && (
+                  <div className="media-band-legend">
+                    <strong>{t("Sortie au coucher du soleil", "Sunset cruise")}</strong>
+                    {t("Images tournées au large de Mandelieu, en fin de journée.", "Filmed off Mandelieu, at the end of the day.")}
+                  </div>
+                )}
+              </div>
+              {!lectureAuto && (
+                <p className="media-band-legend-dessous">
+                  <strong>{t("Sortie au coucher du soleil", "Sunset cruise")}</strong>
+                  {t("Images tournées au large de Mandelieu, en fin de journée.", "Filmed off Mandelieu, at the end of the day.")}
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="detail-section">
             <h3>{t("Équipement", "Equipment")}</h3>
             <ul className="features">
@@ -517,7 +620,7 @@ function DetailPage({ id, setPage }) {
               )}
               {boat.preAuth && (
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 0" }}>
-                  <span>{t("Pré-autorisation (caution)", "Pre-authorization (deposit hold)")}</span><strong>{fmtPrice(boat.preAuth)}</strong>
+                  <span>{t("Caution (sans skipper)", "Deposit hold (without skipper)")}</span><strong>{fmtPrice(boat.preAuth)}</strong>
                 </div>
               )}
               {boat.options && boat.options.length > 0 && (
@@ -607,6 +710,22 @@ function PayLogo({ brand }) {
       </span>
     );
   }
+  if (brand === "wero") {
+    return (
+      <span style={wrap}>
+        <svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true">
+          <defs>
+            <linearGradient id="weroGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#ff2d78" />
+              <stop offset="1" stopColor="#7b2ff7" />
+            </linearGradient>
+          </defs>
+          <rect x="0.5" y="0.5" width="37" height="23" rx="3.5" fill="url(#weroGrad)" />
+          <text x="19" y="16" textAnchor="middle" fontFamily="Helvetica, Arial, sans-serif" fontSize="9" fontWeight="700" fill="#fff">wero</text>
+        </svg>
+      </span>
+    );
+  }
   if (brand === "virement") {
     return (
       <span style={wrap}>
@@ -665,7 +784,7 @@ L'équipe South Boat
 const INTERNAL_EMAIL_TEMPLATE = {
   to: "contact@south-boat.com",
   subject: "Nouvelle réservation — coordonnées chef de bord & client",
-  body: ({ boatName, dateLong, slot, adults, children, itinerary, total, deposit, preAuth, paymentMethod, billing, permit, permitDifferent }) => `
+  body: ({ boatName, dateLong, slot, adults, children, itinerary, total, deposit, preAuth, paymentMethod, billing, permit, permitDifferent, withSkipper }) => `
 NOUVELLE RÉSERVATION — South Boat
 ==================================
 
@@ -674,11 +793,12 @@ Bateau : ${boatName}
 Date : ${dateLong}
 Créneau : ${slot}
 Participants : ${adults} adulte(s)${children ? ", " + children + " enfant(s)" : ""}
+Skipper : ${withSkipper ? "OUI — capitaine South Boat à bord" : "NON — le client pilote"}
 ${itinerary ? "Itinéraire : " + itinerary + "\n" : ""}
 — MONTANTS —
 Total : ${total}
 Acompte payé : ${deposit}
-Pré-autorisation : ${preAuth}
+Pré-autorisation : ${withSkipper ? "Aucune (réservation avec skipper)" : preAuth}
 Moyen de paiement : ${paymentMethod || "—"}
 
 — COORDONNÉES CLIENT (PERSONNE QUI RÉSERVE) —
@@ -689,7 +809,8 @@ Téléphone : ${billing.phone || "—"}
 Adresse postale : ${billing.address || "—"}
 
 — COORDONNÉES CHEF DE BORD (TITULAIRE DU PERMIS) —
-${permitDifferent ? `Nom / prénom : ${permit.lastName || "—"} / ${permit.firstName || "—"}
+${withSkipper ? `Sans objet — réservation AVEC SKIPPER : c'est le capitaine South Boat qui pilote.
+Aucun permis bateau n'est demandé au client, aucune caution n'est prise.` : permitDifferent ? `Nom / prénom : ${permit.lastName || "—"} / ${permit.firstName || "—"}
 Date de naissance : ${permit.birthdate || "—"}
 Email : ${permit.email || "—"}
 Téléphone : ${permit.phone || "—"}
@@ -806,6 +927,11 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
   });
   const [bookingError, setBookingError] = useState("");
   const [bookingPending, setBookingPending] = useState(false);
+  // Paiement Mollie (carte / Apple Pay / Wero)
+  const [molliePaying, setMolliePaying] = useState(false);   // redirection en cours
+  const [mollieError, setMollieError] = useState("");
+  const [mollieReturn, setMollieReturn] = useState(null);    // null | "checking" | "paid" | "failed"
+  const finalizeOnceRef = useRef(false);
 
   // Options dynamiques par bateau (sinon defaults génériques) — filtrées par type de créneau
   const allExtras = boat.options && boat.options.length > 0
@@ -832,21 +958,26 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     }, 0);
     const skipperCost = data.crew === "with" ? (data.slot === "halfday" ? 150 : 200) : 0;
     const total = base + extrasCost + skipperCost;
-    // Acompte et caution : valeurs définies par le bateau (Mochi : 90€ / 2000€)
+    // Acompte et caution : valeurs définies par le bateau (Mochi : 90€ / 1500€)
     const deposit = boat.deposit != null ? boat.deposit : Math.round(total * 0.3);
-    const preAuth = boat.preAuth != null ? boat.preAuth : 2000;
+    const preAuth = boat.preAuth != null ? boat.preAuth : 1500;
     return { total, deposit, preAuth, base, extrasCost, skipperCost };
   }, [boat, data]);
 
+  // Avec skipper, c'est notre capitaine qui pilote : aucun permis client n'est demandé
+  // et aucune caution n'est prise (l'étape 5 « Pré-autorisation » est purement et simplement sautée).
+  const withSkipper = data.crew === "with";
+
+  // `n` = numéro d'étape interne (inchangé), l'affichage renumérote 1..N après filtrage.
   const steps = [
-    t("Créneau", "Time slot"),
-    t("Options", "Options"),
-    t("Récapitulatif", "Summary"),
-    t("Coordonnées", "Contact info"),
-    t("Pré-autorisation", "Pre-authorization"),
-    t("Paiement", "Payment"),
-    t("Confirmation", "Confirmation"),
-  ];
+    { n: 1, label: t("Créneau", "Time slot") },
+    { n: 2, label: t("Options", "Options") },
+    { n: 3, label: t("Récapitulatif", "Summary") },
+    { n: 4, label: t("Coordonnées", "Contact info") },
+    { n: 5, label: t("Pré-autorisation", "Pre-authorization") },
+    { n: 6, label: t("Paiement", "Payment") },
+    { n: 7, label: t("Confirmation", "Confirmation") },
+  ].filter((s) => !(withSkipper && s.n === 5));
 
   const validateStep = () => {
     setErrorMsg("");
@@ -875,11 +1006,12 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
         if (!data.billing[k] || !String(data.billing[k]).trim()) errs["billing." + k] = "Champ requis";
       });
       if (data.billing.email && !emailRe.test(data.billing.email)) errs["billing.email"] = "Email invalide";
-      // Si le client conduit lui-même, le n° de permis est obligatoire ici
-      if (!data.permitDifferent && (!data.billing.permitNumber || !String(data.billing.permitNumber).trim())) {
+      // Si le client conduit lui-même, le n° de permis est obligatoire ici.
+      // Avec skipper, aucun permis n'est demandé (c'est notre capitaine qui pilote).
+      if (!withSkipper && !data.permitDifferent && (!data.billing.permitNumber || !String(data.billing.permitNumber).trim())) {
         if (data.crew === "without") errs["billing.permitNumber"] = "Champ requis";
       }
-      if (data.permitDifferent) {
+      if (!withSkipper && data.permitDifferent) {
         ["firstName", "lastName", "birthdate", "email", "phone", "address", "permitNumber"].forEach((k) => {
           if (!data.permit[k] || !String(data.permit[k]).trim()) errs["permit." + k] = "Champ requis";
         });
@@ -905,13 +1037,12 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
     return true;
   };
 
-  const goNext = async () => {
-    if (!validateStep()) return;
-    // À l'étape 6 → 7, on crée la réservation dans Cal.com pour bloquer le créneau.
-    if (step === 6) {
+  // Crée la réservation Cal.com (bloque le créneau) + envoie l'email interne à South Boat.
+  // Lit l'état `data` courant. Renvoie true si la réservation a bien été créée.
+  const finalizeBooking = async () => {
       if (!data.calStart) {
         setErrorMsg(t("Créneau introuvable. Revenez à l'étape 1 et resélectionnez la date.", "Slot not found. Go back to step 1 and reselect the date."));
-        return;
+        return false;
       }
       const eventKey = data.slot === "day" ? "fullday" : (data.period === "pm" ? "halfday-pm" : "halfday-am");
       const fullName = (data.billing.firstName + " " + data.billing.lastName).trim() || data.billing.email;
@@ -937,35 +1068,149 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
       if (!res.ok) {
         setBookingError(res.error || t("Impossible de réserver le créneau dans Cal.com.", "Could not book the slot in Cal.com."));
         setErrorMsg(t("Le créneau n'a pas pu être bloqué. Essayez une autre date.", "The slot could not be locked. Try another date."));
-        return;
+        return false;
       }
-      // Envoi du justificatif de virement par email à South Boat
-      if (data.transferProof && data.paymentMethod === "virement") {
+      // Email interne complet envoyé à South Boat (contact@south-boat.com) pour TOUTE réservation réelle,
+      // avec toutes les coordonnées nécessaires au contrat du Jour-J + le justificatif de virement si fourni.
+      // On n'envoie pas en mode mock (dev local sans proxy) pour ne pas polluer la boîte mail pendant les tests.
+      if (!res.mock) {
         try {
-          const formData = new FormData();
-          formData.append("access_key", "867b6825-3025-4db9-88a7-56b7f25342f8");
-          formData.append("subject", `[South Boat] Justificatif de virement — ${boat.name} — ${fullName}`);
-          formData.append("from_name", fullName);
-          formData.append("email", data.billing.email);
-          formData.append("message",
-            `Nouveau justificatif de virement reçu.\n\n` +
-            `Bateau : ${boat.name}\n` +
-            `Date : ${data.calStart}\n` +
-            `Créneau : ${data.slot === "day" ? "Journée" : "Demi-journée (" + data.period + ")"}\n` +
-            `Adultes : ${data.adults} — Enfants : ${data.children}\n` +
-            `Skipper : ${data.crew === "with" ? "Oui" : "Non"}\n\n` +
-            `Client : ${fullName}\n` +
-            `Email : ${data.billing.email}\n` +
-            `Tél : ${data.billing.phone}\n`
-          );
-          formData.append("attachment", data.transferProof, data.transferProof.name);
-          await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
-        } catch (_) { /* l'email de confirmation Cal.com reste envoyé même si ceci échoue */ }
+          const slotLabel = data.slot === "day"
+            ? "Journée complète"
+            : "Demi-journée" + (data.period ? " (" + (data.period === "pm" ? "après-midi" : "matin") + ")" : "");
+          const paymentLabels = { cb: "Carte bancaire", creditcard: "Carte bancaire", applepay: "Apple Pay", wero: "Wero", paypal: "PayPal", paybybank: "Pay by Bank", virement: "Virement bancaire" };
+          const message = INTERNAL_EMAIL_TEMPLATE.body({
+            boatName: boat.name,
+            dateLong: fmtLong(data.date, "fr"),
+            slot: slotLabel,
+            adults: data.adults,
+            children: data.children,
+            itinerary: selectedItinerary ? selectedItinerary.name : "",
+            total: fmtPrice(total),
+            deposit: fmtPrice(deposit),
+            preAuth: fmtPrice(preAuth),
+            paymentMethod: paymentLabels[data.paymentMethod] || data.paymentMethod || "—",
+            billing: data.billing,
+            permit: data.permit,
+            permitDifferent: data.permitDifferent,
+            withSkipper: data.crew === "with",
+          });
+          const hasProof = !!(data.transferProof && data.paymentMethod === "virement");
+          const sendInternalEmail = async (withAttachment) => {
+            const formData = new FormData();
+            formData.append("access_key", "867b6825-3025-4db9-88a7-56b7f25342f8");
+            formData.append("subject", `[South Boat] Nouvelle réservation — ${boat.name} — ${fullName}`);
+            formData.append("from_name", fullName);
+            formData.append("email", data.billing.email);
+            formData.append("message", withAttachment ? message : message + "\n\n(Justificatif de virement non joint automatiquement — pièce jointe refusée par le service d'envoi. Le contacter directement pour l'obtenir si besoin.)");
+            if (withAttachment && hasProof) {
+              formData.append("attachment", data.transferProof, data.transferProof.name);
+            }
+            const mailRes = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
+            const mailBody = await mailRes.json().catch(() => null);
+            return mailRes.ok && mailBody && mailBody.success;
+          };
+          const ok = await sendInternalEmail(true);
+          if (!ok) {
+            console.warn("[South Boat] Échec de l'envoi de l'email de réservation (avec pièce jointe), nouvelle tentative sans pièce jointe");
+            const okRetry = hasProof ? await sendInternalEmail(false) : false;
+            if (!okRetry) console.warn("[South Boat] Échec de l'envoi de l'email de réservation à South Boat, même sans pièce jointe");
+          }
+        } catch (err) { console.warn("[South Boat] Erreur lors de l'envoi de l'email de réservation", err); }
       }
-    }
-    setStep((s) => Math.min(7, s + 1)); setErrorMsg(""); setFieldErrors({});
+      return true;
   };
-  const goPrev = () => { setErrorMsg(""); setFieldErrors({}); setStep((s) => Math.max(1, s - 1)); };
+
+  const goNext = async () => {
+    if (!validateStep()) return;
+    // À l'étape 6 → 7 : on crée la réservation Cal.com + on envoie l'email interne.
+    if (step === 6) {
+      const ok = await finalizeBooking();
+      if (!ok) return;
+    }
+    // Avec skipper : pas de caution → on passe directement des Coordonnées (4) au Paiement (6).
+    setStep((s) => (withSkipper && s === 4 ? 6 : Math.min(7, s + 1))); setErrorMsg(""); setFieldErrors({});
+  };
+  const goPrev = () => { setErrorMsg(""); setFieldErrors({}); setStep((s) => (withSkipper && s === 6 ? 4 : Math.max(1, s - 1))); };
+
+  // ----- Paiement Mollie : lancement (carte / Apple Pay / Wero) -----
+  const startMolliePayment = async () => {
+    setMollieError("");
+    const methodMap = { cb: "creditcard", applepay: "applepay", wero: "wero" };
+    const mMethod = methodMap[data.paymentMethod];
+    if (!mMethod) return;
+    setMolliePaying(true);
+    // On mémorise l'état du tunnel pour le restaurer au retour de Mollie.
+    try {
+      const snapshot = { ...data, transferProof: null };
+      localStorage.setItem("sb_mollie_pending", JSON.stringify({ boatId: boat.id, data: snapshot, ts: Date.now() }));
+    } catch (e) {}
+    const returnUrl = window.location.origin + window.pageToPath({ name: "booking", id: boat.id }) + "?mollie=return";
+    const res = await window.MollieAPI.createPayment({
+      amount: deposit,
+      method: mMethod,
+      boatName: boat.name,
+      boatId: boat.id,
+      returnUrl: returnUrl,
+      reference: ((data.billing.lastName || "") + " " + (data.date || "")).trim(),
+    });
+    if (res && res.mock) {
+      // Aperçu local (sans PHP) : pas de redirection réelle, on simule un paiement réussi.
+      setMolliePaying(false);
+      setData((d) => ({ ...d, paymentDone: true }));
+      return;
+    }
+    if (!res || !res.ok || !res.checkoutUrl) {
+      setMolliePaying(false);
+      setMollieError((res && res.error) || t("Impossible de démarrer le paiement. Réessayez.", "Could not start the payment. Please try again."));
+      return;
+    }
+    try { localStorage.setItem("sb_mollie_payment_id", res.paymentId || ""); } catch (e) {}
+    window.location.href = res.checkoutUrl;
+  };
+
+  // ----- Retour depuis Mollie : restaure le tunnel + vérifie le statut -----
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mollie") !== "return") return;
+    let pending = null, pid = "";
+    try {
+      pending = JSON.parse(localStorage.getItem("sb_mollie_pending") || "null");
+      pid = localStorage.getItem("sb_mollie_payment_id") || "";
+    } catch (e) {}
+    // On nettoie l'URL (retire ?mollie=return) sans recharger la page.
+    try { window.history.replaceState({}, "", window.pageToPath({ name: "booking", id: boat.id })); } catch (e) {}
+    if (!pending || !pending.data || !pid) return;
+    // Restauration de l'état au moment du départ vers Mollie.
+    setData((d) => ({ ...d, ...pending.data, transferProof: null }));
+    setStep(6);
+    setMollieReturn("checking");
+    window.MollieAPI.getStatus(pid).then((res) => {
+      try {
+        localStorage.removeItem("sb_mollie_pending");
+        localStorage.removeItem("sb_mollie_payment_id");
+      } catch (e) {}
+      if (res && res.paid) {
+        setData((d) => ({ ...d, paymentDone: true }));
+        setMollieReturn("paid");
+      } else {
+        setMollieReturn("failed");
+        setErrorMsg(t("Le paiement n'a pas abouti ou a été annulé. Vous pouvez réessayer.", "The payment did not go through or was canceled. You can try again."));
+      }
+    });
+  }, []);
+
+  // ----- Après un paiement Mollie confirmé : on finalise la réservation puis on passe à la confirmation -----
+  useEffect(() => {
+    if (mollieReturn === "paid" && data.paymentDone && step === 6 && !bookingPending && !finalizeOnceRef.current) {
+      finalizeOnceRef.current = true;
+      (async () => {
+        const ok = await finalizeBooking();
+        if (ok) { setStep(7); setErrorMsg(""); setFieldErrors({}); }
+        else { finalizeOnceRef.current = false; } // échec Cal.com : on autorise un nouvel essai manuel
+      })();
+    }
+  }, [mollieReturn, data.paymentDone, step, bookingPending]);
 
   // Scroll back to top whenever we change step (fixes "Options" not scrolling up)
   useEffect(() => {
@@ -1014,7 +1259,8 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
         <div className="booking-main">
           <div className="tunnel-stepper">
             {steps.map((s, i) => {
-              const stepNum = i + 1;
+              const stepNum = s.n;
+              const displayNum = i + 1; // numérotation continue même si l'étape 5 est masquée
               const canJump = stepNum < step && stepNum < 6; // peut revenir avant la pré-autorisation
               const cls = "step" + (step > stepNum ? " done" : "") + (step === stepNum ? " active" : "") + (canJump ? " clickable" : "");
               return (
@@ -1025,8 +1271,8 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                   onClick={canJump ? () => { setErrorMsg(""); setFieldErrors({}); setStep(stepNum); } : undefined}
                   disabled={!canJump}
                   aria-current={step === stepNum ? "step" : undefined}>
-                  <span className="step-num">{step > stepNum ? <Icon name="check" size={14} /> : stepNum}</span>
-                  <span className="step-label">{s}</span>
+                  <span className="step-num">{step > stepNum ? <Icon name="check" size={14} /> : displayNum}</span>
+                  <span className="step-label">{s.label}</span>
                 </button>
               );
             })}
@@ -1168,7 +1414,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                   <strong>{t("Sans skipper", "Without skipper")}</strong>
                   <span>{t("Permis bateau requis", "Boating license required")}</span>
                 </button>
-                <button className={"seg-btn" + (data.crew === "with" ? " active" : "")} onClick={() => setData({ ...data, crew: "with" })}>
+                <button className={"seg-btn" + (data.crew === "with" ? " active" : "")} onClick={() => setData({ ...data, crew: "with", permitDifferent: false })}>
                   <strong>{t("Avec skipper", "With skipper")}</strong>
                   <span>{t("+150 € demi-journée · +200 € journée", "+€150 half day · +€200 full day")}</span>
                 </button>
@@ -1228,7 +1474,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                 <div className="recap-row" style={{ alignItems: "center" }}>
                   <span>{t("Bateau", "Boat")}</span>
                   <strong style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <img src={boat.images[0]} alt={boat.name} style={{ width: 56, height: 40, objectFit: "cover", borderRadius: 6 }} />
+                    <img src={window.photoTaille(boat.images[0], 400)} alt={boat.name} loading="lazy" decoding="async" style={{ width: 56, height: 40, objectFit: "cover", borderRadius: 6 }} />
                     {boat.name} <span className="muted" style={{ fontWeight: 400 }}>· {boat.port}</span>
                   </strong>
                 </div>
@@ -1252,6 +1498,15 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                   );
                 })}
                 <div className="recap-row total"><span>{t("Total", "Total")}</span><strong>{fmtPrice(total)}</strong></div>
+                {/* La caution n'entre pas dans le total : simple empreinte CB, et aucune caution avec skipper. */}
+                <div className="recap-row" style={{ borderTop: "1px solid var(--line)", marginTop: 6, paddingTop: 12, fontSize: 13 }}>
+                  <span>{t("Caution", "Security deposit")}</span>
+                  {withSkipper ? (
+                    <strong style={{ color: "#1a5a32" }}>{t("Aucune (skipper à bord)", "None (skipper on board)")}</strong>
+                  ) : (
+                    <strong>{fmtPrice(preAuth)} <span style={{ fontWeight: 400, color: "var(--muted, #5b6b7a)" }}>{t("· empreinte CB, non débitée", "· card hold, not charged")}</span></strong>
+                  )}
+                </div>
               </div>
             </section>
           )}
@@ -1292,7 +1547,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                   <input data-fkey="billing.address" type="text" value={data.billing.address} onChange={(e) => setBilling("address", e.target.value)} />
                   {fieldErrors["billing.address"] && <small style={{ color: "#c00" }}>{t(fieldErrors["billing.address"], "Required")}</small>}
                 </label>
-                {!data.permitDifferent && (
+                {!withSkipper && !data.permitDifferent && (
                   <label className="field full">
                     <span>{t("Numéro de permis bateau", "Boating license number")} {data.crew === "without" ? t("(obligatoire)", "(required)") : t("(si applicable)", "(if applicable)")}</span>
                     <input data-fkey="billing.permitNumber" type="text" value={data.billing.permitNumber || ""} onChange={(e) => setBilling("permitNumber", e.target.value)} />
@@ -1301,12 +1556,18 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                 )}
               </div>
 
-              <label className="field" style={{ marginTop: 16, flexDirection: "row", alignItems: "center", gap: 8 }}>
-                <input type="checkbox" checked={data.permitDifferent} onChange={(e) => setData({ ...data, permitDifferent: e.target.checked })} />
-                <span>{t("Le chef de bord (titulaire du permis) est une autre personne", "The skipper (license holder) is a different person")}</span>
-              </label>
+              {withSkipper ? (
+                <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #1a5a32", padding: "10px 14px", borderRadius: 4, marginTop: 16, color: "#3b4a5a", fontSize: 13 }}>
+                  {t("Réservation avec skipper : aucun permis bateau ne vous est demandé, c'est notre capitaine qui pilote.", "Booking with a skipper: no boating license is required from you — our captain is at the helm.")}
+                </div>
+              ) : (
+                <label className="field" style={{ marginTop: 16, flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <input type="checkbox" checked={data.permitDifferent} onChange={(e) => setData({ ...data, permitDifferent: e.target.checked })} />
+                  <span>{t("Le chef de bord (titulaire du permis) est une autre personne", "The skipper (license holder) is a different person")}</span>
+                </label>
+              )}
 
-              {data.permitDifferent && (
+              {!withSkipper && data.permitDifferent && (
                 <>
                   <h3 className="sub">{t("Chef de bord (titulaire du permis bateau)", "Skipper (boating license holder)")}</h3>
                   <div className="form-grid">
@@ -1395,19 +1656,18 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                 {t("Montant à régler", "Amount to pay")} : <strong style={{ color: "var(--ink)" }}>{fmtPrice(deposit)}</strong>. {t("Sélectionnez le moyen de paiement de votre choix.", "Choose your preferred payment method.")}
               </p>
 
-              <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #0a2540", padding: "12px 14px", borderRadius: 4, marginTop: 8, marginBottom: 22, fontSize: 13, color: "#3b4a5a" }}>
-                {t("Seul le virement bancaire est disponible pour le moment. Les autres moyens de paiement seront activés prochainement.", "Only bank transfer is available at the moment. Other payment methods will be activated shortly.")}
+              <div style={{ background: "#fafbfc", border: "1px solid #e5e7eb", borderLeft: "3px solid #1a5a32", padding: "12px 14px", borderRadius: 4, marginTop: 8, marginBottom: 22, fontSize: 13, color: "#3b4a5a" }}>
+                {t("Paiement 100 % sécurisé via Mollie. Choisissez votre moyen de paiement.", "100% secure payment via Mollie. Choose your payment method.")}
               </div>
 
               <div className="pay-methods" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
                 {[
                   { id: "cb", label: t("Carte bancaire", "Credit card"), logo: <PayLogo brand="cb" /> },
-                  { id: "paypal", label: "PayPal", logo: <PayLogo brand="paypal" /> },
                   { id: "applepay", label: "Apple Pay", logo: <PayLogo brand="applepay" /> },
-                  { id: "paybybank", label: "Pay by Bank", logo: <PayLogo brand="paybybank" /> },
+                  { id: "wero", label: "Wero", logo: <PayLogo brand="wero" /> },
                   { id: "virement", label: t("Virement bancaire", "Bank transfer"), logo: <PayLogo brand="virement" /> },
                 ].map((m) => {
-                  const enabled = m.id === "virement";
+                  const enabled = true;
                   const active = data.paymentMethod === m.id;
                   return (
                     <button
@@ -1453,18 +1713,38 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                     {t("Récapitulatif", "Summary")}
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
-                    <span style={{ fontSize: 14 }}>{({ cb: t("Carte bancaire", "Credit card"), paypal: "PayPal", applepay: "Apple Pay", paybybank: "Pay by Bank" })[data.paymentMethod]}</span>
+                    <span style={{ fontSize: 14 }}>{({ cb: t("Carte bancaire", "Credit card"), applepay: "Apple Pay", wero: "Wero" })[data.paymentMethod]}</span>
                     <strong style={{ fontSize: 22 }}>{fmtPrice(deposit)}</strong>
                   </div>
-                  <a
-                    href="#PAYMENT_LINK"
-                    className="btn btn-primary btn-block"
-                    onClick={(e) => { e.preventDefault(); setData((d) => ({ ...d, paymentDone: true })); }}>
-                    {t("Procéder au paiement", "Proceed to payment")}
-                  </a>
-                  <p style={{ fontSize: 12, color: "var(--muted, #5b6b7a)", marginTop: 10, marginBottom: 0, textAlign: "center" }}>
-                    {t("Vous serez redirigé vers une page de paiement sécurisée.", "You will be redirected to a secure payment page.")}
-                  </p>
+
+                  {mollieError && (
+                    <div style={{ background: "#fef3f2", border: "1px solid #fecdca", color: "#b42318", borderRadius: 8, padding: "10px 12px", fontSize: 13, marginBottom: 14 }}>
+                      {mollieError}
+                    </div>
+                  )}
+
+                  {mollieReturn === "checking" ? (
+                    <div style={{ textAlign: "center", padding: "10px 0", fontSize: 14, color: "var(--muted, #5b6b7a)" }}>
+                      {t("Vérification du paiement en cours…", "Verifying payment…")}
+                    </div>
+                  ) : data.paymentDone ? (
+                    <div style={{ background: "#ecfdf3", border: "1px solid #a6f4c5", color: "#067647", borderRadius: 8, padding: "12px 14px", fontSize: 14, fontWeight: 600, textAlign: "center" }}>
+                      {t("Paiement confirmé", "Payment confirmed")} ✓
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-block"
+                        disabled={molliePaying}
+                        onClick={startMolliePayment}>
+                        {molliePaying ? t("Redirection en cours…", "Redirecting…") : t("Payer maintenant", "Pay now")}
+                      </button>
+                      <p style={{ fontSize: 12, color: "var(--muted, #5b6b7a)", marginTop: 10, marginBottom: 0, textAlign: "center" }}>
+                        {t("Vous serez redirigé vers la page de paiement sécurisée Mollie.", "You will be redirected to Mollie's secure payment page.")}
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -1582,10 +1862,15 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
               <div style={{ background: "#fdf2f2", border: "1px solid #f1c6c6", borderLeft: "4px solid #a83232", padding: "14px 18px", borderRadius: 6, margin: "20px 0", color: "#5a1a1a", fontSize: 14, lineHeight: 1.55 }}>
                 <strong style={{ display: "block", marginBottom: 6 }}>{t("Important", "Important")}</strong>
                 <p style={{ margin: 0 }}>
-                  {t(
-                    "Afin de garantir votre sécurité et de respecter les exigences de notre assurance, la présentation d'une pièce d'identité et du permis bateau en cours de validité de la personne ayant réservé sur le site est obligatoire avant toute prise en charge du bateau.",
-                    "To ensure your safety and meet our insurer's requirements, the booking holder must present a valid ID and a valid boating license before taking charge of the boat."
-                  )}
+                  {withSkipper
+                    ? t(
+                        "Afin de garantir votre sécurité et de respecter les exigences de notre assurance, la présentation d'une pièce d'identité en cours de validité de la personne ayant réservé sur le site est obligatoire avant l'embarquement. Aucun permis bateau ne vous est demandé : c'est notre skipper qui pilote.",
+                        "To ensure your safety and meet our insurer's requirements, the booking holder must present a valid ID before boarding. No boating license is required from you — our skipper is at the helm."
+                      )
+                    : t(
+                        "Afin de garantir votre sécurité et de respecter les exigences de notre assurance, la présentation d'une pièce d'identité et du permis bateau en cours de validité de la personne ayant réservé sur le site est obligatoire avant toute prise en charge du bateau.",
+                        "To ensure your safety and meet our insurer's requirements, the booking holder must present a valid ID and a valid boating license before taking charge of the boat."
+                      )}
                 </p>
                 <p style={{ margin: "8px 0 0 0" }}>
                   {t(
@@ -1624,8 +1909,8 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
               stepIncomplete = data.adults < 1 || (data.adults + data.children > boat.capacity) || (data.crew === "with" && !data.itinerary);
             } else if (step === 4) {
               const billingOk = ["firstName", "lastName", "birthdate", "email", "phone", "address"].every((k) => isStr(data.billing[k])) && emailRe.test(data.billing.email || "");
-              const permitNumOk = data.permitDifferent || data.crew !== "without" || isStr(data.billing.permitNumber);
-              const permitOk = !data.permitDifferent || (
+              const permitNumOk = withSkipper || data.permitDifferent || data.crew !== "without" || isStr(data.billing.permitNumber);
+              const permitOk = withSkipper || !data.permitDifferent || (
                 ["firstName", "lastName", "birthdate", "email", "phone", "address", "permitNumber"].every((k) => isStr(data.permit[k])) &&
                 emailRe.test(data.permit.email || "")
               );
@@ -1654,7 +1939,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
                       : undefined}>
                     {step === 6 && bookingPending
                       ? t("Réservation du créneau…", "Locking the slot…")
-                      : (step === 3 ? t("Réserver", "Book") : step === 4 ? t("Aller à la caution", "Go to deposit hold") : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue"))} <Icon name="arrow" size={16} />
+                      : (step === 3 ? t("Réserver", "Book") : step === 4 ? (withSkipper ? t("Aller au paiement", "Go to payment") : t("Aller à la caution", "Go to deposit hold")) : step === 5 ? t("Aller au paiement", "Go to payment") : step === 6 ? t("Valider la réservation", "Confirm booking") : t("Continuer", "Continue"))} <Icon name="arrow" size={16} />
                   </button>
                 </div>
                 {errorMsg && <p style={{ color: "#c00", margin: 0, textAlign: "right" }}>{errorMsg}</p>}
@@ -1666,7 +1951,7 @@ function BookingPage({ id, setPage, initialDate, initialSlot }) {
 
         {showSidebar && (
           <aside className="booking-summary">
-            <img src={boat.images[0]} alt={`${boat.name} - ${t("Location bateau Mandelieu", "Boat rental Mandelieu")}`} className="bs-img" />
+            <img src={boat.images[0]} alt={`${boat.name} - ${t("Location bateau Mandelieu", "Boat rental Mandelieu")}`} className="bs-img" loading="lazy" decoding="async" />
             <h3>{boat.name}</h3>
             <p className="muted">{t(boat.type, ({ "Day cruiser": "Day cruiser", "Open premium": "Open premium", "Familial": "Family" })[boat.type] || boat.type)} · {boat.port}</p>
             <div className="bs-line">
@@ -1798,10 +2083,10 @@ function AboutPage({ setPage }) {
         </div>
         <div className="ab-hero-art">
           <div className="ab-img main">
-            <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1400&q=80" alt={t("Marina de Mandelieu-la-Napoule, port de départ South Boat sur la Côte d'Azur", "Marina of Mandelieu-la-Napoule, South Boat's departure port on the French Riviera")} fetchpriority="high" decoding="async" />
+            <img src={asset("images/drone/baie-mandelieu-drone-coucher-soleil.jpg")} alt={t("Le port de La Napoule et la baie de Mandelieu au coucher du soleil, vus du ciel", "The La Napoule marina and the bay of Mandelieu at sunset, seen from above")} fetchpriority="high" decoding="async" />
           </div>
           <div className="ab-img stack">
-            <img src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&q=80" alt={t("Bateau au mouillage dans une calanque de l'Estérel, location South Boat", "Boat anchored in an Esterel cove, South Boat rental")} loading="lazy" decoding="async" />
+            <img src={asset("images/drone/bateau-mouillage-coucher-soleil-theoule.jpg")} alt={t("Le bateau South Boat au mouillage au large de Théoule-sur-Mer, au coucher du soleil", "The South Boat boat at anchor off Théoule-sur-Mer at sunset")} loading="lazy" decoding="async" />
           </div>
           <div className="ab-badge">
             <strong>Mandelieu-la-Napoule</strong>
@@ -1981,6 +2266,7 @@ function ContactPage({ setPage }) {
                     <option>{t("Demande de réservation", "Booking request")}</option>
                     <option>{t("Question sur un bateau", "Question about a boat")}</option>
                     <option>{t("Privatisation / événement", "Private charter / event")}</option>
+                    <option>{t("Entretien / nettoyage de bateau", "Boat maintenance / cleaning")}</option>
                     <option>{t("Autre", "Other")}</option>
                   </select>
                 </label>
@@ -2007,7 +2293,7 @@ const fmtArticleDate = (s, lang) => {
 function CapSudListPage({ setPage }) {
   const t = window.useT();
   const articles = window.ARTICLES || [];
-  const highlight = articles.find((a) => a.featured) || articles[0];
+  const highlight = (window.articleDuMoment && window.articleDuMoment()) || articles[0];
   const rest = articles;
 
   return (
@@ -2018,7 +2304,12 @@ function CapSudListPage({ setPage }) {
       ]} />
       <section className="hero">
         <div className="hero-bg">
-          <img src={asset("images/capsud-hero.jpeg")} alt={t("Bateau au mouillage sur la Côte d'Azur — Cap Sud, le blog nautisme de South Boat", "Boat at anchor on the French Riviera — Cap Sud, South Boat's nautical blog")} />
+          <img
+            src={asset("images/drone/fonds-marins-esterel-roches.jpg")}
+            srcSet={asset("images/drone/fonds-marins-esterel-roches-800.jpg") + " 800w, " + asset("images/drone/fonds-marins-esterel-roches.jpg") + " 2000w"}
+            sizes="100vw"
+            alt={t("Roches affleurantes et eaux turquoise de l'Estérel vues du ciel — Cap Sud, le blog nautisme de South Boat", "Shallow rocks and turquoise water of the Estérel seen from above — Cap Sud, South Boat's nautical blog")}
+            fetchpriority="high" decoding="async" />
           <div className="hero-overlay hero-overlay-grad" />
         </div>
         <div className="hero-content">
@@ -2043,7 +2334,7 @@ function CapSudListPage({ setPage }) {
           </div>
           <div className="departure-card" onClick={() => setPage({ name: "capsud-article", id: highlight.id })} style={{ cursor: "pointer" }}>
             <div className="departure-map">
-              <img src={asset(highlight.cover)} alt={highlight.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <img src={asset(highlight.cover)} alt={highlight.title} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
             <div className="departure-text">
               <p className="eyebrow">{fmtArticleDate(highlight.date, t.lang)}</p>
@@ -2137,7 +2428,7 @@ function CapSudArticlePage({ id, setPage }) {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": article.title,
-      "image": [article.cover],
+      "image": ["https://south-boat.com" + (article.cover || "").replace(/^\/?/, "/")],
       "datePublished": article.date,
       "dateModified": article.date,
       "author": { "@type": "Person", "name": article.author || "L'équipage South Boat" },
@@ -2195,11 +2486,57 @@ function CapSudArticlePage({ id, setPage }) {
           <img src={asset(article.cover)} alt={`${article.title} — Cap Sud, ${t("blog nautisme South Boat", "South Boat nautical blog")}`} fetchpriority="high" decoding="async" />
         </div>
         <div className="article-body">
-          {(article.content || []).map((p, i) => {
-            if (p.startsWith("### ")) return <h3 key={i}>{p.slice(4)}</h3>;
-            if (p.startsWith("## ")) return <h2 key={i}>{p.slice(3)}</h2>;
-            if (p.startsWith("# ")) return <h2 key={i}>{p.slice(2)}</h2>;
-            return <p key={i}>{p}</p>;
+          {(article.content || []).map((bloc, i) => {
+            // Bloc objet : photo, lien externe ou encadré « infos pratiques ».
+            if (bloc && typeof bloc === "object") {
+              if (bloc.image) {
+                const large = asset(bloc.image);
+                const petite = asset(bloc.image.replace(/\.(jpe?g|png)$/i, "-800.$1"));
+                /* <picture> plutôt qu'un srcSet : la largeur réelle du fichier n'est pas
+                   connue ici (le client ajoute ses propres photos), et un descripteur "w"
+                   faux fausse le choix du navigateur. Un point de bascule sur la largeur
+                   d'écran ne peut pas se tromper. */
+                return (
+                  <figure className="article-figure" key={i}>
+                    <picture>
+                      <source media="(max-width: 480px)" srcSet={petite} />
+                      <img src={large} alt={bloc.alt || ""} loading="lazy" decoding="async" />
+                    </picture>
+                    {bloc.legende && <figcaption>{bloc.legende}</figcaption>}
+                  </figure>
+                );
+              }
+              if (bloc.lien) {
+                return (
+                  <p className="article-lien" key={i}>
+                    <a className="btn btn-outline" href={bloc.lien} target="_blank" rel="noopener noreferrer">
+                      {bloc.libelle || bloc.lien} <Icon name="arrow" size={15} />
+                    </a>
+                  </p>
+                );
+              }
+              if (bloc.encadre) {
+                return (
+                  <aside className="article-encadre" key={i}>
+                    {bloc.encadre.titre && <h3>{bloc.encadre.titre}</h3>}
+                    <dl>
+                      {(bloc.encadre.lignes || []).map((l, j) => (
+                        <div key={j}>
+                          <dt>{l.intitule}</dt>
+                          <dd>{l.valeur}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </aside>
+                );
+              }
+              return null;
+            }
+            // Bloc texte.
+            if (bloc.startsWith("### ")) return <h3 key={i}>{bloc.slice(4)}</h3>;
+            if (bloc.startsWith("## ")) return <h2 key={i}>{bloc.slice(3)}</h2>;
+            if (bloc.startsWith("# ")) return <h2 key={i}>{bloc.slice(2)}</h2>;
+            return <p key={i}>{bloc}</p>;
           })}
         </div>
         <div className="article-foot">
@@ -2241,7 +2578,7 @@ const ITINERARY_DETAILS = {
     ],
   },
   "esterel": {
-    hero: "images/itineraire-esterel.jpeg",
+    hero: "images/drone/calanques-esterel-vue-aerienne.jpg",
     duration_fr: "Demi-journée ou journée", duration_en: "Half day or full day",
     distance_fr: "≈ 15 min de navigation depuis Mandelieu", distance_en: "≈ 15 min cruise from Mandelieu",
     intro_fr: "C'est l'escale la plus proche de Mandelieu, et l'une des plus spectaculaires : le massif de l'Estérel plonge dans la mer ses roches rouges de porphyre, créant un contraste saisissant avec le bleu turquoise de la Méditerranée. Idéal pour une demi-journée comme pour une journée complète.",
@@ -2495,7 +2832,7 @@ function CGVPage({ setPage }) {
 
       <section>
         <h2>Article 10 — Caution</h2>
-        <p>La caution est versée par le locataire au moment de la prise en charge du bateau. À hauteur de <strong>2 000 €</strong>, elle a pour objet de garantir les détériorations du bien loué ou les pertes d'objets imputables au locataire et non couvertes par l'assurance. Elle est restituée entre huit et trente jours après le retour du bateau. En cas de détérioration du bien loué ou de pertes non couvertes par l'assurance imputables au locataire, ou sur lesquelles un doute subsiste, le remboursement de la caution peut être différé jusqu'au règlement des frais correspondants par le locataire. Le loueur est tenu de rembourser un règlement versé postérieurement par l'assurance.</p>
+        <p>La caution est versée par le locataire au moment de la prise en charge du bateau. À hauteur de <strong>1 500 €</strong>, elle a pour objet de garantir les détériorations du bien loué ou les pertes d'objets imputables au locataire et non couvertes par l'assurance. Elle est restituée entre huit et trente jours après le retour du bateau. En cas de détérioration du bien loué ou de pertes non couvertes par l'assurance imputables au locataire, ou sur lesquelles un doute subsiste, le remboursement de la caution peut être différé jusqu'au règlement des frais correspondants par le locataire. Le loueur est tenu de rembourser un règlement versé postérieurement par l'assurance.</p>
         <p>La franchise, fixée à <strong>370 €</strong>, doit être réglée par le locataire dans un délai de 30 jours ouvrables suivant la date du sinistre.</p>
       </section>
 
@@ -2759,6 +3096,7 @@ function Footer() {
             <h5>{t("Naviguer", "Navigate")}</h5>
             <a style={linkStyle} onClick={() => go("catalog")}>{t("Catalogue", "Catalog")}</a>
             <a style={linkStyle} onClick={() => go("catalog")}>{t("Destinations", "Destinations")}</a>
+            <a style={linkStyle} onClick={() => go("entretien")}>{t("Entretien", "Maintenance")}</a>
           </div>
           <div>
             <h5>{t("Maison", "House")}</h5>
