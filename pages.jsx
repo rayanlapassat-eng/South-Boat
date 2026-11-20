@@ -99,7 +99,7 @@ function HomePage({ setPage, query, setQuery }) {
         </div>
         <div className="hero-content">
           <div className="hero-eyebrow">
-            <span className="dot" /> {t("Côte d'Azur · Saison 2026", "French Riviera · 2026 Season")}
+            <span className="dot" /> {t("South Boat Location · Côte d'Azur", "South Boat Rental · French Riviera")}
           </div>
           <h1 className="hero-title">
             {t("Location de bateau", "Boat rental")}<br />{t("à Mandelieu-la-Napoule", "in Mandelieu-la-Napoule")}
@@ -2066,7 +2066,7 @@ function AboutPage({ setPage }) {
   return (
     <main className="about-v2">
       <Breadcrumb setPage={setPage} trail={[
-        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Accueil", "Home"), page: { name: "accueil" } },
         { label: t("À propos", "About") },
       ]} />
 
@@ -2201,7 +2201,7 @@ function ContactPage({ setPage }) {
   return (
     <main className="contact">
       <Breadcrumb setPage={setPage} trail={[
-        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Accueil", "Home"), page: { name: "accueil" } },
         { label: t("Contact", "Contact") },
       ]} />
       <section className="contact-grid">
@@ -2692,7 +2692,7 @@ function LegalShell({ setPage, eyebrow, title, updated, children }) {
   return (
     <main className="legal-page">
       <Breadcrumb setPage={setPage} trail={[
-        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: t("Accueil", "Home"), page: { name: "accueil" } },
         { label: eyebrow },
       ]} />
       <p className="eyebrow">{eyebrow}</p>
@@ -3067,24 +3067,21 @@ function PrivacyPage({ setPage }) {
 
 function Footer() {
   const t = window.useT();
-  const go = (name) => {
-    if (window.__setPage) window.__setPage({ name });
-    window.scrollTo({ top: 0, behavior: "instant" });
-  };
-  const linkStyle = { cursor: "pointer" };
+  // Vrais liens <a href> (suivis par Google) qui naviguent sans recharger.
+  const lien = (page) => window.lienInterne(page);
   return (
     <footer className="foot">
       <div className="foot-inner">
         <div className="foot-brand">
-          <div className="logo">
+          <a className="logo" {...lien({ name: "accueil" })}>
             <span className="logo-mark">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 17l9-12 9 12M5 17h14l-2 4H7z" />
               </svg>
             </span>
             <span className="logo-text">South Boat<sup>°</sup></span>
-          </div>
-          <p>{t("La location de bateaux", "Boat rentals")}<br />{t("sur la Côte d'Azur.", "on the French Riviera.")}</p>
+          </a>
+          <p>{t("Location et entretien de bateaux", "Boat rental and maintenance")}<br />{t("à Mandelieu, sur la Côte d'Azur.", "in Mandelieu, on the French Riviera.")}</p>
           <div className="foot-socials" style={{ marginTop: 12, display: "flex", gap: 10 }}>
             <a href="https://www.instagram.com/south_boat_/" target="_blank" rel="noopener noreferrer" aria-label="Instagram South Boat" style={{ color: "inherit", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 999, border: "1px solid var(--line)" }}>
               <Icon name="instagram" size={18} />
@@ -3092,22 +3089,33 @@ function Footer() {
           </div>
         </div>
         <div className="foot-cols">
-          <div>
-            <h5>{t("Naviguer", "Navigate")}</h5>
-            <a style={linkStyle} onClick={() => go("catalog")}>{t("Catalogue", "Catalog")}</a>
-            <a style={linkStyle} onClick={() => go("catalog")}>{t("Destinations", "Destinations")}</a>
-            <a style={linkStyle} onClick={() => go("entretien")}>{t("Entretien", "Maintenance")}</a>
+          <div className="foot-col-location">
+            <h5>South Boat {t("Location", "Rental")}</h5>
+            <a {...lien({ name: "home" })}>{t("Louer un bateau", "Rent a boat")}</a>
+            <a {...lien({ name: "catalog" })}>{t("Catalogue", "Catalog")}</a>
+            <a {...lien({ name: "planning" })}>{t("Disponibilités", "Availability")}</a>
+            <a {...lien({ name: "fireworks" })}>{t("Feux d'artifice", "Fireworks")}</a>
+            <a {...lien({ name: "capsud" })}>Cap Sud</a>
+          </div>
+          <div className="foot-col-entretien">
+            <h5>South Boat {t("Entretien", "Maintenance")}</h5>
+            {((window.ENTRETIEN && window.ENTRETIEN.prestations) || []).map((p) =>
+              <a key={p.id} {...lien({ name: "entretien-prestation", id: p.id })}>{t(p.court || p.titre, p.court_en || p.titre_en)}</a>
+            )}
+            <a {...lien({ name: "entretien", ancre: "forfaits" })}>{t("Forfaits", "Plans")}</a>
+            <a {...lien({ name: "entretien", ancre: "devis" })}>{t("Demander un devis", "Request a quote")}</a>
           </div>
           <div>
             <h5>{t("Maison", "House")}</h5>
-            <a style={linkStyle} onClick={() => go("about")}>{t("À propos", "About")}</a>
-            <a style={linkStyle} onClick={() => go("contact")}>{t("Contact", "Contact")}</a>
+            <a {...lien({ name: "accueil" })}>{t("Accueil", "Home")}</a>
+            <a {...lien({ name: "about" })}>{t("À propos", "About")}</a>
+            <a {...lien({ name: "contact" })}>{t("Contact", "Contact")}</a>
           </div>
           <div>
             <h5>{t("Légal", "Legal")}</h5>
-            <a style={linkStyle} onClick={() => go("cgv")}>{t("CGV", "Terms")}</a>
-            <a style={linkStyle} onClick={() => go("legal")}>{t("Mentions légales", "Legal notice")}</a>
-            <a style={linkStyle} onClick={() => go("privacy")}>{t("Confidentialité", "Privacy")}</a>
+            <a {...lien({ name: "cgv" })}>{t("CGV", "Terms")}</a>
+            <a {...lien({ name: "legal" })}>{t("Mentions légales", "Legal notice")}</a>
+            <a {...lien({ name: "privacy" })}>{t("Confidentialité", "Privacy")}</a>
           </div>
         </div>
       </div>

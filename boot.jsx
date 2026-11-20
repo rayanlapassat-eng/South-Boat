@@ -1,4 +1,4 @@
-/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, HomePage, CatalogPage, PlanningPage, FireworksPage, EntretienPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage, MentionsLegalesPage, CGVPage, PrivacyPage */
+/* global React, ReactDOM, useTweaks, TWEAK_DEFAULTS, applyTheme, Nav, TweaksPanel, TweakSection, TweakRadio, TweakToggle, PortailPage, HomePage, CatalogPage, PlanningPage, FireworksPage, EntretienPage, EntretienPrestationPage, DetailPage, BookingPage, AboutPage, ContactPage, CapSudListPage, CapSudArticlePage, ItineraryPage, MentionsLegalesPage, CGVPage, PrivacyPage */
 /* ============================================================
    boot.jsx — Amorçage de l'application South Boat
    SOURCE JSX : à recompiler en boot.js via `npm run build`
@@ -50,6 +50,27 @@ function App() {
   }, []);
 
   useEffect(() => { window.__setPage = setPage; }, []);
+  window.__pageCourante = page;
+
+  // ---- Univers : Location ou Entretien (portail = page d'accueil « / ») ----
+  // Une page commune (À propos, Contact, légal) garde l'univers d'où l'on vient.
+  const universPage = window.universDePage(page.name);
+  const [dernierUnivers, setDernierUnivers] = useState(() => {
+    try { return sessionStorage.getItem("sb_univers") || "location"; } catch (e) { return "location"; }
+  });
+  const univers = universPage || dernierUnivers;
+  useEffect(() => {
+    if (universPage === "location" || universPage === "entretien") {
+      setDernierUnivers(universPage);
+      try { sessionStorage.setItem("sb_univers", universPage); } catch (e) {}
+    }
+  }, [universPage]);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-univers", univers);
+    const couleur = { location: "#3a8dde", entretien: "#0e8f82", portail: "#0a2540" }[univers];
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta && couleur) meta.setAttribute("content", couleur);
+  }, [univers]);
   const [query, setQuery] = useState({
     port: "",
     from: new Date().toISOString().slice(0,10),
@@ -63,18 +84,31 @@ function App() {
     document.documentElement.style.setProperty("--radius", tweaks.radius + "px");
   }, [tweaks.darkMode, tweaks.radius]);
 
-  // scroll up on page change
-  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [page.name, page.id]);
-
-  // SEO : titre + meta description dynamiques par page
+  // Changement de page : on remonte en haut, ou on va à l'ancre demandée
+  // (ex. menu Entretien › « Forfaits »). Les effets des pages enfants ont déjà
+  // tourné : la section visée existe donc dans le DOM.
   useEffect(() => {
-    const SITE = "South Boat";
+    const cible = page.ancre && document.getElementById(page.ancre);
+    if (cible) { cible.scrollIntoView({ behavior: "instant", block: "start" }); return; }
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [page.name, page.id, page.ancre]);
+
+  // SEO : titre + meta description dynamiques par page.
+  // Le nom de l'univers est dans chaque titre (« … | South Boat Entretien ») :
+  // c'est ce qui permet à Google d'associer « south boat entretien » à ces pages.
+  useEffect(() => {
+    const SITE = universPage === "entretien" ? "South Boat Entretien"
+      : universPage === "location" ? "South Boat Location"
+      : "South Boat";
     const BOATS = window.BOATS || [];
     const ARTICLES = window.ARTICLES || [];
-    let title = `${SITE} — Location de bateaux à Mandelieu, Côte d'Azur`;
-    let desc  = "Location de bateaux à Mandelieu-la-Napoule sur la Côte d'Azur. Bateaux familiaux vérifiés, avec ou sans skipper, vers l'Estérel, Cannes et les îles de Lérins.";
+    let title = "South Boat — Location et entretien de bateaux à Mandelieu";
+    let desc  = "South Boat à Mandelieu-la-Napoule : location de bateaux avec ou sans skipper vers l'Estérel, Cannes et Lérins, et entretien de bateaux (nettoyage, lustrage, antifouling).";
 
-    if (page.name === "catalog") {
+    if (page.name === "home") {
+      title = "South Boat Location — Location de bateaux à Mandelieu, Côte d'Azur";
+      desc  = "Location de bateaux à Mandelieu-la-Napoule sur la Côte d'Azur. Bateaux familiaux vérifiés, avec ou sans skipper, vers l'Estérel, Cannes et les îles de Lérins.";
+    } else if (page.name === "catalog") {
       title = `Catalogue — Location de bateaux à Mandelieu | ${SITE}`;
       desc  = "Découvrez notre sélection de bateaux à louer au départ de Mandelieu-la-Napoule. Day cruisers, open premium, familiaux — avec ou sans skipper.";
     } else if (page.name === "planning") {
@@ -83,9 +117,15 @@ function App() {
     } else if (page.name === "fireworks") {
       title = `Feux d'artifice 2026 — Cannes, Antibes, Juan-les-Pins | ${SITE}`;
       desc  = "Calendrier des feux d'artifice 2026 sur la Côte d'Azur. Réservez un bateau pour les vivre depuis la baie, loin de la foule.";
-    } else if (page.name === "entretien") {
-      title = `Entretien et nettoyage de bateau à Mandelieu | ${SITE}`;
-      desc  = "Nettoyage extérieur et intérieur, lustrage et polish, antifouling, gelcoat et chromes : South Boat entretient votre bateau jusqu'à ~25 m. Tarifs sur devis, forfaits au mois ou à l'année.";
+    } else if (page.name === "entretien" || page.name === "entretien-prestation") {
+      title = "South Boat Entretien — Entretien et nettoyage de bateaux à Mandelieu";
+      desc  = "Nettoyage extérieur et intérieur, lustrage et polish, antifouling, gelcoat et chromes : South Boat Entretien prend soin de votre bateau jusqu'à ~25 m. Tarifs sur devis, forfaits au mois ou à l'année.";
+      const p = page.name === "entretien-prestation"
+        && ((window.ENTRETIEN && window.ENTRETIEN.prestations) || []).find((x) => x.id === page.id);
+      if (p) {
+        title = `${p.titre} de bateau à Mandelieu | ${SITE}`;
+        desc  = `${p.intro} ${p.titre} par South Boat Entretien à Mandelieu-la-Napoule, sur devis.`;
+      }
     } else if (page.name === "detail" && page.id) {
       const b = BOATS.find(x => x.id === page.id);
       if (b) {
@@ -159,16 +199,18 @@ function App() {
     if (ogD) ogD.setAttribute('content', desc);
     if (!ogU) { ogU = document.createElement('meta'); ogU.setAttribute('property', 'og:url'); document.head.appendChild(ogU); }
     ogU.setAttribute('content', canonicalUrl);
-  }, [page.name, page.id]);
+  }, [page.name, page.id, universPage]);
 
   return (
     <>
-      <Nav page={page} setPage={setPage} />
+      {univers !== "portail" && <Nav page={page} setPage={setPage} univers={univers} />}
+      {page.name === "accueil" && <PortailPage setPage={setPage} />}
       {page.name === "home" && <HomePage setPage={setPage} query={query} setQuery={setQuery} />}
       {page.name === "catalog" && <CatalogPage setPage={setPage} query={query} setQuery={setQuery} />}
       {page.name === "planning" && <PlanningPage setPage={setPage} initialDate={page.date} />}
       {page.name === "fireworks" && <FireworksPage setPage={setPage} />}
       {page.name === "entretien" && <EntretienPage setPage={setPage} />}
+      {page.name === "entretien-prestation" && <EntretienPrestationPage id={page.id} setPage={setPage} />}
       {page.name === "detail" && <DetailPage id={page.id} setPage={setPage} />}
       {page.name === "booking" && <BookingPage id={page.id} setPage={setPage} initialDate={page.date} initialSlot={page.slot} />}
       {page.name === "about" && <AboutPage setPage={setPage} />}

@@ -1,7 +1,8 @@
-/* global React, Icon, Footer, Breadcrumb, asset */
+/* global React, Icon, Footer, Breadcrumb, asset, lienInterne, defilerVersAncre */
 /* ============================================================
-   entretien.jsx — Page « Entretien & nettoyage de bateaux »
-   URL : /entretien-bateau
+   entretien.jsx — Univers « South Boat Entretien »
+   - /entretien-bateau        : accueil de l'univers (EntretienPage)
+   - /entretien-bateau/<id>   : une page par prestation (EntretienPrestationPage)
    SOURCE JSX : à recompiler en dist/entretien.js via `npm run build`.
    Les prestations et les prix « à partir de » ne sont PAS ici :
    ils sont dans entretien-prestations.js (modifiable sans compilation).
@@ -40,8 +41,8 @@ const EN_FAQ = [
   {
     q_fr: "Quels produits utilisez-vous ?",
     q_en: "Which products do you use?",
-    a_fr: "Des produits éco-responsables, choisis en accord avec le milieu marin, auprès de marques partenaires comme RUPES, NAUTICLEAN ou 3M.",
-    a_en: "Eco-friendly products, chosen to respect the marine environment, from partner brands such as RUPES, NAUTICLEAN and 3M."
+    a_fr: "Des produits éco-responsables, choisis en accord avec le milieu marin, auprès de marques partenaires comme RUPES, Nautic Clean ou 3M.",
+    a_en: "Eco-friendly products, chosen to respect the marine environment, from partner brands such as RUPES, Nautic Clean and 3M."
   },
   {
     q_fr: "Proposez-vous des forfaits d'entretien ?",
@@ -50,6 +51,15 @@ const EN_FAQ = [
     a_en: "Yes. We can set up a monthly or yearly maintenance plan, built around your boat's needs."
   }
 ];
+
+function enDonnees() {
+  const data = window.ENTRETIEN || {};
+  return {
+    prestations: data.prestations || [],
+    niveaux: data.niveauxLustrage || [],
+    forfait: data.forfait || {},
+  };
+}
 
 // Texte « À partir de … » d'une prestation, ou null si aucun montant n'est
 // renseigné dans entretien-prestations.js (la carte affiche alors « Sur devis »).
@@ -73,77 +83,77 @@ function EnPrix({ item }) {
   );
 }
 
-function EnCarte({ p, num, large, onDevis }) {
+const enCourt = (p, t) => t(p.court || p.titre, p.court_en || p.titre_en);
+const enCote = (p, t) => (p.cote === "interieur" ? t("Intérieur", "Interior") : t("Extérieur", "Exterior"));
+
+// ---------- Bouton-tuile d'une prestation (accueil Entretien) ----------
+function EnTuile({ p, num, setPage }) {
   const t = window.useT();
-  const points = (t.lang === "en" && p.points_en) || p.points || [];
+  const tarif = enTarif(p, t);
   return (
-    <article className={"en-card" + (large ? " wide" : "")}>
-      <span className="en-num">{String(num).padStart(2, "0")}</span>
-      <h3>{t(p.titre, p.titre_en)}</h3>
-      <p>{t(p.intro, p.intro_en)}</p>
-      <ul className="en-list">
-        {points.map((pt, i) => <li key={i}><Icon name="check" size={16} />{pt}</li>)}
-      </ul>
-      {p.note && <p className="en-note">{t(p.note, p.note_en)}</p>}
-      <div className="en-card-foot">
-        <EnPrix item={p} />
-        <button type="button" className="en-link" onClick={() => onDevis(p.id)}>
-          {t("Demander un devis", "Request a quote")} <Icon name="arrow" size={15} />
-        </button>
-      </div>
-    </article>
+    <a className="en-tuile" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>
+      <span className="en-tuile-haut">
+        <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={24} /></span>
+        <span className="en-num">{String(num).padStart(2, "0")} · {enCote(p, t)}</span>
+      </span>
+      <strong className="en-tuile-titre">{enCourt(p, t)}</strong>
+      <span className="en-tuile-texte">{t(p.intro, p.intro_en)}</span>
+      <span className="en-tuile-pied">
+        <span className="en-tuile-prix">{tarif || t("Sur devis", "On quote")}</span>
+        <span className="en-tuile-voir">{t("Voir le détail", "See details")}<Icon name="arrow" size={15} /></span>
+      </span>
+    </a>
   );
 }
 
-function defilerVers(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const doux = !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  el.scrollIntoView({ behavior: doux ? "smooth" : "auto", block: "start" });
+// ---------- Les trois niveaux de lustrage ----------
+function EnNiveaux({ onDevis }) {
+  const t = window.useT();
+  const { niveaux } = enDonnees();
+  if (!niveaux.length) return null;
+  return (
+    <section className="en-levels-wrap">
+      <div className="en-levels-inner">
+        <div className="en-head">
+          <p className="eyebrow">{t("Lustrage & polish", "Polishing")}</p>
+          <h2>{t("Trois niveaux, selon l'état de votre coque.", "Three levels, depending on your hull's condition.")}</h2>
+          <p className="lead">{t("De l'entretien régulier à la rénovation complète : nous vous conseillons le niveau le plus adapté à votre bateau.", "From regular upkeep to full restoration: we advise you on the level best suited to your boat.")}</p>
+        </div>
+        <div className="en-levels">
+          {niveaux.map((n) => (
+            <article className="en-level" key={n.niveau}>
+              <div className="en-level-top">
+                <span className="en-level-bars" aria-hidden="true">
+                  {[1, 2, 3].map((k) => <i key={k} className={k <= n.niveau ? "on" : ""} />)}
+                </span>
+                <span className="en-level-tag">{t("Niveau", "Level")} {n.niveau} · {t(n.passes, n.passes_en)}</span>
+              </div>
+              <h3>{t(n.titre, n.titre_en)}</h3>
+              <p>{t(n.texte, n.texte_en)}</p>
+              <div className="en-card-foot">
+                <EnPrix item={n} />
+                <button type="button" className="en-link" onClick={() => onDevis("lustrage")}>
+                  {t("Devis", "Quote")} <Icon name="arrow" size={15} />
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function EntretienPage({ setPage }) {
+// ---------- Formulaire de devis (accueil Entretien + chaque prestation) ----------
+// `choix` / `setChoix` viennent de la page : un bouton « Devis » ailleurs sur
+// la page peut ainsi cocher une prestation avant de faire défiler jusqu'ici.
+function EnDevis({ choix, setChoix, etat, setEtat, titre }) {
   const t = window.useT();
-  const data = window.ENTRETIEN || {};
-  const prestations = data.prestations || [];
-  const niveaux = data.niveauxLustrage || [];
-  const forfait = data.forfait || {};
-  const exterieur = prestations.filter((p) => p.cote !== "interieur");
-  const interieur = prestations.filter((p) => p.cote === "interieur");
-
-  const [choix, setChoix] = useState([]);
-  const [etat, setEtat] = useState("idle"); // idle | envoi | envoye | erreur
-  const [openFaq, setOpenFaq] = useState(0);
-
-  // Cases à cocher du formulaire : les prestations + le forfait.
+  const { prestations } = enDonnees();
   const options = [
-    ...prestations.map((p) => ({ id: p.id, fr: p.titre, en: p.titre_en })),
-    { id: "forfait", fr: "Forfait d'entretien (mois / année)", en: "Maintenance plan (monthly / yearly)" },
+    ...prestations.map((p) => ({ id: p.id, fr: p.titre, court: enCourt(p, t) })),
+    { id: "forfait", fr: "Forfait d'entretien (mois / année)", court: t("Forfait mois / année", "Monthly / yearly plan") },
   ];
-
-  window.useJsonLd("ld-service-entretien", {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Entretien et nettoyage de bateaux",
-    serviceType: "Entretien de bateaux",
-    url: "https://south-boat.com/entretien-bateau",
-    description: "Nettoyage extérieur et intérieur, lustrage et polish, traitement antifouling, réfection du gelcoat et des chromes. Bateaux jusqu'à ~25 m, tarifs sur devis, forfaits au mois ou à l'année.",
-    provider: { "@id": "https://south-boat.com/#business" },
-    hasOfferCatalog: {
-      "@type": "OfferCatalog",
-      name: "Prestations d'entretien",
-      itemListElement: prestations.map((p) => ({
-        "@type": "Offer",
-        itemOffered: { "@type": "Service", name: p.titre, description: p.intro },
-      })),
-    },
-  });
-
-  const allerAuDevis = (id) => {
-    if (id) setChoix((c) => (c.includes(id) ? c : [...c, id]));
-    if (etat === "envoye" || etat === "erreur") setEtat("idle");
-    defilerVers("devis");
-  };
   const basculer = (id) => setChoix((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));
 
   const envoyer = async (e) => {
@@ -179,27 +189,131 @@ function EntretienPage({ setPage }) {
     }
   };
 
+  return (
+    <section className="en-quote en-anchor" id="devis">
+      <div className="contact-info">
+        <p className="eyebrow">{t("Devis", "Quote")}</p>
+        <h2>{titre || t("Parlez-nous de votre bateau.", "Tell us about your boat.")}</h2>
+        <p className="lead">{t(
+          "Nos tarifs sont établis sur devis : ils dépendent de la taille du bateau, de son état et des prestations choisies. Décrivez votre besoin, nous revenons vers vous rapidement.",
+          "Our prices are set on quote: they depend on the boat's size, its condition and the services chosen. Describe what you need and we'll get back to you quickly."
+        )}</p>
+        <ul className="contact-list">
+          <li><Icon name="phone" /> <div><strong><a href="tel:+33634491621" style={{ color: "inherit", textDecoration: "none" }}>06 34 49 16 21</a></strong><span>{t("Maxim — nous appeler", "Maxim — call us")}</span></div></li>
+          <li><Icon name="phone" /> <div><strong><a href="tel:+33786237848" style={{ color: "inherit", textDecoration: "none" }}>07 86 23 78 48</a></strong><span>{t("Vincent — nous appeler", "Vincent — call us")}</span></div></li>
+          <li className="brand-whatsapp"><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33634491621" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>WhatsApp</a></strong><span>{t("Idéal pour nous envoyer des photos", "Ideal for sending us photos")}</span></div></li>
+          <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
+        </ul>
+      </div>
+
+      <form className="contact-form" onSubmit={envoyer}>
+        {etat === "envoye" ? (
+          <div className="sent">
+            <div className="success-icon"><Icon name="check" size={28} /></div>
+            <h3>{t("Merci, votre demande est envoyée", "Thank you, your request has been sent")}</h3>
+            <p>{t("Nous revenons vers vous très vite avec votre devis. Vous pouvez déjà nous envoyer des photos du bateau par WhatsApp.", "We'll get back to you very soon with your quote. Feel free to send us photos of the boat on WhatsApp.")}</p>
+          </div>
+        ) : (
+          <>
+            <div className="form-grid">
+              <label className="field"><span>{t("Nom", "Name")} *</span><input name="nom" type="text" autoComplete="name" required /></label>
+              <label className="field"><span>{t("Email", "Email")} *</span><input name="email" type="email" autoComplete="email" required /></label>
+              <label className="field"><span>{t("Téléphone", "Phone")}</span><input name="tel" type="tel" autoComplete="tel" /></label>
+              <label className="field"><span>{t("Bateau (marque, modèle)", "Boat (make, model)")}</span><input name="bateau" type="text" /></label>
+              <label className="field"><span>{t("Longueur (m)", "Length (m)")}</span><input name="longueur" type="text" inputMode="decimal" placeholder={t("ex. 12", "e.g. 12")} /></label>
+              <label className="field"><span>{t("Port d'amarrage", "Home port")}</span><input name="port" type="text" /></label>
+              <fieldset className="field full en-fieldset">
+                <legend>{t("Prestations souhaitées", "Services needed")}</legend>
+                <div className="en-chips">
+                  {options.map((o) => {
+                    const on = choix.includes(o.id);
+                    return (
+                      <label key={o.id} className={"en-chip" + (on ? " on" : "")}>
+                        <input type="checkbox" checked={on} onChange={() => basculer(o.id)} />
+                        {on && <Icon name="check" size={14} />}
+                        {o.court}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+              <label className="field full"><span>{t("Votre message", "Your message")}</span><textarea name="message" rows="4" placeholder={t("État du bateau, période souhaitée, questions…", "Boat condition, preferred dates, questions…")} /></label>
+            </div>
+            {etat === "erreur" && (
+              <p className="field-error en-form-error" role="alert">{t("L'envoi n'a pas abouti. Merci de réessayer, ou de nous écrire à contact@south-boat.com.", "Sending failed. Please try again, or email us at contact@south-boat.com.")}</p>
+            )}
+            <button className="btn btn-primary btn-block" type="submit" disabled={etat === "envoi"}>
+              {etat === "envoi" ? t("Envoi en cours…", "Sending…") : t("Envoyer ma demande de devis", "Send my quote request")}
+            </button>
+            <p className="en-form-legal">{t("* Champs obligatoires. Vos informations servent uniquement à établir votre devis.", "* Required fields. Your details are only used to prepare your quote.")}</p>
+          </>
+        )}
+      </form>
+    </section>
+  );
+}
+
+// État partagé du devis + « aller au devis en cochant telle prestation ».
+function useDevis(initial) {
+  const [choix, setChoix] = useState(initial || []);
+  const [etat, setEtat] = useState("idle"); // idle | envoi | envoye | erreur
+  const allerAuDevis = (id) => {
+    if (id) setChoix((c) => (c.includes(id) ? c : [...c, id]));
+    if (etat === "envoye" || etat === "erreur") setEtat("idle");
+    defilerVersAncre("devis");
+  };
+  return { choix, setChoix, etat, setEtat, allerAuDevis };
+}
+
+// =====================================================================
+// ACCUEIL DE L'UNIVERS ENTRETIEN — /entretien-bateau
+// =====================================================================
+function EntretienPage({ setPage }) {
+  const t = window.useT();
+  const { prestations, forfait } = enDonnees();
+  const devis = useDevis();
+  const [openFaq, setOpenFaq] = useState(0);
+
+  window.useJsonLd("ld-service-entretien", {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "South Boat Entretien — Entretien et nettoyage de bateaux",
+    serviceType: "Entretien de bateaux",
+    url: "https://south-boat.com/entretien-bateau",
+    description: "Nettoyage extérieur et intérieur, lustrage et polish, traitement antifouling, réfection du gelcoat et des chromes. Bateaux jusqu'à ~25 m, tarifs sur devis, forfaits au mois ou à l'année.",
+    provider: { "@id": "https://south-boat.com/#business" },
+    areaServed: "Mandelieu-la-Napoule, Cannes, Côte d'Azur",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Prestations d'entretien",
+      itemListElement: prestations.map((p) => ({
+        "@type": "Offer",
+        itemOffered: { "@type": "Service", name: p.titre, description: p.intro, url: "https://south-boat.com/entretien-bateau/" + p.id },
+      })),
+    },
+  });
+
   const tarifForfait = enTarif(forfait, t);
 
   return (
     <main className="about-v2 entretien">
       <Breadcrumb setPage={setPage} trail={[
-        { label: t("Accueil", "Home"), page: { name: "home" } },
+        { label: "South Boat", page: { name: "accueil" } },
         { label: t("Entretien", "Maintenance") },
       ]} />
 
       {/* HERO */}
       <section className="ab-hero en-hero">
         <div className="ab-hero-text">
-          <p className="eyebrow">{t("Entretien & nettoyage de bateaux", "Boat maintenance & cleaning")}</p>
+          <p className="eyebrow">{t("South Boat Entretien · Mandelieu", "South Boat Maintenance · Mandelieu")}</p>
           <h1>{t(<>Votre bateau,<br />soigné comme le nôtre.</>, <>Your boat,<br />cared for like our own.</>)}</h1>
           <p className="lead">{t(
             "Nettoyage extérieur et intérieur, lustrage, antifouling, gelcoat et chromes : nous entretenons votre bateau avec la même exigence que notre propre flotte. Chaque prestation est établie sur devis, selon votre bateau et vos besoins.",
             "Exterior and interior cleaning, polishing, antifouling, gelcoat and chrome: we look after your boat with the same care as our own fleet. Every service is priced on quote, based on your boat and your needs."
           )}</p>
           <div className="ab-hero-cta">
-            <button className="btn btn-primary" onClick={() => allerAuDevis()}>{t("Demander un devis", "Request a quote")}</button>
-            <button className="btn btn-outline" onClick={() => defilerVers("prestations")}>{t("Voir les prestations", "See our services")}</button>
+            <button className="btn btn-primary" onClick={() => defilerVersAncre("prestations")}>{t("Voir les prestations", "See our services")}</button>
+            <button className="btn btn-outline" onClick={() => devis.allerAuDevis()}>{t("Demander un devis", "Request a quote")}</button>
           </div>
         </div>
         <div className="ab-hero-art">
@@ -246,72 +360,30 @@ function EntretienPage({ setPage }) {
         </div>
       </section>
 
-      {/* PRESTATIONS */}
+      {/* PRESTATIONS : un bouton par prestation, le détail est sur sa page */}
       <section className="en-section en-anchor" id="prestations">
         <div className="en-head">
           <p className="eyebrow">{t("Nos prestations", "Our services")}</p>
           <h2>{t("Du pont à la carène, tout l'entretien de votre bateau.", "From deck to hull bottom, complete care for your boat.")}</h2>
-          <p className="lead">{t("Des prestations à la carte, à combiner selon l'état de votre bateau et l'usage que vous en faites.", "À la carte services, to combine according to your boat's condition and how you use it.")}</p>
+          <p className="lead">{t("Choisissez une prestation pour en découvrir le détail. Elles se combinent à la carte, selon l'état de votre bateau et l'usage que vous en faites.", "Pick a service to see the details. They can be combined à la carte, depending on your boat's condition and how you use it.")}</p>
         </div>
-
-        <div className="en-group">
-          <h3>{t("À l'extérieur", "Exterior")}</h3>
-          <span>{t("Bateaux jusqu'à ~25 m, plus sur demande", "Boats up to ~25 m, larger on request")}</span>
+        <div className="en-tuiles">
+          {prestations.map((p, i) => <EnTuile key={p.id} p={p} num={i + 1} setPage={setPage} />)}
+          <button type="button" className="en-tuile en-tuile-devis" onClick={() => devis.allerAuDevis()}>
+            <span className="en-tuile-haut">
+              <span className="en-tuile-icone"><Icon name="mail" size={24} /></span>
+            </span>
+            <strong className="en-tuile-titre">{t("Un besoin particulier ?", "Something specific?")}</strong>
+            <span className="en-tuile-texte">{t("Décrivez-nous votre bateau : nous vous conseillons et établissons un devis sur mesure.", "Tell us about your boat: we'll advise you and prepare a tailored quote.")}</span>
+            <span className="en-tuile-pied">
+              <span className="en-tuile-voir">{t("Demander un devis", "Request a quote")}<Icon name="arrow" size={15} /></span>
+            </span>
+          </button>
         </div>
-        <div className="en-grid">
-          {exterieur.map((p, i) => (
-            <EnCarte key={p.id} p={p} num={i + 1} large={exterieur.length % 2 === 1 && i === exterieur.length - 1} onDevis={allerAuDevis} />
-          ))}
-        </div>
-
-        {interieur.length > 0 && <>
-          <div className="en-group">
-            <h3>{t("À l'intérieur", "Interior")}</h3>
-            <span>{t("Bateaux de plus de 10 m avec espace de nuit, à quai", "Boats over 10 m with sleeping quarters, at the dock")}</span>
-          </div>
-          <div className="en-grid">
-            {interieur.map((p, i) => (
-              <EnCarte key={p.id} p={p} num={exterieur.length + i + 1} large={interieur.length % 2 === 1 && i === interieur.length - 1} onDevis={allerAuDevis} />
-            ))}
-          </div>
-        </>}
       </section>
 
-      {/* NIVEAUX DE LUSTRAGE */}
-      {niveaux.length > 0 && (
-        <section className="en-levels-wrap">
-          <div className="en-levels-inner">
-            <div className="en-head">
-              <p className="eyebrow">{t("Lustrage & polish", "Polishing")}</p>
-              <h2>{t("Trois niveaux, selon l'état de votre coque.", "Three levels, depending on your hull's condition.")}</h2>
-              <p className="lead">{t("De l'entretien régulier à la rénovation complète : nous vous conseillons le niveau le plus adapté à votre bateau.", "From regular upkeep to full restoration: we advise you on the level best suited to your boat.")}</p>
-            </div>
-            <div className="en-levels">
-              {niveaux.map((n) => (
-                <article className="en-level" key={n.niveau}>
-                  <div className="en-level-top">
-                    <span className="en-level-bars" aria-hidden="true">
-                      {[1, 2, 3].map((k) => <i key={k} className={k <= n.niveau ? "on" : ""} />)}
-                    </span>
-                    <span className="en-level-tag">{t("Niveau", "Level")} {n.niveau} · {t(n.passes, n.passes_en)}</span>
-                  </div>
-                  <h3>{t(n.titre, n.titre_en)}</h3>
-                  <p>{t(n.texte, n.texte_en)}</p>
-                  <div className="en-card-foot">
-                    <EnPrix item={n} />
-                    <button type="button" className="en-link" onClick={() => allerAuDevis("lustrage")}>
-                      {t("Devis", "Quote")} <Icon name="arrow" size={15} />
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* FORFAITS */}
-      <section className="en-plan">
+      <section className="en-plan en-anchor" id="forfaits">
         <div className="en-plan-inner">
           <div>
             <p className="eyebrow">{t("Forfaits d'entretien", "Maintenance plans")}</p>
@@ -323,7 +395,7 @@ function EntretienPage({ setPage }) {
             {tarifForfait && <p className="en-plan-price">{tarifForfait}</p>}
           </div>
           <div className="en-plan-actions">
-            <button className="btn en-btn-light" onClick={() => allerAuDevis("forfait")}>{t("Composer mon forfait", "Build my plan")}</button>
+            <button className="btn en-btn-light" onClick={() => devis.allerAuDevis("forfait")}>{t("Composer mon forfait", "Build my plan")}</button>
             <a className="btn en-btn-ghost" href="tel:+33634491621"><Icon name="phone" size={16} /> 06 34 49 16 21</a>
           </div>
         </div>
@@ -373,7 +445,7 @@ function EntretienPage({ setPage }) {
           <span className="en-brand-label">{t("Nos marques partenaires", "Our partner brands")}</span>
           <div className="en-brand-list">
             <span className="en-brand">RUPES</span>
-            <span className="en-brand">NAUTICLEAN</span>
+            <span className="en-brand">NAUTIC CLEAN</span>
             <span className="en-brand">3M</span>
             <span className="en-brand more">{t("et d'autres…", "and more…")}</span>
           </div>
@@ -410,70 +482,115 @@ function EntretienPage({ setPage }) {
       </section>
 
       {/* DEVIS */}
-      <section className="en-quote en-anchor" id="devis">
-        <div className="contact-info">
-          <p className="eyebrow">{t("Devis", "Quote")}</p>
-          <h2>{t("Parlez-nous de votre bateau.", "Tell us about your boat.")}</h2>
-          <p className="lead">{t(
-            "Nos tarifs sont établis sur devis : ils dépendent de la taille du bateau, de son état et des prestations choisies. Décrivez votre besoin, nous revenons vers vous rapidement.",
-            "Our prices are set on quote: they depend on the boat's size, its condition and the services chosen. Describe what you need and we'll get back to you quickly."
-          )}</p>
-          <ul className="contact-list">
-            <li><Icon name="phone" /> <div><strong><a href="tel:+33634491621" style={{ color: "inherit", textDecoration: "none" }}>06 34 49 16 21</a></strong><span>{t("Maxim — nous appeler", "Maxim — call us")}</span></div></li>
-            <li><Icon name="phone" /> <div><strong><a href="tel:+33786237848" style={{ color: "inherit", textDecoration: "none" }}>07 86 23 78 48</a></strong><span>{t("Vincent — nous appeler", "Vincent — call us")}</span></div></li>
-            <li className="brand-whatsapp"><Icon name="whatsapp" /> <div><strong><a href="https://wa.me/33634491621" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>WhatsApp</a></strong><span>{t("Idéal pour nous envoyer des photos", "Ideal for sending us photos")}</span></div></li>
-            <li><Icon name="mail" /> <div><strong><a href="mailto:contact@south-boat.com" style={{ color: "inherit", textDecoration: "none" }}>contact@south-boat.com</a></strong><span>{t("Nous écrire", "Write to us")}</span></div></li>
-          </ul>
-        </div>
-
-        <form className="contact-form" onSubmit={envoyer}>
-          {etat === "envoye" ? (
-            <div className="sent">
-              <div className="success-icon"><Icon name="check" size={28} /></div>
-              <h3>{t("Merci, votre demande est envoyée", "Thank you, your request has been sent")}</h3>
-              <p>{t("Nous revenons vers vous très vite avec votre devis. Vous pouvez déjà nous envoyer des photos du bateau par WhatsApp.", "We'll get back to you very soon with your quote. Feel free to send us photos of the boat on WhatsApp.")}</p>
-            </div>
-          ) : (
-            <>
-              <div className="form-grid">
-                <label className="field"><span>{t("Nom", "Name")} *</span><input name="nom" type="text" autoComplete="name" required /></label>
-                <label className="field"><span>{t("Email", "Email")} *</span><input name="email" type="email" autoComplete="email" required /></label>
-                <label className="field"><span>{t("Téléphone", "Phone")}</span><input name="tel" type="tel" autoComplete="tel" /></label>
-                <label className="field"><span>{t("Bateau (marque, modèle)", "Boat (make, model)")}</span><input name="bateau" type="text" /></label>
-                <label className="field"><span>{t("Longueur (m)", "Length (m)")}</span><input name="longueur" type="text" inputMode="decimal" placeholder={t("ex. 12", "e.g. 12")} /></label>
-                <label className="field"><span>{t("Port d'amarrage", "Home port")}</span><input name="port" type="text" /></label>
-                <fieldset className="field full en-fieldset">
-                  <legend>{t("Prestations souhaitées", "Services needed")}</legend>
-                  <div className="en-chips">
-                    {options.map((o) => {
-                      const on = choix.includes(o.id);
-                      return (
-                        <label key={o.id} className={"en-chip" + (on ? " on" : "")}>
-                          <input type="checkbox" checked={on} onChange={() => basculer(o.id)} />
-                          {on && <Icon name="check" size={14} />}
-                          {t(o.fr, o.en)}
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-                <label className="field full"><span>{t("Votre message", "Your message")}</span><textarea name="message" rows="4" placeholder={t("État du bateau, période souhaitée, questions…", "Boat condition, preferred dates, questions…")} /></label>
-              </div>
-              {etat === "erreur" && (
-                <p className="field-error en-form-error" role="alert">{t("L'envoi n'a pas abouti. Merci de réessayer, ou de nous écrire à contact@south-boat.com.", "Sending failed. Please try again, or email us at contact@south-boat.com.")}</p>
-              )}
-              <button className="btn btn-primary btn-block" type="submit" disabled={etat === "envoi"}>
-                {etat === "envoi" ? t("Envoi en cours…", "Sending…") : t("Envoyer ma demande de devis", "Send my quote request")}
-              </button>
-              <p className="en-form-legal">{t("* Champs obligatoires. Vos informations servent uniquement à établir votre devis.", "* Required fields. Your details are only used to prepare your quote.")}</p>
-            </>
-          )}
-        </form>
-      </section>
+      <EnDevis {...devis} />
 
       <Footer />
     </main>
   );
 }
 
-Object.assign(window, { EntretienPage });
+// =====================================================================
+// PAGE D'UNE PRESTATION — /entretien-bateau/<id>
+// =====================================================================
+function EntretienPrestationPage({ id, setPage }) {
+  const { prestations } = enDonnees();
+  const p = prestations.find((x) => x.id === id);
+  // Adresse inconnue (ancien lien, faute de frappe) : accueil Entretien.
+  if (!p) return <EntretienPage setPage={setPage} />;
+  // key : on repart d'un formulaire neuf (prestation pré-cochée) à chaque prestation.
+  return <EnPrestation key={p.id} p={p} setPage={setPage} />;
+}
+
+function EnPrestation({ p, setPage }) {
+  const t = window.useT();
+  const { prestations } = enDonnees();
+  const devis = useDevis([p.id]);
+  const index = prestations.indexOf(p);
+  const autres = prestations.filter((x) => x.id !== p.id);
+  const points = (t.lang === "en" && p.points_en) || p.points || [];
+
+  window.useJsonLd("ld-service-prestation", {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: p.titre,
+    serviceType: p.titre,
+    description: p.intro,
+    url: "https://south-boat.com/entretien-bateau/" + p.id,
+    provider: { "@id": "https://south-boat.com/#business" },
+    areaServed: "Mandelieu-la-Napoule, Cannes, Côte d'Azur",
+    brand: { "@type": "Brand", name: "South Boat Entretien" },
+  });
+
+  return (
+    <main className="about-v2 entretien en-detail">
+      <Breadcrumb setPage={setPage} trail={[
+        { label: "South Boat", page: { name: "accueil" } },
+        { label: t("Entretien", "Maintenance"), page: { name: "entretien" } },
+        { label: enCourt(p, t) },
+      ]} />
+
+      <section className="en-d-hero">
+        <div className="en-d-hero-text">
+          <a className="en-retour" {...lienInterne({ name: "entretien", ancre: "prestations" }, setPage)}>
+            <Icon name="arrowL" size={15} /> {t("Toutes les prestations", "All services")}
+          </a>
+          <p className="eyebrow">{t("Prestation", "Service")} {String(index + 1).padStart(2, "0")} · {enCote(p, t)}</p>
+          <h1>{t(p.titre, p.titre_en)}</h1>
+          <p className="lead">{t(p.intro, p.intro_en)}</p>
+          <div className="ab-hero-cta">
+            <button className="btn btn-primary" onClick={() => devis.allerAuDevis(p.id)}>{t("Demander un devis", "Request a quote")}</button>
+            <a className="btn btn-outline" href="tel:+33634491621"><Icon name="phone" size={16} /> 06 34 49 16 21</a>
+          </div>
+        </div>
+        <div className={"en-d-visuel" + (p.photo ? " avec-photo" : "")}>
+          {p.photo ? (
+            <img
+              src={asset(p.photo)}
+              srcSet={window.srcSetVignette(asset(p.photo)) ? asset(window.photoTaille(p.photo, 800)) + " 800w, " + asset(p.photo) + " 1600w" : undefined}
+              sizes="(max-width: 1024px) 90vw, 45vw"
+              alt={t(p.titre, p.titre_en) + " — South Boat Entretien, Mandelieu"}
+              fetchpriority="high" decoding="async" />
+          ) : (
+            <span className="en-d-icone" aria-hidden="true"><Icon name={p.icone || "sparkle"} size={64} /></span>
+          )}
+          <div className="en-d-prix"><EnPrix item={p} /></div>
+        </div>
+      </section>
+
+      <section className="en-section en-d-contenu">
+        <div className="en-head">
+          <p className="eyebrow">{t("Le détail", "In detail")}</p>
+          <h2>{t("Ce que comprend la prestation", "What the service includes")}</h2>
+        </div>
+        <ul className="en-list en-d-liste">
+          {points.map((pt, i) => <li key={i}><Icon name="check" size={16} />{pt}</li>)}
+        </ul>
+        {p.note && <p className="en-note en-d-note">{t(p.note, p.note_en)}</p>}
+      </section>
+
+      {p.id === "lustrage" && <EnNiveaux onDevis={devis.allerAuDevis} />}
+
+      <section className="en-section en-d-autres">
+        <div className="en-head">
+          <p className="eyebrow">{t("Les autres prestations", "Other services")}</p>
+          <h2>{t("À combiner selon vos besoins.", "Combine them as you need.")}</h2>
+        </div>
+        <div className="en-d-autres-liste">
+          {autres.map((x) => (
+            <a key={x.id} className="en-d-autre" {...lienInterne({ name: "entretien-prestation", id: x.id }, setPage)}>
+              <span className="en-tuile-icone"><Icon name={x.icone || "sparkle"} size={20} /></span>
+              <span>{enCourt(x, t)}</span>
+              <Icon name="arrow" size={15} />
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <EnDevis {...devis} titre={t(`Votre devis : ${enCourt(p, t).toLowerCase()}.`, `Your quote: ${enCourt(p, t).toLowerCase()}.`)} />
+
+      <Footer />
+    </main>
+  );
+}
+
+Object.assign(window, { EntretienPage, EntretienPrestationPage });

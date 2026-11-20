@@ -15,35 +15,40 @@
 })();
 </script>
 
-<!-- Perf : précharge l'image hero (élément LCP) uniquement sur la page d'accueil -->
+<!-- Perf : précharge l'image de fond (élément LCP) du portail « / » et de
+     l'accueil Location « /location-bateau ». Même srcset ET même point de bascule
+     que les balises <picture>, sinon le téléphone précharge une image que le
+     rendu n'utilisera pas : deux fois le trafic, et le LCP n'y gagne rien. -->
 <script>
 (function () {
-  var p = location.pathname;
-  if (p === "/" || p === "/South-Boat/" || p === "/South-Boat") {
-    var base = p.indexOf("/South-Boat") === 0 ? "/South-Boat/" : "/";
-    var l = document.createElement("link");
-    // Même srcset ET même point de bascule que la balise <picture> du hero,
-    // sinon le téléphone précharge une image que le rendu n'utilisera pas :
-    // deux fois le trafic, et le LCP n'y gagne rien.
-    var portrait = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
-    var nom = "images/drone/bateau-eau-turquoise-esterel-vue-drone";
-    l.rel = "preload"; l.as = "image";
-    if (portrait) {
-      l.href = base + nom + "-portrait.jpg";
-      l.setAttribute("imagesrcset", base + nom + "-portrait-800.jpg 800w, " + base + nom + "-portrait.jpg 1200w");
-    } else {
-      l.href = base + nom + ".jpg";
-      l.setAttribute("imagesrcset", base + nom + "-800.jpg 800w, " + base + nom + ".jpg 2400w");
-    }
-    l.setAttribute("imagesizes", "100vw");
-    l.setAttribute("fetchpriority", "high");
-    document.head.appendChild(l);
+  var base = location.pathname.indexOf("/South-Boat") === 0 ? "/South-Boat/" : "/";
+  var p = location.pathname.slice(base.length - 1).replace(/\/+$/, "") || "/";
+  var portail = p === "/";
+  if (!portail && p !== "/location-bateau") return;
+  var portrait = window.matchMedia && window.matchMedia("(max-width: 700px)").matches;
+  var href, srcset;
+  if (portrait) {
+    // Portail et Location partagent le même recadrage vertical sur téléphone.
+    var v = base + "images/drone/bateau-eau-turquoise-esterel-vue-drone-portrait";
+    href = v + ".jpg"; srcset = v + "-800.jpg 800w, " + v + ".jpg " + (portail ? "900w" : "1200w");
+  } else if (portail) {
+    var n = base + "images/drone/bateau-navigation-poster-video";
+    href = n + ".jpg"; srcset = n + "-800.jpg 800w, " + n + ".jpg 2000w";
+  } else {
+    var h = base + "images/drone/bateau-eau-turquoise-esterel-vue-drone";
+    href = h + ".jpg"; srcset = h + "-800.jpg 800w, " + h + ".jpg 2400w";
   }
+  var l = document.createElement("link");
+  l.rel = "preload"; l.as = "image"; l.href = href;
+  l.setAttribute("imagesrcset", srcset);
+  l.setAttribute("imagesizes", "100vw");
+  l.setAttribute("fetchpriority", "high");
+  document.head.appendChild(l);
 })();
 </script>
 
-<title>South Boat — Location de bateaux à Mandelieu, Côte d'Azur</title>
-<meta name="description" content="Location de bateaux à Mandelieu-la-Napoule sur la Côte d'Azur. Bateaux familiaux vérifiés, avec ou sans skipper, au départ vers l'Estérel, Cannes et les îles de Lérins. Réservation simple et transparente."/>
+<title>South Boat — Location et entretien de bateaux à Mandelieu</title>
+<meta name="description" content="South Boat à Mandelieu-la-Napoule : location de bateaux avec ou sans skipper vers l'Estérel, Cannes et Lérins, et entretien de bateaux (nettoyage, lustrage, antifouling)."/>
 <meta name="author" content="South Boat"/>
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
 <meta name="theme-color" content="#3a8dde"/>
@@ -59,8 +64,8 @@
 <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="South Boat"/>
-<meta property="og:title" content="South Boat — Location de bateaux à Mandelieu, Côte d'Azur"/>
-<meta property="og:description" content="Bateaux familiaux au départ de Mandelieu vers l'Estérel, Cannes et les îles de Lérins. Avec ou sans skipper. Réservation simple."/>
+<meta property="og:title" content="South Boat — Location et entretien de bateaux à Mandelieu"/>
+<meta property="og:description" content="South Boat Location : bateaux avec ou sans skipper vers l'Estérel, Cannes et Lérins. South Boat Entretien : nettoyage, lustrage, antifouling."/>
 <meta property="og:url" content="https://south-boat.com/"/>
 <meta property="og:image" content="https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg"/>
 <meta property="og:image:width" content="1600"/>
@@ -71,8 +76,8 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="South Boat — Location de bateaux à Mandelieu"/>
-<meta name="twitter:description" content="Bateaux familiaux au départ de Mandelieu vers l'Estérel, Cannes et les îles de Lérins."/>
+<meta name="twitter:title" content="South Boat — Location et entretien de bateaux à Mandelieu"/>
+<meta name="twitter:description" content="Location de bateaux avec ou sans skipper, et entretien de bateaux à Mandelieu-la-Napoule."/>
 <meta name="twitter:image" content="https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg"/>
 
 <link rel="preconnect" href="https://images.unsplash.com"/>
@@ -87,7 +92,7 @@
 <link rel="preload" as="font" type="font/woff2" href="fonts/inter-latin.woff2" crossorigin/>
 <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin/>
 <link rel="stylesheet" href="fonts.css?v=20260714b"/>
-<link rel="stylesheet" href="styles.css?v=20261119a"/>
+<link rel="stylesheet" href="styles.css?v=20261120a"/>
 
 <!-- JSON-LD : LocalBusiness (Google Business, Maps, SERP enrichi) -->
 <script type="application/ld+json">
@@ -96,7 +101,8 @@
   "@type": ["LocalBusiness", "BoatRental"],
   "@id": "https://south-boat.com/#business",
   "name": "South Boat",
-  "description": "Location de bateaux familiaux sur la Côte d'Azur, au départ de Mandelieu-la-Napoule. Avec ou sans skipper, vers l'Estérel, Cannes et les îles de Lérins.",
+  "description": "Location de bateaux familiaux au départ de Mandelieu-la-Napoule (South Boat Location), avec ou sans skipper, vers l'Estérel, Cannes et les îles de Lérins ; entretien et nettoyage de bateaux (South Boat Entretien) : nettoyage extérieur et intérieur, lustrage, antifouling, gelcoat.",
+  "alternateName": ["South Boat Location", "South Boat Entretien"],
   "url": "https://south-boat.com/",
   "image": "https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg",
   "logo": "https://south-boat.com/images/mochi/location-bateau-mandelieu-south-boat.jpg",
@@ -134,6 +140,20 @@
     "opens": "08:00",
     "closes": "19:00"
   }]
+}
+</script>
+
+<!-- JSON-LD : WebSite (nom du site affiché par Google au-dessus du résultat) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://south-boat.com/#website",
+  "name": "South Boat",
+  "alternateName": ["South Boat Location", "South Boat Entretien", "south-boat.com"],
+  "url": "https://south-boat.com/",
+  "inLanguage": "fr-FR",
+  "publisher": { "@id": "https://south-boat.com/#business" }
 }
 </script>
 
@@ -178,23 +198,33 @@
 <!-- Contenu de secours pour les crawlers SEO (si JavaScript désactivé) -->
 <noscript>
 <header>
-<h1>South Boat — Location de bateaux à Mandelieu, Côte d'Azur</h1>
-<p>Location de bateaux familiaux vérifiés au départ de Mandelieu-la-Napoule. Naviguez vers l'Estérel, Cannes et les îles de Lérins, avec ou sans skipper.</p>
+<h1>South Boat — Location et entretien de bateaux à Mandelieu-la-Napoule</h1>
+<p>Deux univers au départ du port de Mandelieu, sur la Côte d'Azur : la location de bateaux et l'entretien de bateaux.</p>
+<nav>
+<a href="/location-bateau">South Boat Location — louer un bateau</a> ·
+<a href="/entretien-bateau">South Boat Entretien — faire entretenir son bateau</a>
+</nav>
 </header>
 <main>
-<h2>Notre flotte de bateaux à louer à Mandelieu</h2>
+<h2><a href="/location-bateau">South Boat Location</a> : location de bateaux à Mandelieu</h2>
 <p><strong>Mochi</strong> — Day cruiser de 7,15 m, jusqu'à 8 personnes, à partir de 435 € la journée (320 € la demi-journée). Avec ou sans skipper. Port de départ : Port de Mandelieu, 06210 Mandelieu-la-Napoule.</p>
-<h2>Destinations au départ de Mandelieu</h2>
 <ul>
 <li>Massif de l'Estérel et ses calanques (Cap Roux, Trayas, calanque de Maubois)</li>
 <li>Baie de Cannes</li>
 <li>Îles de Lérins (Sainte-Marguerite, Saint-Honorat)</li>
 <li>Cap d'Antibes et la Côte d'Azur</li>
 </ul>
-<h2>Entretien et nettoyage de bateaux</h2>
-<p>Nettoyage extérieur et intérieur, lustrage et polish, traitement antifouling, réfection du gelcoat et des chromes. Bateaux jusqu'à ~25 m (plus sur demande), entretien intérieur des bateaux de plus de 10 m. Tarifs sur devis, forfaits d'entretien au mois ou à l'année : <a href="/entretien-bateau">south-boat.com/entretien-bateau</a>.</p>
-<h2>Réserver une sortie en bateau</h2>
-<p>Location à la journée ou demi-journée, options à bord (bouée tractée, wakeboard, paddle, apéritif gourmand). Réservez en ligne après avoir activé JavaScript, ou contactez la conciergerie 7j/7 de 8h à 19h au 06 34 49 16 21 — contact@south-boat.com.</p>
+<p>Location à la journée ou demi-journée, options à bord (bouée tractée, wakeboard, paddle, apéritif gourmand).</p>
+<h2><a href="/entretien-bateau">South Boat Entretien</a> : entretien et nettoyage de bateaux</h2>
+<p>Bateaux jusqu'à ~25 m (plus sur demande), entretien intérieur des bateaux de plus de 10 m. Tarifs sur devis, forfaits d'entretien au mois ou à l'année.</p>
+<ul>
+<li><a href="/entretien-bateau/nettoyage-exterieur">Entretien extérieur</a></li>
+<li><a href="/entretien-bateau/lustrage">Lustrage et rénovation esthétique (trois niveaux)</a></li>
+<li><a href="/entretien-bateau/antifouling">Traitement antifouling</a></li>
+<li><a href="/entretien-bateau/gelcoat-chromes">Gelcoat et chromes</a></li>
+<li><a href="/entretien-bateau/nettoyage-interieur">Entretien intérieur</a></li>
+</ul>
+<p>Contact 7j/7 de 8h à 19h au 06 34 49 16 21 — contact@south-boat.com.</p>
 </main>
 </noscript>
 
@@ -206,13 +236,14 @@
 <script defer src="cal-api.js?v=20260716a"></script>
 <script defer src="mollie-api.js?v=20260716a"></script>
 <script defer src="articles.js?v=20260907b"></script>
-<script defer src="entretien-prestations.js?v=20261119a"></script>
+<script defer src="entretien-prestations.js?v=20261120a"></script>
 <script defer src="dist/tweaks-panel.js?v=20260716a"></script>
-<script defer src="dist/app.js?v=20261119c"></script>
-<script defer src="dist/pages.js?v=20261119b"></script>
+<script defer src="dist/app.js?v=20261120j"></script>
+<script defer src="dist/pages.js?v=20261120c"></script>
 <script defer src="dist/planning.js?v=20260716a"></script>
 <script defer src="dist/fireworks.js?v=20260730b"></script>
-<script defer src="dist/entretien.js?v=20261119d"></script>
-<script defer src="dist/boot.js?v=20261119c"></script>
+<script defer src="dist/entretien.js?v=20261120a"></script>
+<script defer src="dist/portail.js?v=20261120d"></script>
+<script defer src="dist/boot.js?v=20261120g"></script>
 </body>
 </html>

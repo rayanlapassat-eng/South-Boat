@@ -52,7 +52,7 @@ cwebp -q 80 photo-400.jpg -o photo-400.jpg.webp
 **À NE PAS téléverser :**
 
 - `node_modules/` (très lourd, inutile en production)
-- les fichiers source `*.jsx` (`app.jsx`, `pages.jsx`, `planning.jsx`, `fireworks.jsx`, `entretien.jsx`, `tweaks-panel.jsx`, `boot.jsx`) — facultatifs, seul `dist/` est utilisé
+- les fichiers source `*.jsx` (`app.jsx`, `pages.jsx`, `planning.jsx`, `fireworks.jsx`, `entretien.jsx`, `portail.jsx`, `tweaks-panel.jsx`, `boot.jsx`) — facultatifs, seul `dist/` est utilisé
 - `South-Boat-standalone.html` et `South Boat.html` (anciennes versions — risque de contenu dupliqué)
 - `package.json`, `package-lock.json`, ce fichier
 
@@ -67,7 +67,25 @@ Le fichier `.htaccess` redirige automatiquement en 301 :
 
 → Tout le référencement est concentré sur **une seule URL canonique** : `https://south-boat.com`.
 
-## 3. Modifier le site
+## 3. Les deux univers : South Boat Location / South Boat Entretien
+
+| Adresse | Page |
+|---|---|
+| `/` | **Portail** : logo + deux grands boutons (Location / Entretien), vidéo drone en fond sur ordinateur, photo sur téléphone |
+| `/location-bateau` | Accueil de **South Boat Location** (l'ancienne page d'accueil) |
+| `/catalogue`, `/disponibilites`, `/feux-artifice`, `/cap-sud`… | Pages de l'univers Location |
+| `/entretien-bateau` | Accueil de **South Boat Entretien** : un bouton par prestation, forfaits, FAQ, devis |
+| `/entretien-bateau/<id>` | Une page par prestation (`nettoyage-exterieur`, `lustrage`, `antifouling`, `gelcoat-chromes`, `nettoyage-interieur`) |
+
+- Chaque univers a **son menu et son code couleur** : bleu pour la Location,
+  vert d'eau pour l'Entretien. Les couleurs se changent à un seul endroit, en
+  bas de `styles.css`, bloc « UNIVERS ».
+- Le bouton « Entretien → » / « Location → » du menu fait passer d'un univers à
+  l'autre ; le logo ramène au portail.
+- À propos, Contact et les pages légales sont communes : elles gardent les
+  couleurs de l'univers d'où vient le visiteur.
+
+## 4. Modifier le site
 
 ### Ajouter / modifier un article (cas courant)
 Éditer **`articles.js`** directement (fichier texte simple), puis re-téléverser ce seul fichier.
@@ -92,8 +110,8 @@ Les réglages sont en bas de `articles.js` :
 | Qu'un article sorte de la rotation après une date (article d'événement) | `alaUneJusquau: "2026-09-20",` dans son bloc |
 | Arrêter complètement la rotation | `active: false` dans le bloc `ROTATION` |
 
-### Page Entretien : prestations et prix « à partir de »
-La page **/entretien-bateau** lit ses prestations dans **`entretien-prestations.js`**
+### Univers Entretien : prestations, photos et prix « à partir de »
+Les pages **/entretien-bateau** et **/entretien-bateau/&lt;id&gt;** lisent leurs prestations dans **`entretien-prestations.js`**
 (fichier texte simple, comme `articles.js`). Tant qu'aucun montant n'est
 renseigné, chaque carte affiche **« Sur devis »**.
 
@@ -108,6 +126,12 @@ unite: "€ / m",
 
 La carte affiche alors « À partir de 150 € / m » (« From 150 € / m » en anglais).
 Re-téléverser ce seul fichier, en incrémentant son `?v=` dans `index.html`.
+
+Pour mettre une **photo** en haut de la page d'une prestation (à la place du
+visuel coloré), remplacer `photo: null,` par son chemin, par exemple
+`photo: "images/entretien/antifouling.jpg",` — et générer sa version
+`-800.jpg` à côté (voir § 1 bis). Le libellé du bouton se change dans `court`.
+**Ne jamais modifier un `id`** : c'est l'adresse de la page, connue de Google.
 
 Les demandes de devis du formulaire arrivent sur la même adresse que la page
 Contact (service Web3Forms), avec l'objet « [Devis entretien South Boat] ».
@@ -124,9 +148,12 @@ Puis re-téléverser le dossier `dist/`.
 
 > ⚠️ Important : modifier un `.jsx` sans lancer `npm run build` n'a **aucun effet** en ligne (le site charge `dist/`, pas les `.jsx`). Pensez aussi à incrémenter le `?v=...` dans `index.html` pour forcer le rafraîchissement du cache.
 
-## 4. Après la mise en ligne — référencement
+## 5. Après la mise en ligne — référencement
 
 1. Créer/valider la propriété **Google Search Console** pour `https://south-boat.com`.
 2. Y soumettre le sitemap : `https://south-boat.com/sitemap.xml`.
+   Après la mise en ligne des deux univers (novembre 2026), le **re-soumettre**,
+   puis demander l'indexation (outil « Inspection d'URL ») de `/`,
+   `/location-bateau` et `/entretien-bateau`.
 3. Créer/réclamer la fiche **Google Business Profile** (Mandelieu) — cohérente avec le JSON-LD (nom, téléphone, adresse).
 4. À faire encore : pages **Mentions légales / CGV / Politique de confidentialité (RGPD)** — obligatoires en France.

@@ -1,6 +1,6 @@
 /* ============================================================
    ENTRETIEN — PRESTATIONS ET TARIFS
-   (page « Entretien » : https://south-boat.com/entretien-bateau)
+   (univers « South Boat Entretien » : https://south-boat.com/entretien-bateau)
    ============================================================
    Fichier texte simple, comme articles.js : après modification,
    re-téléverser CE SEUL fichier. Aucune compilation nécessaire.
@@ -14,6 +14,16 @@
    Remettre  null  pour revenir à « Sur devis ».
 
    Les textes existent en français et en anglais (champs « _en »).
+
+   CHAQUE PRESTATION A SA PROPRE PAGE :
+   https://south-boat.com/entretien-bateau/<id>   (ex. /entretien-bateau/antifouling)
+   Ne pas modifier les « id » : ils servent d'adresse aux pages (Google).
+   - court   : libellé du bouton sur la page Entretien (« Entretien extérieur »)
+   - titre   : titre complet, affiché en haut de la page de la prestation
+   - icone   : goutte, brillance, carene, outil, cabine
+   - photo   : null (visuel coloré) ou le chemin d'une photo, par exemple
+               photo: "images/entretien/antifouling.jpg",
+               (prévoir aussi la version « -800.jpg » à côté, cf. DEPLOIEMENT.md)
    ============================================================ */
 
 var ENTRETIEN = {
@@ -23,9 +33,13 @@ var ENTRETIEN = {
   prestations: [
     {
       id: "nettoyage-exterieur",
+      court: "Entretien extérieur",
+      court_en: "Exterior care",
+      icone: "goutte",
+      photo: null,
       cote: "exterieur",
-      titre: "Nettoyage extérieur courant",
-      titre_en: "Routine exterior cleaning",
+      titre: "Entretien & nettoyage extérieur",
+      titre_en: "Exterior care & cleaning",
       intro: "Pont, coque, selleries : tout ce qui reste exposé au sel et au soleil, remis au propre après vos sorties.",
       intro_en: "Deck, hull, upholstery: everything exposed to salt and sun, cleaned up after your outings.",
       points: [
@@ -61,11 +75,15 @@ var ENTRETIEN = {
     },
     {
       id: "lustrage",
+      court: "Lustrage & polish",
+      court_en: "Polishing",
+      icone: "brillance",
+      photo: null,
       cote: "exterieur",
       titre: "Lustrage & rénovation esthétique",
       titre_en: "Polishing & cosmetic restoration",
-      intro: "Pour redonner de l'éclat à la coque et aux surfaces extérieures. Trois niveaux au choix, détaillés plus bas.",
-      intro_en: "To bring the shine back to the hull and exterior surfaces. Three levels to choose from, detailed below.",
+      intro: "Pour redonner de l'éclat à la coque et aux surfaces extérieures. Trois niveaux au choix, selon l'état de votre coque.",
+      intro_en: "To bring the shine back to the hull and exterior surfaces. Three levels to choose from, depending on your hull's condition.",
       points: [
         "Décontamination des surfaces.",
         "Nettoyage approfondi du gelcoat.",
@@ -95,6 +113,10 @@ var ENTRETIEN = {
     },
     {
       id: "antifouling",
+      court: "Antifouling",
+      court_en: "Antifouling",
+      icone: "carene",
+      photo: null,
       cote: "exterieur",
       titre: "Traitement antifouling",
       titre_en: "Antifouling treatment",
@@ -127,6 +149,10 @@ var ENTRETIEN = {
     },
     {
       id: "gelcoat-chromes",
+      court: "Gelcoat & chromes",
+      court_en: "Gelcoat & chrome",
+      icone: "outil",
+      photo: null,
       cote: "exterieur",
       titre: "Gelcoat & chromes",
       titre_en: "Gelcoat & chrome",
@@ -147,9 +173,13 @@ var ENTRETIEN = {
     },
     {
       id: "nettoyage-interieur",
+      court: "Entretien intérieur",
+      court_en: "Interior care",
+      icone: "cabine",
+      photo: null,
       cote: "interieur",
-      titre: "Nettoyage intérieur",
-      titre_en: "Interior cleaning",
+      titre: "Entretien & nettoyage intérieur",
+      titre_en: "Interior care & cleaning",
       intro: "Un intérieur net et frais pour profiter pleinement de la vie à bord.",
       intro_en: "A clean, fresh interior to fully enjoy life on board.",
       points: [

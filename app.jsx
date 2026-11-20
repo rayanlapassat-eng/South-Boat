@@ -232,10 +232,57 @@ window.usePauseHorsEcran = function usePauseHorsEcran(actif) {
   return ref;
 };
 
+// ============ UNIVERS (South Boat Location / South Boat Entretien) ============
+// La page d'accueil « / » est un portail qui mène à deux univers, chacun avec
+// son menu et son code couleur (attribut data-univers sur <html>, cf. styles.css).
+// Les pages communes (À propos, Contact, pages légales) gardent l'univers d'où
+// vient le visiteur.
+const PAGES_ENTRETIEN = ["entretien", "entretien-prestation"];
+const PAGES_LOCATION = ["home", "catalog", "planning", "fireworks", "detail", "booking", "capsud", "capsud-article", "itinerary"];
+function universDePage(name) {
+  if (name === "accueil") return "portail";
+  if (PAGES_ENTRETIEN.includes(name)) return "entretien";
+  if (PAGES_LOCATION.includes(name)) return "location";
+  return null;
+}
+
+// Défilement doux vers une ancre (respecte « réduire les animations »).
+function defilerVersAncre(id) {
+  const el = document.getElementById(id);
+  if (!el) return false;
+  const doux = !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  el.scrollIntoView({ behavior: doux ? "smooth" : "auto", block: "start" });
+  return true;
+}
+
+// Navigation interne. Une page peut porter une ancre ({ name: "entretien",
+// ancre: "devis" }) : si l'on est déjà sur cette page, on y défile directement.
+function naviguerVers(page) {
+  const courante = window.__pageCourante;
+  if (page.ancre && courante && courante.name === page.name && String(courante.id || "") === String(page.id || "")) {
+    if (defilerVersAncre(page.ancre)) return;
+  }
+  if (window.__setPage) window.__setPage(page);
+}
+
+// Props d'un vrai lien <a href> (lisible par Google, ouvrable dans un nouvel
+// onglet) qui navigue sans recharger la page sur un clic simple.
+function lienInterne(page, onNaviguer) {
+  return {
+    href: pageToPath(page),
+    onClick: (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      (onNaviguer || naviguerVers)(page);
+    },
+  };
+}
+
 function pageToPath(page) {
   let path = "/";
   switch (page.name) {
-    case "home": path = "/"; break;
+    case "accueil": path = "/"; break;
+    case "home": path = "/location-bateau"; break;
     case "catalog": path = "/catalogue"; break;
     case "planning": {
       path = "/disponibilites";
@@ -244,6 +291,7 @@ function pageToPath(page) {
     }
     case "fireworks": path = "/feux-artifice"; break;
     case "entretien": path = "/entretien-bateau"; break;
+    case "entretien-prestation": path = `/entretien-bateau/${page.id}`; break;
     case "detail": path = `/bateau/${page.id}`; break;
     case "booking": {
       path = `/reservation/${page.id}`;
@@ -271,8 +319,9 @@ function pathToPage(pathname, search) {
   if (BASE_PATH && p.startsWith(BASE_PATH)) p = p.slice(BASE_PATH.length);
   const parts = p.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
   const params = new URLSearchParams(search || "");
-  if (parts.length === 0) return { name: "home" };
+  if (parts.length === 0) return { name: "accueil" };
   switch (parts[0]) {
+    case "location-bateau": return { name: "home" };
     case "catalogue": return { name: "catalog" };
     case "disponibilites": {
       const page = { name: "planning" };
@@ -280,7 +329,7 @@ function pathToPage(pathname, search) {
       return page;
     }
     case "feux-artifice": return { name: "fireworks" };
-    case "entretien-bateau": return { name: "entretien" };
+    case "entretien-bateau": return parts[1] ? { name: "entretien-prestation", id: parts[1] } : { name: "entretien" };
     case "bateau": return parts[1] ? { name: "detail", id: +parts[1] || parts[1] } : { name: "catalog" };
     case "reservation": {
       if (!parts[1]) return { name: "catalog" };
@@ -296,7 +345,7 @@ function pathToPage(pathname, search) {
     case "cgv": return { name: "cgv" };
     case "mentions-legales": return { name: "legal" };
     case "confidentialite": return { name: "privacy" };
-    default: return { name: "home" };
+    default: return { name: "accueil" };
   }
 }
 
@@ -335,6 +384,13 @@ const Icon = ({ name, size = 18 }) => {
     sun: <><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></>,
     moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />,
     wave: <path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M2 6c2-2 4-2 6 0s4 2 6 0 4-2 6 0" />,
+    // Univers & prestations d'entretien
+    voile: <path d="M3 17l9-12 9 12M5 17h14l-2 4H7z" />,
+    goutte: <><path d="M12 2.7l5.66 5.66a8 8 0 1 1-11.32 0z" /><path d="M8.5 14.5a3.5 3.5 0 0 0 3.5 3.5" /></>,
+    brillance: <><path d="M10 3l1.9 5.1L17 10l-5.1 1.9L10 17l-1.9-5.1L3 10l5.1-1.9z" /><path d="M18.5 14l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" /></>,
+    carene: <><path d="M2 9h20l-3 8H5z" /><path d="M7 9V6h7l3 3" /><path d="M2 21c2-1.3 4-1.3 6 0s4 1.3 6 0 4-1.3 6 0" /></>,
+    outil: <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />,
+    cabine: <><path d="M3 20v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8" /><path d="M3 16h18" /><path d="M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" /></>,
     phone: <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />,
     mail: <><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><path d="M22 6l-10 7L2 6" /></>,
     instagram: <><rect x="2" y="2" width="20" height="20" rx="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><path d="M17.5 6.5h.01" /></>,
@@ -382,41 +438,81 @@ function applyTheme(dark) {
 }
 
 // ============ NAV ============
-function Nav({ page, setPage, dark }) {
+// Le logo South Boat (pictogramme voile + nom), avec en dessous le nom de
+// l'univers en cours (« Location » / « Entretien ») dans sa couleur.
+function Logo({ univers, taille = 22 }) {
+  const t = window.useT();
+  return (
+    <>
+      <span className="logo-mark">
+        <svg width={taille} height={taille} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 17l9-12 9 12M5 17h14l-2 4H7z" />
+        </svg>
+      </span>
+      <span className="logo-words">
+        <span className="logo-text">South Boat<sup>°</sup></span>
+        {univers === "location" && <span className="logo-univers">{t("Location", "Rental")}</span>}
+        {univers === "entretien" && <span className="logo-univers">{t("Entretien", "Maintenance")}</span>}
+      </span>
+    </>
+  );
+}
+
+function Nav({ page, setPage, univers }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const t = window.useT();
-  const items = [
-  { id: "home", label: t("Accueil", "Home") },
-  { id: "catalog", label: t("Catalogue", "Catalog") },
-  { id: "planning", label: t("Disponibilités", "Availability") },
-  { id: "entretien", label: t("Entretien", "Maintenance") },
-  { id: "fireworks", label: t("Feux d'artifice", "Fireworks") },
-  { id: "capsud", label: "Cap Sud" },
-  { id: "about", label: t("À propos", "About") },
-  { id: "contact", label: t("Contact", "Contact") }];
+  const entretien = univers === "entretien";
 
-  const navigate = (id) => { setPage({ name: id }); setMobileOpen(false); };
+  // Chaque univers a son propre menu. `actif` dit quand le lien est surligné.
+  const items = entretien ? [
+    { id: "entretien", label: t("Accueil", "Home"), page: { name: "entretien" }, actif: page.name === "entretien" },
+    { id: "prestations", label: t("Prestations", "Services"), page: { name: "entretien", ancre: "prestations" }, actif: page.name === "entretien-prestation" },
+    { id: "forfaits", label: t("Forfaits", "Plans"), page: { name: "entretien", ancre: "forfaits" }, actif: false },
+    { id: "about", label: t("À propos", "About"), page: { name: "about" } },
+    { id: "contact", label: t("Contact", "Contact"), page: { name: "contact" } },
+  ] : [
+    { id: "home", label: t("Accueil", "Home"), page: { name: "home" } },
+    { id: "catalog", label: t("Catalogue", "Catalog"), page: { name: "catalog" } },
+    { id: "planning", label: t("Disponibilités", "Availability"), page: { name: "planning" } },
+    { id: "fireworks", label: t("Feux d'artifice", "Fireworks"), page: { name: "fireworks" } },
+    { id: "capsud", label: "Cap Sud", page: { name: "capsud" } },
+    { id: "about", label: t("À propos", "About"), page: { name: "about" } },
+    { id: "contact", label: t("Contact", "Contact"), page: { name: "contact" } },
+  ];
+  const estActif = (it) => (it.actif != null ? it.actif : page.name === it.page.name);
+  // Le menu mobile occupe de la hauteur dans la page : on le referme AVANT de
+  // défiler vers une ancre, sinon la cible remonte d'autant pendant le défilement.
+  const aller = (p) => {
+    if (!mobileOpen) { naviguerVers(p); return; }
+    setMobileOpen(false);
+    setTimeout(() => naviguerVers(p), 0);
+  };
+
+  // Passerelle vers l'autre univers.
+  const autre = entretien
+    ? { id: "location", page: { name: "home" }, label: t("Location", "Rental"), titre: t("Aller à South Boat Location", "Go to South Boat Rental") }
+    : { id: "entretien", page: { name: "entretien" }, label: t("Entretien", "Maintenance"), titre: t("Aller à South Boat Entretien", "Go to South Boat Maintenance") };
+  const cta = entretien
+    ? { page: { name: "entretien", ancre: "devis" }, label: t("Devis", "Quote") }
+    : { page: { name: "catalog" }, label: t("Réserver", "Book") };
 
   return (
     <header className="nav">
-      <div className="nav-inner" style={{ opacity: "10", color: "rgb(255, 255, 255)" }}>
-        <button className="logo" onClick={() => navigate("home")}>
-          <span className="logo-mark">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 17l9-12 9 12M5 17h14l-2 4H7z" />
-            </svg>
-          </span>
-          <span className="logo-text">South Boat<sup>°</sup></span>
-        </button>
-        <nav className="nav-links">
+      <div className="nav-inner">
+        <a className="logo" {...lienInterne({ name: "accueil" }, aller)} aria-label={t("South Boat — accueil", "South Boat — home")}>
+          <Logo univers={univers} />
+        </a>
+        <nav className="nav-links" aria-label={t("Menu principal", "Main menu")}>
           {items.map((it) =>
-          <button
+          <a
             key={it.id}
-            className={"nav-link" + (page.name === it.id ? " active" : "")}
-            onClick={() => navigate(it.id)}>
+            className={"nav-link" + (estActif(it) ? " active" : "")}
+            aria-current={estActif(it) ? "page" : undefined}
+            {...lienInterne(it.page, aller)}>
               {it.label}
-            </button>
+            </a>
           )}
+          {!entretien &&
           <a
             className="nav-link nav-link-ext"
             href="https://marine.meteoconsult.fr/"
@@ -427,9 +523,14 @@ function Nav({ page, setPage, dark }) {
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: 4, verticalAlign: "middle" }}>
               <path d="M7 17L17 7M9 7h8v8" />
             </svg>
-          </a>
+          </a>}
         </nav>
         <div className="nav-actions">
+          <a className={"univers-switch vers-" + autre.id} title={autre.titre} {...lienInterne(autre.page, aller)}>
+            <span className="univers-switch-dot" aria-hidden="true" />
+            {autre.label}
+            <Icon name="arrow" size={13} />
+          </a>
           <button
             className="lang-toggle"
             onClick={() => t.setLang(t.lang === "fr" ? "en" : "fr")}
@@ -439,9 +540,9 @@ function Nav({ page, setPage, dark }) {
             <span className="lang-sep">|</span>
             <span className={t.lang === "en" ? "lang-on" : "lang-off"}>EN</span>
           </button>
-          <button className="btn btn-primary nav-cta" onClick={() => setPage({ name: "catalog" })} style={{ borderRadius: "20px" }}>
-            {t("Réserver", "Book")}
-          </button>
+          <a className="btn btn-primary nav-cta" {...lienInterne(cta.page, aller)} style={{ borderRadius: "20px" }}>
+            {cta.label}
+          </a>
           <button className="hamburger-btn" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu" aria-expanded={mobileOpen}>
             {mobileOpen
               ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -453,13 +554,14 @@ function Nav({ page, setPage, dark }) {
       {mobileOpen && (
         <div className="mobile-menu">
           {items.map((it) =>
-          <button
+          <a
             key={it.id}
-            className={"mobile-menu-link" + (page.name === it.id ? " active" : "")}
-            onClick={() => navigate(it.id)}>
+            className={"mobile-menu-link" + (estActif(it) ? " active" : "")}
+            {...lienInterne(it.page, aller)}>
               {it.label}
-            </button>
+            </a>
           )}
+          {!entretien &&
           <a
             className="mobile-menu-link"
             href="https://marine.meteoconsult.fr/"
@@ -467,6 +569,13 @@ function Nav({ page, setPage, dark }) {
             rel="noopener noreferrer"
             onClick={() => setMobileOpen(false)}>
             Météo Marine ↗
+          </a>}
+          <a className={"mobile-univers vers-" + autre.id} {...lienInterne(autre.page, aller)}>
+            <span>
+              <small>{t("Changer d'univers", "Switch to")}</small>
+              South Boat {autre.label}
+            </span>
+            <Icon name="arrow" size={18} />
           </a>
         </div>
       )}
@@ -559,4 +668,4 @@ function Breadcrumb({ trail, setPage }) {
   );
 }
 
-Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, SearchBar, Breadcrumb, TWEAK_DEFAULTS, pageToPath, pathToPage, BASE_PATH, asset });
+Object.assign(window, { BOATS, PORTS, fmtPrice, Star, Heart, Icon, applyTheme, Nav, Logo, SearchBar, Breadcrumb, TWEAK_DEFAULTS, pageToPath, pathToPage, BASE_PATH, asset, universDePage, naviguerVers, lienInterne, defilerVersAncre });

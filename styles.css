@@ -446,11 +446,11 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 
 /* ===== FOOTER ===== */
 .foot { background: var(--navy); color: rgba(255,255,255,0.85); padding: 60px 32px 24px; margin-top: 60px; }
-.foot-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 2fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.foot-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 2.6fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .foot-brand .logo { color: white; margin-bottom: 16px; }
 .foot-brand .logo-mark { background: rgba(255,255,255,0.12); }
 .foot-brand p { color: rgba(255,255,255,0.6); font-size: 14px; }
-.foot-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.foot-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
 .foot-cols h5 { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: white; margin-bottom: 14px; }
 .foot-cols a { display: block; padding: 6px 0; color: rgba(255,255,255,0.65); text-decoration: none; font-size: 14px; cursor: pointer; }
 .foot-cols a:hover { color: white; }
@@ -1253,4 +1253,230 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
   .en-card, .en-level { padding: 24px 22px; border-radius: 20px; }
   .en-quote { padding: 64px 18px; }
   .en-brand { padding: 14px 18px; font-size: 14px; }
+}
+
+/* ============================================================
+   UNIVERS — South Boat Location (bleu) / South Boat Entretien (vert d'eau)
+   boot.jsx pose data-univers="location|entretien|portail" sur <html>.
+   applyTheme() écrit --accent… en style en ligne sur <html> : les couleurs
+   d'univers sont donc redéfinies sur <body>, dont tout le site hérite.
+   >>> Pour changer le code couleur d'un univers, c'est ICI (et seulement ici,
+   plus les deux pastilles .vers-… juste en dessous). <<<
+   ============================================================ */
+body { --accent-clair: #7CC0EA; --navy-2: #0E3A5C; --accent-rgb: 58,141,222; }
+[data-univers="entretien"] body {
+  --accent: #0E8F82;
+  --accent-soft: rgba(14,143,130,0.12);
+  --accent-rgb: 14,143,130;
+  --accent-clair: #7FDCCB;
+  --navy: #0B3534;
+  --navy-2: #0F4F4A;
+}
+[data-theme="dark"][data-univers="entretien"] body { --accent: #3CC2AF; --accent-soft: rgba(60,194,175,0.18); }
+.vers-location  { --u: #3A8DDE; --u-rgb: 58,141,222; }
+.vers-entretien { --u: #0E8F82; --u-rgb: 14,143,130; }
+
+/* Les liens internes sont de vrais <a href> (lisibles par Google) */
+a.btn, a.nav-link, a.logo, a.mobile-menu-link { text-decoration: none; }
+a.nav-link { display: inline-flex; align-items: center; }
+
+/* Logo : nom de l'univers sous « South Boat° » */
+.logo-words { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+.logo-univers { margin-top: 5px; font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); }
+
+/* Passerelle vers l'autre univers (menu) */
+.univers-switch { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px 7px 11px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 12px; font-weight: 600; color: var(--ink-soft); text-decoration: none; white-space: nowrap; transition: all .15s; }
+.univers-switch-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--u); box-shadow: 0 0 0 3px rgba(var(--u-rgb), 0.22); }
+.univers-switch svg { transition: transform .15s; }
+.univers-switch:hover { border-color: var(--u); color: var(--ink); background: rgba(var(--u-rgb), 0.08); }
+.univers-switch:hover svg { transform: translateX(2px); }
+.mobile-univers { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 14px 16px; border-radius: 14px; background: var(--u); color: #fff; text-decoration: none; font-size: 16px; font-weight: 600; }
+.mobile-univers small { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; }
+.nav-link { white-space: nowrap; }
+/* Entre 1200 et 1365 px, le menu Location tient tout juste sur une ligne :
+   on compacte la passerelle (sans flèche) et les marges latérales. */
+@media (min-width: 1200px) and (max-width: 1365px) {
+  .nav-inner { padding-left: 22px; padding-right: 22px; }
+  .univers-switch { padding: 7px 11px; }
+  .univers-switch svg { display: none; }
+}
+@media (max-width: 760px) { .nav-actions .univers-switch { display: none; } }
+
+/* Pied de page : une colonne par univers, pastille de couleur */
+.foot-col-location h5::before, .foot-col-entretien h5::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+.foot-col-location h5::before { background: #5BAEDC; }
+.foot-col-entretien h5::before { background: #3CC2AF; }
+.foot-brand a.logo { color: white; }
+
+/* Bandeau forfaits : suit la couleur de l'univers */
+.en-plan-inner { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); }
+.en-plan-inner::before { background: radial-gradient(circle, rgba(var(--accent-rgb), 0.3) 0%, transparent 70%); }
+.en-plan .eyebrow { color: var(--accent-clair); }
+
+/* ============================================================
+   PORTAIL — page d'accueil « / » (portail.jsx)
+   ============================================================ */
+.portail { position: relative; isolation: isolate; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden; background: #06121F; color: #fff; }
+.portail-fond { position: absolute; inset: 0; z-index: -1; }
+.portail-fond picture { position: absolute; inset: 0; }
+.portail-fond img, .portail-fond video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.portail-fond video { opacity: 0; transition: opacity 1.4s ease; }
+.portail-fond video.pret { opacity: 1; }
+.portail-voile { position: absolute; inset: 0; background:
+  radial-gradient(ellipse 70% 60% at 50% 48%, rgba(4,14,26,0.30) 0%, rgba(4,14,26,0.62) 100%),
+  linear-gradient(180deg, rgba(4,14,26,0.40) 0%, rgba(4,14,26,0.10) 35%, rgba(4,14,26,0.70) 100%); }
+.portail-haut { display: flex; justify-content: flex-end; padding: 22px 32px 0; }
+.portail-lang { color: #fff; border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.portail-lang:hover { border-color: #fff; color: #fff; }
+.portail-lang .lang-on { color: #fff; }
+.portail-lang .lang-off, .portail-lang .lang-sep { color: rgba(255,255,255,0.55); }
+
+.portail-centre { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px 24px 40px; }
+.portail-logo { color: #fff; gap: 14px; margin-bottom: 26px; }
+.portail-logo .logo-mark { width: 58px; height: 58px; border-radius: 18px; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.portail-logo .logo-text { font-size: 40px; }
+.portail-logo .logo-text sup { font-size: 20px; color: #8CC8F0; }
+.portail-titre { color: #fff; max-width: 860px; font-size: clamp(30px, 4.2vw, 54px); line-height: 1.08; text-wrap: balance; text-shadow: 0 2px 24px rgba(0,0,0,0.25); }
+.portail-sous { margin-top: 14px; color: rgba(255,255,255,0.82); font-size: 13px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
+
+.portail-choix { width: 100%; margin-top: 44px; display: grid; grid-template-columns: repeat(2, minmax(0, 370px)); justify-content: center; gap: 22px; }
+.portail-carte { --u: #3A8DDE; --u-rgb: 58,141,222; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 30px 30px 26px; border-radius: 26px; color: #fff; text-decoration: none;
+  background: linear-gradient(160deg, rgba(255,255,255,0.17), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.24);
+  backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,0.6);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), border-color .25s, background .25s, box-shadow .35s; }
+.portail-carte.entretien { --u: #12A594; --u-rgb: 18,165,148; }
+.portail-carte::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--u); }
+.portail-carte:hover, .portail-carte:focus-visible { transform: translateY(-6px); border-color: rgba(var(--u-rgb), 0.9); background: linear-gradient(160deg, rgba(var(--u-rgb), 0.42), rgba(var(--u-rgb), 0.14)); box-shadow: 0 40px 70px -30px rgba(var(--u-rgb), 0.7); outline: none; }
+.portail-icone { width: 54px; height: 54px; margin-bottom: 22px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; background: var(--u); color: #fff; box-shadow: 0 10px 24px -8px rgba(var(--u-rgb), 0.85); }
+.portail-marque { font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.72); }
+.portail-nom { margin: 4px 0 12px; font-family: 'Fraunces', serif; font-size: 42px; font-weight: 400; line-height: 1.05; letter-spacing: -0.02em; }
+.portail-accroche { margin-bottom: 24px; font-size: 14.5px; line-height: 1.55; color: rgba(255,255,255,0.85); }
+.portail-cta { margin-top: auto; display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; background: #fff; color: #0A2540; font-size: 14px; font-weight: 600; transition: background .25s, color .25s, gap .25s; }
+.portail-carte:hover .portail-cta, .portail-carte:focus-visible .portail-cta { background: var(--u); color: #fff; gap: 12px; }
+
+.portail-pied { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 24px 24px; font-size: 13px; color: rgba(255,255,255,0.78); }
+.portail-contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; }
+.portail-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; font-size: 12px; color: rgba(255,255,255,0.55); }
+.portail-pied a { display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; }
+.portail-pied a:hover { color: #fff; }
+
+/* Arrivée en douceur (fill-mode backwards : le survol des cartes reste libre) */
+@keyframes portail-entree { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.portail-logo, .portail-titre, .portail-sous, .portail-carte, .portail-pied { animation: portail-entree .8s cubic-bezier(.2,.8,.2,1) backwards; }
+.portail-titre { animation-delay: .1s; }
+.portail-sous { animation-delay: .2s; }
+.portail-carte.location { animation-delay: .3s; }
+.portail-carte.entretien { animation-delay: .42s; }
+.portail-pied { animation-delay: .6s; }
+@media (prefers-reduced-motion: reduce) {
+  .portail-logo, .portail-titre, .portail-sous, .portail-carte, .portail-pied { animation: none; }
+  .portail-carte, .portail-cta { transition: none; }
+}
+.portail-resume { display: none; }
+@media (max-width: 900px) { .portail-fond video { display: none; } }
+/* Téléphone : deux cartes compactes, visibles d'un coup sans faire défiler —
+   icône | South Boat + nom + résumé | flèche. */
+@media (max-width: 760px) {
+  .portail-haut { padding: 14px 16px 0; }
+  .portail-centre { padding: 4px 16px 24px; }
+  .portail-logo { margin-bottom: 16px; gap: 12px; }
+  .portail-logo .logo-mark { width: 46px; height: 46px; border-radius: 14px; }
+  .portail-logo .logo-text { font-size: 31px; }
+  .portail-sous { font-size: 11px; letter-spacing: 0.14em; }
+  .portail-choix { grid-template-columns: minmax(0, 440px); gap: 14px; margin-top: 26px; }
+  .portail-carte { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 16px; padding: 18px 16px 18px 18px; border-radius: 22px; }
+  .portail-icone { grid-row: 1 / span 3; width: 50px; height: 50px; border-radius: 15px; margin: 0; }
+  .portail-marque { grid-column: 2; font-size: 10px; }
+  .portail-nom { grid-column: 2; font-size: 30px; margin: 2px 0 4px; }
+  .portail-resume { display: block; grid-column: 2; font-size: 13px; line-height: 1.35; color: rgba(255,255,255,0.82); }
+  .portail-accroche { display: none; }
+  .portail-cta { grid-column: 3; grid-row: 1 / span 3; margin: 0; width: 42px; height: 42px; padding: 0; justify-content: center; }
+  .portail-cta-texte { display: none; }
+  .portail-pied { padding-bottom: 18px; }
+}
+
+/* ============================================================
+   ENTRETIEN — boutons de prestations (accueil Entretien)
+   ============================================================ */
+.en-tuiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.en-tuile { position: relative; width: 100%; min-height: 270px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; color: var(--ink); font: inherit; text-decoration: none; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease, border-color .25s; }
+.en-tuile:hover, .en-tuile:focus-visible { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 24px 50px -18px rgba(var(--accent-rgb), 0.38); outline: none; }
+.en-tuile-haut { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.en-tuile-icone { flex-shrink: 0; width: 52px; height: 52px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); transition: background .25s, color .25s; }
+.en-tuile:hover .en-tuile-icone, .en-tuile:focus-visible .en-tuile-icone { background: var(--accent); color: #fff; }
+.en-tuile .en-num { margin: 0; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); }
+.en-tuile-titre { margin-bottom: 10px; font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+.en-tuile-texte { margin-bottom: 24px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.en-tuile-pied { width: 100%; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.en-tuile-prix { font-size: 13px; font-weight: 500; color: var(--ink-muted); }
+.en-tuile-voir { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 14px; font-weight: 600; transition: gap .2s; }
+.en-tuile:hover .en-tuile-voir { gap: 10px; }
+.en-tuile-devis { background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%); border-color: transparent; color: #fff; }
+.en-tuile-devis .en-tuile-titre { color: #fff; }
+.en-tuile-devis .en-tuile-texte { color: rgba(255,255,255,0.75); }
+.en-tuile-devis .en-tuile-icone { background: rgba(255,255,255,0.12); color: #fff; }
+.en-tuile-devis .en-tuile-pied { border-top-color: rgba(255,255,255,0.15); }
+.en-tuile-devis .en-tuile-voir { color: var(--accent-clair); }
+
+/* ============================================================
+   ENTRETIEN — page d'une prestation (/entretien-bateau/<id>)
+   ============================================================ */
+.en-d-hero { max-width: 1280px; margin: 0 auto; padding: 44px 32px 40px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center; }
+.en-retour { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 26px; padding: 6px 13px 6px 9px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 13px; font-weight: 500; color: var(--ink-soft); text-decoration: none; transition: all .15s; }
+.en-retour:hover { color: var(--ink); border-color: var(--accent); }
+.en-d-hero h1 { margin: 10px 0 20px; font-size: clamp(38px, 4.4vw, 60px); text-wrap: balance; }
+.en-d-hero .lead { max-width: 540px; margin-bottom: 30px; }
+.en-d-visuel { position: relative; height: 440px; overflow: hidden; border-radius: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 30px 60px -30px rgba(10,37,64,0.4);
+  background:
+    radial-gradient(circle at 85% 95%, rgba(255,255,255,0.10) 0 130px, transparent 131px),
+    radial-gradient(circle at 85% 95%, rgba(255,255,255,0.06) 0 220px, transparent 221px),
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,0.20) 0%, transparent 45%),
+    linear-gradient(145deg, var(--accent) 0%, var(--navy) 100%); }
+.en-d-visuel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.en-d-icone { position: relative; width: 140px; height: 140px; border-radius: 40px; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.28); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.en-d-prix { position: absolute; left: 20px; bottom: 20px; padding: 16px 20px; border-radius: 18px; background: var(--surface); box-shadow: 0 16px 40px -16px rgba(10,37,64,0.35); }
+.en-d-contenu { padding-top: 70px; }
+.en-d-contenu .en-head { margin-bottom: 28px; }
+.en-d-liste { max-width: 1000px; columns: 2; column-gap: 48px; margin: 0; }
+.en-d-liste li { padding: 12px 0 12px 30px; border-bottom: 1px solid var(--line); font-size: 15px; color: var(--ink); }
+.en-d-liste li svg { top: 14px; }
+.en-d-note { max-width: 1000px; margin-top: 24px; padding: 14px 18px; border-radius: 14px; background: var(--accent-soft); font-size: 14px; color: var(--ink); }
+.en-detail .en-levels-wrap { margin-top: 90px; }
+.en-d-autres { padding-top: 90px; }
+.en-d-autres .en-head { margin-bottom: 26px; }
+.en-d-autres-liste { display: flex; flex-wrap: wrap; gap: 12px; }
+.en-d-autre { display: inline-flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 15px; font-weight: 500; text-decoration: none; transition: all .2s; }
+.en-d-autre .en-tuile-icone { width: 38px; height: 38px; border-radius: 50%; }
+.en-d-autre > svg { color: var(--accent); transition: transform .2s; }
+.en-d-autre:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 12px 28px -14px rgba(var(--accent-rgb), 0.45); }
+.en-d-autre:hover .en-tuile-icone { background: var(--accent); color: #fff; }
+.en-d-autre:hover > svg { transform: translateX(3px); }
+
+@media (max-width: 1024px) {
+  .en-tuiles { grid-template-columns: repeat(2, 1fr); }
+  .en-d-hero { grid-template-columns: 1fr; gap: 36px; }
+  .en-d-visuel { height: 340px; }
+}
+@media (max-width: 760px) {
+  .en-d-liste { columns: 1; }
+}
+@media (max-width: 640px) {
+  .en-tuiles { grid-template-columns: 1fr; gap: 14px; }
+  .en-tuile { min-height: 0; padding: 22px; border-radius: 20px; }
+  .en-tuile-haut { margin-bottom: 16px; }
+  .en-tuile-icone { width: 46px; height: 46px; border-radius: 14px; }
+  .en-tuile-titre { font-size: 23px; }
+  .en-tuile-texte { margin-bottom: 18px; }
+  .en-d-hero { padding: 24px 18px 16px; }
+  .en-retour { margin-bottom: 18px; }
+  .en-d-visuel { height: 250px; border-radius: 22px; }
+  .en-d-icone { width: 100px; height: 100px; border-radius: 30px; }
+  .en-d-icone svg { width: 46px; height: 46px; }
+  .en-d-prix { left: 14px; bottom: 14px; padding: 12px 16px; }
+  .en-d-contenu { padding-top: 48px; }
+  .en-detail .en-levels-wrap { margin-top: 56px; }
+  .en-d-autres { padding-top: 56px; }
+  .en-d-autre { font-size: 14px; }
 }
