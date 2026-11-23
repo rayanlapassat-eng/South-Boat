@@ -28,6 +28,10 @@ RewriteRule ^ https://south-boat.com%{REQUEST_URI} [L,R=301]
 RewriteCond %{HTTP_HOST} ^www\.south-boat\.com$ [NC]
 RewriteRule ^ https://south-boat.com%{REQUEST_URI} [L,R=301]
 
+# 4) Ancienne page supprimée (nov. 2026) : « Gelcoat & chromes » -> Lustrage,
+#    où figure désormais la réparation du gelcoat. Garde le référencement acquis.
+RewriteRule ^entretien-bateau/gelcoat-chromes/?$ https://south-boat.com/entretien-bateau/lustrage [L,R=301]
+
 # ============================================================
 # Performance — Images nouvelle génération (WebP)
 # Si le navigateur accepte le WebP ET qu'un fichier "nom.jpg.webp"

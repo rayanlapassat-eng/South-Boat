@@ -23,26 +23,26 @@ const EN_FAQ = [
   {
     q_fr: "Jusqu'à quelle taille de bateau intervenez-vous ?",
     q_en: "Up to what boat size do you work?",
-    a_fr: "Pour l'entretien extérieur, nous intervenons sur les bateaux jusqu'à ~25 m, et au-delà sur demande. L'entretien intérieur concerne les bateaux de plus de 10 m disposant d'un espace de nuit.",
-    a_en: "For exterior maintenance, we work on boats up to ~25 m, and larger on request. Interior maintenance covers boats over 10 m with sleeping quarters."
+    a_fr: "Pour l'entretien extérieur, nous intervenons sur les bateaux jusqu'à 42 pieds (environ 13 m), et au-delà sur demande. L'entretien intérieur concerne les bateaux de plus de 10 m disposant d'un espace de nuit.",
+    a_en: "For exterior maintenance, we work on boats up to 42 ft (about 13 m), and larger on request. Interior maintenance covers boats over 10 m with sleeping quarters."
   },
   {
     q_fr: "La sortie de l'eau est-elle comprise ?",
     q_en: "Is the haul-out included?",
-    a_fr: "Pour les entretiens extérieurs, la sortie de l'eau et la remise à l'eau du bateau peuvent être comprises dans le devis.",
-    a_en: "For exterior work, hauling the boat out and relaunching it can be included in the quote."
+    a_fr: "Pour certains entretiens extérieurs, la sortie de l'eau et la remise à l'eau peuvent être comprises dans le devis, sur demande.",
+    a_en: "For some exterior work, hauling the boat out and relaunching it can be included in the quote, on request."
   },
   {
     q_fr: "Où se fait le nettoyage intérieur ?",
     q_en: "Where is interior cleaning done?",
-    a_fr: "À quai, directement à bord de votre bateau.",
-    a_en: "At the dock, directly on board your boat."
+    a_fr: "À quai, directement à bord de votre bateau. En carénage, sur demande.",
+    a_en: "At the dock, directly on board your boat. In the boatyard, on request."
   },
   {
     q_fr: "Quels produits utilisez-vous ?",
     q_en: "Which products do you use?",
-    a_fr: "Des produits éco-responsables, choisis en accord avec le milieu marin, auprès de marques partenaires comme RUPES, Nautic Clean ou 3M.",
-    a_en: "Eco-friendly products, chosen to respect the marine environment, from partner brands such as RUPES, Nautic Clean and 3M."
+    a_fr: "Des produits éco-responsables, choisis en accord avec le milieu marin, auprès de nos marques partenaires.",
+    a_en: "Eco-friendly products, chosen to respect the marine environment, from our partner brands."
   },
   {
     q_fr: "Proposez-vous des forfaits d'entretien ?",
@@ -57,6 +57,7 @@ function enDonnees() {
   return {
     prestations: data.prestations || [],
     niveaux: data.niveauxLustrage || [],
+    partenaires: data.partenaires || [],
     forfait: data.forfait || {},
   };
 }
@@ -85,6 +86,20 @@ function EnPrix({ item }) {
 
 const enCourt = (p, t) => t(p.court || p.titre, p.court_en || p.titre_en);
 const enCote = (p, t) => (p.cote === "interieur" ? t("Intérieur", "Interior") : t("Extérieur", "Exterior"));
+// Libellé de bouton : « Entretien intérieur (sur demande) » pour une prestation surDemande.
+const enLibelle = (p, t) => enCourt(p, t) + (p.surDemande ? t(" (sur demande)", " (on request)") : "");
+
+// ---------- Bouton simple d'une prestation « sur demande » (accueil Entretien) ----------
+function EnBoutonSurDemande({ p, setPage }) {
+  const t = window.useT();
+  return (
+    <a className="en-tuile-option" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>
+      <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={18} /></span>
+      <span className="en-tuile-option-texte">{enCourt(p, t)} <em>{t("(sur demande)", "(on request)")}</em></span>
+      <Icon name="arrow" size={15} />
+    </a>
+  );
+}
 
 // ---------- Bouton-tuile d'une prestation (accueil Entretien) ----------
 function EnTuile({ p, num, setPage }) {
@@ -106,7 +121,7 @@ function EnTuile({ p, num, setPage }) {
   );
 }
 
-// ---------- Les trois niveaux de lustrage ----------
+// ---------- Les niveaux de prestations (lustrage) ----------
 function EnNiveaux({ onDevis }) {
   const t = window.useT();
   const { niveaux } = enDonnees();
@@ -115,21 +130,25 @@ function EnNiveaux({ onDevis }) {
     <section className="en-levels-wrap">
       <div className="en-levels-inner">
         <div className="en-head">
-          <p className="eyebrow">{t("Lustrage & polish", "Polishing")}</p>
-          <h2>{t("Trois niveaux, selon l'état de votre coque.", "Three levels, depending on your hull's condition.")}</h2>
-          <p className="lead">{t("De l'entretien régulier à la rénovation complète : nous vous conseillons le niveau le plus adapté à votre bateau.", "From regular upkeep to full restoration: we advise you on the level best suited to your boat.")}</p>
+          <p className="eyebrow">{t("Les différents niveaux de prestations", "Service levels")}</p>
+          <h2>{t("Du lustrage à la rénovation, selon l'état de votre coque.", "From polishing to restoration, depending on your hull's condition.")}</h2>
+          <p className="lead">{t("Trois niveaux de travail et une protection en option : nous vous conseillons la formule la plus adaptée à votre bateau.", "Three levels of work plus an optional protection: we advise you on the option best suited to your boat.")}</p>
         </div>
         <div className="en-levels">
-          {niveaux.map((n) => (
+          {niveaux.map((n) => {
+            const lignes = (t.lang === "en" && n.lignes_en) || n.lignes || [];
+            return (
             <article className="en-level" key={n.niveau}>
               <div className="en-level-top">
                 <span className="en-level-bars" aria-hidden="true">
-                  {[1, 2, 3].map((k) => <i key={k} className={k <= n.niveau ? "on" : ""} />)}
+                  {niveaux.map((x) => <i key={x.niveau} className={x.niveau <= n.niveau ? "on" : ""} />)}
                 </span>
                 <span className="en-level-tag">{t("Niveau", "Level")} {n.niveau} · {t(n.passes, n.passes_en)}</span>
               </div>
               <h3>{t(n.titre, n.titre_en)}</h3>
-              <p>{t(n.texte, n.texte_en)}</p>
+              <ul className="en-level-lignes">
+                {lignes.map((l, i) => <li key={i}>{l}</li>)}
+              </ul>
               <div className="en-card-foot">
                 <EnPrix item={n} />
                 <button type="button" className="en-link" onClick={() => onDevis("lustrage")}>
@@ -137,7 +156,8 @@ function EnNiveaux({ onDevis }) {
                 </button>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -270,7 +290,7 @@ function useDevis(initial) {
 // =====================================================================
 function EntretienPage({ setPage }) {
   const t = window.useT();
-  const { prestations, forfait } = enDonnees();
+  const { prestations, partenaires, forfait } = enDonnees();
   const devis = useDevis();
   const [openFaq, setOpenFaq] = useState(0);
 
@@ -280,7 +300,7 @@ function EntretienPage({ setPage }) {
     name: "South Boat Entretien — Entretien et nettoyage de bateaux",
     serviceType: "Entretien de bateaux",
     url: "https://south-boat.com/entretien-bateau",
-    description: "Nettoyage extérieur et intérieur, lustrage et polish, traitement antifouling, réfection du gelcoat et des chromes. Bateaux jusqu'à ~25 m, tarifs sur devis, forfaits au mois ou à l'année.",
+    description: "Nettoyage extérieur, lustrage et rénovation du gelcoat, traitement antifouling, nettoyage intérieur sur demande. Bateaux jusqu'à 42 pieds (environ 13 m), tarifs sur devis, forfaits au mois ou à l'année.",
     provider: { "@id": "https://south-boat.com/#business" },
     areaServed: "Mandelieu-la-Napoule, Cannes, Côte d'Azur",
     hasOfferCatalog: {
@@ -294,6 +314,8 @@ function EntretienPage({ setPage }) {
   });
 
   const tarifForfait = enTarif(forfait, t);
+  const tuiles = prestations.filter((p) => !p.surDemande);
+  const surDemande = prestations.filter((p) => p.surDemande);
 
   return (
     <main className="about-v2 entretien">
@@ -308,8 +330,8 @@ function EntretienPage({ setPage }) {
           <p className="eyebrow">{t("South Boat Entretien · Mandelieu", "South Boat Maintenance · Mandelieu")}</p>
           <h1>{t(<>Votre bateau,<br />soigné comme le nôtre.</>, <>Your boat,<br />cared for like our own.</>)}</h1>
           <p className="lead">{t(
-            "Nettoyage extérieur et intérieur, lustrage, antifouling, gelcoat et chromes : nous entretenons votre bateau avec la même exigence que notre propre flotte. Chaque prestation est établie sur devis, selon votre bateau et vos besoins.",
-            "Exterior and interior cleaning, polishing, antifouling, gelcoat and chrome: we look after your boat with the same care as our own fleet. Every service is priced on quote, based on your boat and your needs."
+            "Nettoyage extérieur, lustrage et rénovation du gelcoat, antifouling : nous entretenons votre bateau avec la même exigence que notre propre flotte. Chaque prestation est établie sur devis, selon votre bateau et vos besoins.",
+            "Exterior cleaning, polishing and gelcoat restoration, antifouling: we look after your boat with the same care as our own fleet. Every service is priced on quote, based on your boat and your needs."
           )}</p>
           <div className="ab-hero-cta">
             <button className="btn btn-primary" onClick={() => defilerVersAncre("prestations")}>{t("Voir les prestations", "See our services")}</button>
@@ -334,25 +356,21 @@ function EntretienPage({ setPage }) {
               loading="lazy" decoding="async" />
           </div>
           <div className="ab-badge en-badge">
-            <strong>{t("Entretien extérieur", "Exterior care")}</strong>
-            <span>{t("plus sur demande", "larger on request")}</span>
+            <strong>{t("À quai ou en carénage", "At the dock or ashore")}</strong>
+            <span>{t("selon les prestations", "depending on the service")}</span>
           </div>
         </div>
       </section>
 
-      {/* INFOS CLÉS */}
+      {/* INFOS CLÉS (sans tailles de bateaux, à la demande du client) */}
       <section className="en-facts" aria-label={t("À savoir", "Good to know")}>
         <div className="en-fact">
-          <strong>~25 m</strong>
-          <span>{t("Entretien extérieur des bateaux jusqu'à ~25 m, plus sur demande.", "Exterior maintenance for boats up to ~25 m, larger on request.")}</span>
-        </div>
-        <div className="en-fact">
-          <strong>{t("10 m et +", "10 m +")}</strong>
-          <span>{t("Entretien intérieur des bateaux avec espace de nuit, à quai.", "Interior maintenance for boats with sleeping quarters, at the dock.")}</span>
+          <strong>{t("Sur devis", "On quote")}</strong>
+          <span>{t("Chaque tarif est établi selon votre bateau, son état et les prestations choisies.", "Each price is set according to your boat, its condition and the services chosen.")}</span>
         </div>
         <div className="en-fact">
           <strong>{t("Mise à l'eau", "Haul-out")}</strong>
-          <span>{t("Sortie et remise à l'eau possibles, comprises dans le devis extérieur.", "Haul-out and relaunch available, included in the exterior quote.")}</span>
+          <span>{t("Sortie de l'eau et remise à l'eau possibles sur demande.", "Haul-out and relaunch available on request.")}</span>
         </div>
         <div className="en-fact">
           <strong>{t("Éco-responsable", "Eco-friendly")}</strong>
@@ -368,7 +386,17 @@ function EntretienPage({ setPage }) {
           <p className="lead">{t("Choisissez une prestation pour en découvrir le détail. Elles se combinent à la carte, selon l'état de votre bateau et l'usage que vous en faites.", "Pick a service to see the details. They can be combined à la carte, depending on your boat's condition and how you use it.")}</p>
         </div>
         <div className="en-tuiles">
-          {prestations.map((p, i) => <EnTuile key={p.id} p={p} num={i + 1} setPage={setPage} />)}
+          {/* Les prestations « surDemande » (entretien intérieur) n'ont pas de
+              grande carte : un simple bouton à la suite de l'entretien extérieur. */}
+          {tuiles.map((p, i) => (
+            p.id === "nettoyage-exterieur" && surDemande.length ? (
+              <div key={p.id} className="en-tuile-groupe">
+                <EnTuile p={p} num={i + 1} setPage={setPage} />
+                {surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} />)}
+              </div>
+            ) : <EnTuile key={p.id} p={p} num={i + 1} setPage={setPage} />
+          ))}
+          {!tuiles.some((p) => p.id === "nettoyage-exterieur") && surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} />)}
           <button type="button" className="en-tuile en-tuile-devis" onClick={() => devis.allerAuDevis()}>
             <span className="en-tuile-haut">
               <span className="en-tuile-icone"><Icon name="mail" size={24} /></span>
@@ -411,7 +439,7 @@ function EntretienPage({ setPage }) {
           <div className="ab-step">
             <span className="ab-year">01</span>
             <h3>{t("Votre demande", "Your request")}</h3>
-            <p>{t("Décrivez votre bateau et les prestations souhaitées, via le formulaire, par téléphone ou sur WhatsApp. Quelques photos nous aident à bien évaluer.", "Describe your boat and the services you need, via the form, by phone or on WhatsApp. A few photos help us assess it properly.")}</p>
+            <p>{t("Décrivez-nous votre bateau et les prestations souhaitées via notre formulaire, par téléphone ou sur WhatsApp. Quelques photos et un rendez-vous sur place nous permettront d'évaluer précisément l'état du bateau et vos besoins.", "Tell us about your boat and the services you need via our form, by phone or on WhatsApp. A few photos and an on-site visit let us accurately assess the boat's condition and your needs.")}</p>
           </div>
           <div className="ab-step">
             <span className="ab-year">02</span>
@@ -421,19 +449,20 @@ function EntretienPage({ setPage }) {
           <div className="ab-step">
             <span className="ab-year">03</span>
             <h3>{t("L'intervention", "The work")}</h3>
-            <p>{t("À quai pour l'intérieur. Pour l'extérieur, la sortie et la remise à l'eau du bateau peuvent être comprises dans le devis.", "At the dock for interiors. For exterior work, hauling out and relaunching the boat can be included in the quote.")}</p>
+            <p>{t("L'intervention peut se faire à quai ou en carénage, selon les prestations demandées.", "The work can be done at the dock or in the boatyard, depending on the services requested.")}</p>
           </div>
           <div className="ab-step">
             <span className="ab-year">04</span>
             <h3>{t("Le bateau prêt à naviguer", "Ready to sail")}</h3>
-            <p>{t("Chaque prestation est contrôlée avant de vous rendre un bateau propre, protégé et prêt pour vos prochaines sorties.", "Every job is checked before we hand back a clean, protected boat, ready for your next outings.")}</p>
+            <p>{t("Chaque prestation est contrôlée avant de vous rendre le bateau, protégé et prêt pour vos prochaines sorties.", "Every job is checked before we hand the boat back to you, protected and ready for your next outings.")}</p>
           </div>
         </div>
       </section>
 
       {/* PRODUITS & PARTENAIRES */}
-      <section className="en-section en-eco">
-        <div>
+      {/* Logos et noms : liste dans entretien-prestations.js (« partenaires »). */}
+      <section className="en-section en-partenaires">
+        <div className="en-head">
           <p className="eyebrow">{t("Produits & partenaires", "Products & partners")}</p>
           <h2>{t("Des produits professionnels, respectueux de la mer.", "Professional products that respect the sea.")}</h2>
           <p className="lead">{t(
@@ -441,15 +470,22 @@ function EntretienPage({ setPage }) {
             "We work with eco-friendly products, chosen to respect the marine environment, from well-known boating brands."
           )}</p>
         </div>
-        <div className="en-brands">
-          <span className="en-brand-label">{t("Nos marques partenaires", "Our partner brands")}</span>
-          <div className="en-brand-list">
-            <span className="en-brand">RUPES</span>
-            <span className="en-brand">NAUTIC CLEAN</span>
-            <span className="en-brand">3M</span>
-            <span className="en-brand more">{t("et d'autres…", "and more…")}</span>
-          </div>
-        </div>
+        {partenaires.length > 0 && (
+          <ul className="en-partenaires-grille" aria-label={t("Nos marques partenaires", "Our partner brands")}>
+            {partenaires.map((m) => (
+              <li key={m.nom} className="en-partenaire">
+                {/* Sans logo, le nom s'affiche en grand à la place du logo. */}
+                <span className={"en-partenaire-logo" + (m.logo ? "" : " sans-logo")}>
+                  {m.logo
+                    ? <img src={asset(m.logo)} alt="" loading="lazy" decoding="async" />
+                    : <strong>{m.nom}</strong>}
+                </span>
+                {m.logo && <strong className="en-partenaire-nom">{m.nom}</strong>}
+                {m.precision && <span className="en-partenaire-precision">{t(m.precision, m.precision_en || m.precision)}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* FAQ */}
@@ -535,7 +571,10 @@ function EnPrestation({ p, setPage }) {
             <Icon name="arrowL" size={15} /> {t("Toutes les prestations", "All services")}
           </a>
           <p className="eyebrow">{t("Prestation", "Service")} {String(index + 1).padStart(2, "0")} · {enCote(p, t)}</p>
-          <h1>{t(p.titre, p.titre_en)}</h1>
+          <h1>
+            {t(p.titre, p.titre_en)}
+            {p.surDemande && <span className="en-sur-demande">{t("Sur demande", "On request")}</span>}
+          </h1>
           <p className="lead">{t(p.intro, p.intro_en)}</p>
           <div className="ab-hero-cta">
             <button className="btn btn-primary" onClick={() => devis.allerAuDevis(p.id)}>{t("Demander un devis", "Request a quote")}</button>
@@ -579,7 +618,7 @@ function EnPrestation({ p, setPage }) {
           {autres.map((x) => (
             <a key={x.id} className="en-d-autre" {...lienInterne({ name: "entretien-prestation", id: x.id }, setPage)}>
               <span className="en-tuile-icone"><Icon name={x.icone || "sparkle"} size={20} /></span>
-              <span>{enCourt(x, t)}</span>
+              <span>{enLibelle(x, t)}</span>
               <Icon name="arrow" size={15} />
             </a>
           ))}

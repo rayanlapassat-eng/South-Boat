@@ -24,12 +24,16 @@
    - photo   : null (visuel coloré) ou le chemin d'une photo, par exemple
                photo: "images/entretien/antifouling.jpg",
                (prévoir aussi la version « -800.jpg » à côté, cf. DEPLOIEMENT.md)
+   - surDemande : true -> la prestation n'a pas de grande carte sur la page
+               Entretien : simple bouton « … (sur demande) » à la suite de
+               l'entretien extérieur, et mention « Sur demande » à côté du
+               titre de sa page.
    ============================================================ */
 
 var ENTRETIEN = {
 
   // ---------- Prestations (cartes de la section « Nos prestations ») ----------
-  // cote : "exterieur" ou "interieur" (le groupe où la carte apparaît)
+  // cote : "exterieur" ou "interieur"
   prestations: [
     {
       id: "nettoyage-exterieur",
@@ -42,33 +46,30 @@ var ENTRETIEN = {
       titre_en: "Exterior care & cleaning",
       intro: "Pont, coque, selleries : tout ce qui reste exposé au sel et au soleil, remis au propre après vos sorties.",
       intro_en: "Deck, hull, upholstery: everything exposed to salt and sun, cleaned up after your outings.",
+      // Ordre : nettoyage général, surfaces et équipements, traces de sel, rinçage.
       points: [
         "Nettoyage complet du pont, du fly bridge et des espaces détente.",
         "Nettoyage des passavants.",
         "Nettoyage des francs-bords.",
-        "Nettoyage des coques au-dessus de la ligne de flottaison.",
         "Nettoyage des coffres extérieurs.",
-        "Nettoyage des sièges et banquettes.",
         "Nettoyage des selleries extérieures.",
         "Nettoyage des pare-battages.",
-        "Nettoyage des tauds et protections.",
-        "Rinçage à l'eau douce après utilisation.",
+        "Nettoyage tauds et protections.",
+        "Nettoyage des inox et chromes.",
         "Élimination des traces de sel.",
-        "Nettoyage des inox et chromes."
+        "Rinçage à l'eau douce après intervention."
       ],
       points_en: [
         "Full cleaning of the deck, flybridge and lounge areas.",
         "Cleaning of the side decks.",
         "Cleaning of the topsides.",
-        "Hull cleaning above the waterline.",
         "Cleaning of exterior lockers.",
-        "Cleaning of seats and benches.",
         "Cleaning of exterior upholstery.",
         "Cleaning of fenders.",
         "Cleaning of covers and canvas.",
-        "Fresh-water rinse after use.",
+        "Cleaning of stainless steel and chrome.",
         "Salt residue removal.",
-        "Cleaning of stainless steel and chrome."
+        "Fresh-water rinse after the work."
       ],
       aPartirDe: null,
       unite: ""
@@ -82,31 +83,31 @@ var ENTRETIEN = {
       cote: "exterieur",
       titre: "Lustrage & rénovation esthétique",
       titre_en: "Polishing & cosmetic restoration",
-      intro: "Pour redonner de l'éclat à la coque et aux surfaces extérieures. Trois niveaux au choix, selon l'état de votre coque.",
-      intro_en: "To bring the shine back to the hull and exterior surfaces. Three levels to choose from, depending on your hull's condition.",
+      intro: "Pour redonner de l'éclat à la coque et aux surfaces extérieures. Trois niveaux au choix selon l'état de votre coque, et une protection en option.",
+      intro_en: "To bring the shine back to the hull and exterior surfaces. Three levels to choose from depending on your hull's condition, plus an optional protection.",
       points: [
         "Décontamination des surfaces.",
         "Nettoyage approfondi du gelcoat.",
-        "Suppression des traces d'oxydation.",
-        "Polissage du gelcoat.",
-        "Lustrage de la coque.",
+        "Suppression des rayures superficielles.",
+        "Réparation du gelcoat (impacts superficiels).",
         "Rénovation des surfaces ternies.",
-        "Suppression des micro-rayures superficielles.",
         "Rénovation des surfaces en polyester.",
+        "Polissage du gelcoat.",
+        "Lustrage du gelcoat.",
         "Traitement des inox.",
-        "Protection des surfaces après polissage."
+        "Protection des surfaces (céramique / Wax)."
       ],
       points_en: [
         "Surface decontamination.",
         "Deep gelcoat cleaning.",
-        "Oxidation removal.",
-        "Gelcoat polishing.",
-        "Hull buffing.",
+        "Removal of light surface scratches.",
+        "Gelcoat repair (minor surface impacts).",
         "Restoration of dull surfaces.",
-        "Removal of light micro-scratches.",
         "Restoration of polyester surfaces.",
+        "Gelcoat polishing.",
+        "Gelcoat buffing.",
         "Stainless steel treatment.",
-        "Surface protection after polishing."
+        "Surface protection (ceramic / wax)."
       ],
       aPartirDe: null,
       unite: ""
@@ -123,51 +124,25 @@ var ENTRETIEN = {
       intro: "Ponçage et peinture de la carène pour la protéger des salissures marines.",
       intro_en: "Sanding and painting of the hull bottom to protect it from marine fouling.",
       points: [
-        "Nettoyage de la coque avant traitement.",
+        "Nettoyage de la coque avec traitement, incluant le nettoyage des zones immergées.",
         "Élimination des anciennes salissures.",
-        "Préparation du support.",
-        "Ponçage léger si nécessaire et autorisé.",
-        "Application d'antifouling.",
-        "Application de produits adaptés au type de coque.",
-        "Nettoyage des zones immergées.",
-        "Entretien périodique de la carène lorsque le bateau est accessible."
+        "Protection et masquage du bateau.",
+        "Ponçage si nécessaire et autorisé.",
+        "Préparation du support si nécessaire.",
+        "Application de l'antifouling selon la nature de la coque.",
+        "Entretien périodique."
       ],
       points_en: [
-        "Hull cleaning before treatment.",
+        "Hull cleaning with treatment, including the submerged areas.",
         "Removal of old fouling.",
-        "Surface preparation.",
-        "Light sanding where needed and permitted.",
-        "Antifouling application.",
-        "Products suited to your hull type.",
-        "Cleaning of submerged areas.",
-        "Periodic hull-bottom maintenance when the boat is accessible."
+        "Protection and masking of the boat.",
+        "Sanding where needed and permitted.",
+        "Surface preparation where needed.",
+        "Antifouling application suited to the hull type.",
+        "Periodic maintenance."
       ],
-      note: "Sortie de l'eau et remise à l'eau possibles, comprises dans le devis.",
-      note_en: "Haul-out and relaunch available, included in the quote.",
-      aPartirDe: null,
-      unite: ""
-    },
-    {
-      id: "gelcoat-chromes",
-      court: "Gelcoat & chromes",
-      court_en: "Gelcoat & chrome",
-      icone: "outil",
-      photo: null,
-      cote: "exterieur",
-      titre: "Gelcoat & chromes",
-      titre_en: "Gelcoat & chrome",
-      intro: "Les petits dégâts qui ternissent l'allure d'un bateau : nous les réparons pour lui rendre un aspect soigné.",
-      intro_en: "The small damage that spoils a boat's looks: we repair it to restore a neat finish.",
-      points: [
-        "Réfection des éclats de gelcoat.",
-        "Réparation des trous et impacts.",
-        "Réfection de l'ensemble des chromes."
-      ],
-      points_en: [
-        "Gelcoat chip repair.",
-        "Repair of holes and impacts.",
-        "Restoration of all chrome fittings."
-      ],
+      note: "Sortie de l'eau et remise à l'eau possibles sur demande.",
+      note_en: "Haul-out and relaunch available on request.",
       aPartirDe: null,
       unite: ""
     },
@@ -178,6 +153,7 @@ var ENTRETIEN = {
       icone: "cabine",
       photo: null,
       cote: "interieur",
+      surDemande: true,
       titre: "Entretien & nettoyage intérieur",
       titre_en: "Interior care & cleaning",
       intro: "Un intérieur net et frais pour profiter pleinement de la vie à bord.",
@@ -194,48 +170,98 @@ var ENTRETIEN = {
         "Cleaning of storage and lockers.",
         "Full vacuuming of the boat."
       ],
-      note: "Pour les bateaux de plus de 10 m avec espace de nuit. Intervention à quai.",
-      note_en: "For boats over 10 m with sleeping quarters. Done at the dock.",
+      note: "Pour les bateaux de plus de 10 m avec espace de nuit. Intervention à quai, ou en carénage sur demande.",
+      note_en: "For boats over 10 m with sleeping quarters. Done at the dock, or in the boatyard on request.",
       aPartirDe: null,
       unite: ""
     }
   ],
 
-  // ---------- Les trois niveaux de lustrage ----------
+  // ---------- Les niveaux de prestations (page Lustrage) ----------
+  // lignes : une ligne par phrase affichée sur la carte du niveau.
   niveauxLustrage: [
     {
       niveau: 1,
-      titre: "Lustrage simple",
-      titre_en: "Simple polish",
+      titre: "Lustrage",
+      titre_en: "Polish",
       passes: "1 passe",
       passes_en: "1 pass",
-      texte: "Pour raviver l'éclat d'une coque déjà en bon état.",
-      texte_en: "To revive the shine of a hull already in good condition.",
+      lignes: [
+        "Forfait lustrage.",
+        "Objectif : raviver l'état et l'éclat de la coque."
+      ],
+      lignes_en: [
+        "Polishing package.",
+        "Goal: revive the condition and shine of the hull."
+      ],
       aPartirDe: null,
       unite: ""
     },
     {
       niveau: 2,
-      titre: "Polissage et rénovation",
-      titre_en: "Polishing & restoration",
+      titre: "Polissage et lustrage",
+      titre_en: "Polishing & buffing",
       passes: "2 passes",
       passes_en: "2 passes",
-      texte: "Pour un gelcoat terni ou oxydé : on retire l'oxydation et les micro-rayures avant de lustrer.",
-      texte_en: "For dull or oxidised gelcoat: oxidation and micro-scratches are removed before buffing.",
+      lignes: [
+        "Polissage suivi d'un lustrage.",
+        "Prestation adaptée selon l'état de la coque."
+      ],
+      lignes_en: [
+        "Polishing followed by buffing.",
+        "Tailored to the condition of the hull."
+      ],
       aPartirDe: null,
       unite: ""
     },
     {
       niveau: 3,
-      titre: "Polissage complet + protection céramique",
-      titre_en: "Full polish + ceramic coating",
+      titre: "Rénovation",
+      titre_en: "Restoration",
       passes: "3 passes",
       passes_en: "3 passes",
-      texte: "La rénovation la plus complète, scellée par une protection céramique.",
-      texte_en: "The most complete restoration, sealed with a ceramic coating.",
+      lignes: [
+        "Rénovation comprenant polissage et lustrage.",
+        "Travail adapté selon l'état de la coque.",
+        "Rénovation par ponçage, polissage mécanique et lustrage de finition pour un éclat optimal."
+      ],
+      lignes_en: [
+        "Restoration including polishing and buffing.",
+        "Work tailored to the condition of the hull.",
+        "Restoration by sanding, machine polishing and finishing buff for optimal shine."
+      ],
+      aPartirDe: null,
+      unite: ""
+    },
+    {
+      niveau: 4,
+      titre: "Protection",
+      titre_en: "Protection",
+      passes: "En option",
+      passes_en: "Optional",
+      lignes: [
+        "Option de protection des surfaces avec application d'une protection céramique ou Wax."
+      ],
+      lignes_en: [
+        "Optional surface protection with a ceramic coating or wax."
+      ],
       aPartirDe: null,
       unite: ""
     }
+  ],
+
+  // ---------- Produits & partenaires (logos + noms) ----------
+  // logo : null (le nom s'affiche en toutes lettres à la place) ou le chemin
+  //        du logo, par exemple  logo: "images/partenaires/hempel.png",
+  //        (PNG ou SVG sur fond transparent, ~300 px de large suffisent).
+  // precision : petite mention sous le nom (« Antifouling »), ou "".
+  partenaires: [
+    { nom: "Rupes Marine", precision: "", precision_en: "", logo: null },
+    { nom: "International", precision: "Antifouling", precision_en: "Antifouling", logo: null },
+    { nom: "3M", precision: "", precision_en: "", logo: null },
+    { nom: "Nautic Clean", precision: "", precision_en: "", logo: null },
+    { nom: "Hempel", precision: "Antifouling", precision_en: "Antifouling", logo: null },
+    { nom: "Revival Marine Care", precision: "", precision_en: "", logo: null }
   ],
 
   // ---------- Forfaits d'entretien au mois ou à l'année ----------

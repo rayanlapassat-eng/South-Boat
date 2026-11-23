@@ -119,7 +119,7 @@ function App() {
       desc  = "Calendrier des feux d'artifice 2026 sur la Côte d'Azur. Réservez un bateau pour les vivre depuis la baie, loin de la foule.";
     } else if (page.name === "entretien" || page.name === "entretien-prestation") {
       title = "South Boat Entretien — Entretien et nettoyage de bateaux à Mandelieu";
-      desc  = "Nettoyage extérieur et intérieur, lustrage et polish, antifouling, gelcoat et chromes : South Boat Entretien prend soin de votre bateau jusqu'à ~25 m. Tarifs sur devis, forfaits au mois ou à l'année.";
+      desc  = "Nettoyage extérieur, lustrage et rénovation du gelcoat, antifouling : South Boat Entretien prend soin de votre bateau jusqu'à 42 pieds (environ 13 m). Tarifs sur devis, forfaits au mois ou à l'année.";
       const p = page.name === "entretien-prestation"
         && ((window.ENTRETIEN && window.ENTRETIEN.prestations) || []).find((x) => x.id === page.id);
       if (p) {

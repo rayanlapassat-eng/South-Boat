@@ -33,7 +33,7 @@ function PortailPage({ setPage }) {
       id: "entretien",
       page: { name: "entretien" },
       icone: "brillance",
-      nom: t("Entretien", "Maintenance"),
+      nom: t("Services", "Services"),
       resume: t("Nettoyage, lustrage, antifouling", "Cleaning, polishing, antifouling"),
       accroche: t(
         "Nettoyage, lustrage, antifouling, gelcoat : nous prenons soin de votre bateau, à quai ou au sec.",
@@ -93,8 +93,10 @@ function PortailPage({ setPage }) {
         <div className="portail-logo logo">
           <Logo taille={30} />
         </div>
-        <h1 className="portail-titre">
-          {t(<>Location &amp; entretien de bateaux<br />à Mandelieu-la-Napoule</>, <>Boat rental &amp; maintenance<br />in Mandelieu-la-Napoule</>)}
+        {/* Titre retiré de l'affichage à la demande du client, mais conservé
+            pour Google et les lecteurs d'écran (seul h1 de la page). */}
+        <h1 className="sr-only">
+          {t("South Boat : location et entretien de bateaux à Mandelieu-la-Napoule", "South Boat: boat rental and maintenance in Mandelieu-la-Napoule")}
         </h1>
         <p className="portail-sous">{t("Côte d'Azur · Choisissez votre univers", "French Riviera · Choose your world")}</p>
 
