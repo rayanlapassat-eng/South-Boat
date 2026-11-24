@@ -1,6 +1,6 @@
 /* ============================================================
    ENTRETIEN — PRESTATIONS ET TARIFS
-   (univers « South Boat Entretien » : https://south-boat.com/entretien-bateau)
+   (univers « South Boat Services » : https://south-boat.com/entretien-bateau)
    ============================================================
    Fichier texte simple, comme articles.js : après modification,
    re-téléverser CE SEUL fichier. Aucune compilation nécessaire.
@@ -10,22 +10,29 @@
    par le montant, par exemple           aPartirDe: 150,
    et, si besoin, préciser l'unité       unite: "€ / m",
    (sans unité, le site affiche « € »).
-   -> la carte affiche « À partir de 150 € / m » au lieu de « Sur devis ».
-   Remettre  null  pour revenir à « Sur devis ».
+   -> la carte affiche « À partir de 150 € / m » au-dessus du bouton « Devis ».
+   Remettre  null  pour ne plus afficher de prix (la page de la prestation
+   indique alors « Sur devis »).
 
    Les textes existent en français et en anglais (champs « _en »).
 
    CHAQUE PRESTATION A SA PROPRE PAGE :
    https://south-boat.com/entretien-bateau/<id>   (ex. /entretien-bateau/antifouling)
    Ne pas modifier les « id » : ils servent d'adresse aux pages (Google).
-   - court   : libellé du bouton sur la page Entretien (« Entretien extérieur »)
+   - court   : libellé de la carte sur la page Services (« Entretien extérieur »)
    - titre   : titre complet, affiché en haut de la page de la prestation
    - icone   : goutte, brillance, carene, outil, cabine
-   - photo   : null (visuel coloré) ou le chemin d'une photo, par exemple
+   - photo   : null (icône) ou le chemin d'une photo, par exemple
                photo: "images/entretien/antifouling.jpg",
-               (prévoir aussi la version « -800.jpg » à côté, cf. DEPLOIEMENT.md)
+               -> la photo remplace l'icône sur la carte de la page Services
+               et en haut de la page de la prestation.
+               Prévoir aussi les versions « -400.jpg » et « -800.jpg » à côté
+               (cf. DEPLOIEMENT.md, « Les tailles multiples des photos »).
+   - photoAvant : null, ou la photo AVANT intervention. Avec « photo » (la
+               photo APRÈS), les deux s'affichent côte à côte, étiquetées
+               « Avant » / « Après ». Mêmes tailles -400 / -800 à prévoir.
    - surDemande : true -> la prestation n'a pas de grande carte sur la page
-               Entretien : simple bouton « … (sur demande) » à la suite de
+               Services : simple bouton « … (sur demande) » à la suite de
                l'entretien extérieur, et mention « Sur demande » à côté du
                titre de sa page.
    ============================================================ */
@@ -41,6 +48,7 @@ var ENTRETIEN = {
       court_en: "Exterior care",
       icone: "goutte",
       photo: null,
+      photoAvant: null,
       cote: "exterieur",
       titre: "Entretien & nettoyage extérieur",
       titre_en: "Exterior care & cleaning",
@@ -80,6 +88,7 @@ var ENTRETIEN = {
       court_en: "Polishing",
       icone: "brillance",
       photo: null,
+      photoAvant: null,
       cote: "exterieur",
       titre: "Lustrage & rénovation esthétique",
       titre_en: "Polishing & cosmetic restoration",
@@ -118,6 +127,7 @@ var ENTRETIEN = {
       court_en: "Antifouling",
       icone: "carene",
       photo: null,
+      photoAvant: null,
       cote: "exterieur",
       titre: "Traitement antifouling",
       titre_en: "Antifouling treatment",
@@ -152,6 +162,7 @@ var ENTRETIEN = {
       court_en: "Interior care",
       icone: "cabine",
       photo: null,
+      photoAvant: null,
       cote: "interieur",
       surDemande: true,
       titre: "Entretien & nettoyage intérieur",

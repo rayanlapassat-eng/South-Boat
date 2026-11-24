@@ -89,35 +89,104 @@ const enCote = (p, t) => (p.cote === "interieur" ? t("Intérieur", "Interior") :
 // Libellé de bouton : « Entretien intérieur (sur demande) » pour une prestation surDemande.
 const enLibelle = (p, t) => enCourt(p, t) + (p.surDemande ? t(" (sur demande)", " (on request)") : "");
 
-// ---------- Bouton simple d'une prestation « sur demande » (accueil Entretien) ----------
-function EnBoutonSurDemande({ p, setPage }) {
+// ---------- Bouton « Devis » d'une prestation (accueil Services) ----------
+// Coche la prestation dans le formulaire de devis puis y fait défiler la page,
+// sans passer par la page de détail.
+function EnBoutonDevis({ p, onDevis }) {
   const t = window.useT();
+  const nom = enCourt(p, t);
   return (
-    <a className="en-tuile-option" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>
-      <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={18} /></span>
-      <span className="en-tuile-option-texte">{enCourt(p, t)} <em>{t("(sur demande)", "(on request)")}</em></span>
-      <Icon name="arrow" size={15} />
-    </a>
+    <button
+      type="button"
+      className="en-btn-devis"
+      onClick={() => onDevis(p.id)}
+      aria-label={t("Demander un devis : " + nom, "Request a quote: " + nom)}>
+      {t("Devis", "Quote")}
+    </button>
   );
 }
 
-// ---------- Bouton-tuile d'une prestation (accueil Entretien) ----------
-function EnTuile({ p, num, setPage }) {
+// Les cartes ne sont plus des <a> d'un seul bloc : un lien ne peut pas contenir
+// de bouton. Le lien (sur le titre) couvre toute la carte via .en-tuile-lien::after,
+// et le bouton « Devis » passe au-dessus.
+
+// ---------- Bouton simple d'une prestation « sur demande » (accueil Services) ----------
+function EnBoutonSurDemande({ p, setPage, onDevis }) {
+  const t = window.useT();
+  return (
+    <div className="en-tuile-option">
+      <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={18} /></span>
+      <a className="en-tuile-option-texte en-tuile-lien" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>
+        {enCourt(p, t)} <em>{t("(sur demande)", "(on request)")}</em>
+      </a>
+      <EnBoutonDevis p={p} onDevis={onDevis} />
+    </div>
+  );
+}
+
+// ---------- Photo(s) d'une prestation : une seule, ou avant / après ----------
+// Réglées dans entretien-prestations.js : `photo` seule = une photo ;
+// `photoAvant` + `photo` = deux photos côte à côte, étiquetées Avant / Après.
+// Sans `photo`, rien ne s'affiche (la carte et la page gardent l'icône).
+// taille : "carte" (page Services) ou "page" (haut de la page de la prestation).
+function EnPhotos({ p, taille, alt, priorite }) {
+  const t = window.useT();
+  if (!p.photo) return null;
+  const page = taille === "page";
+  const chargement = priorite ? { fetchpriority: "high" } : { loading: "lazy" };
+  const image = (chemin, texteAlt, moitie) => {
+    const vignettes = window.srcSetVignette(asset(chemin));
+    // Grande photo seule en haut de page : 800 px + originale. Sinon 400 / 800 px.
+    const srcs = !vignettes ? { src: asset(chemin) }
+      : page && !moitie ? { src: asset(chemin), srcSet: asset(window.photoTaille(chemin, 800)) + " 800w, " + asset(chemin) + " 1600w" }
+      : { src: asset(window.photoTaille(chemin, 800)), srcSet: vignettes };
+    const sizes = page
+      ? (moitie ? "(max-width: 1024px) 45vw, 23vw" : "(max-width: 1024px) 90vw, 45vw")
+      : (moitie ? "(max-width: 700px) 45vw, (max-width: 1100px) 23vw, 13vw" : "(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 25vw");
+    return <img {...srcs} sizes={sizes} alt={texteAlt} decoding="async" {...chargement} />;
+  };
+  if (!p.photoAvant) return image(p.photo, alt, false);
+  return (
+    <span className="en-avant-apres">
+      <span className="en-aa-moitie">
+        {image(p.photoAvant, alt + t(" — avant", " — before"), true)}
+        <span className="en-aa-tag">{t("Avant", "Before")}</span>
+      </span>
+      <span className="en-aa-moitie">
+        {image(p.photo, alt + t(" — après", " — after"), true)}
+        <span className="en-aa-tag">{t("Après", "After")}</span>
+      </span>
+    </span>
+  );
+}
+
+// ---------- Carte d'une prestation (accueil Services) ----------
+// Avec une photo renseignée, la photo remplace l'icône en haut de la carte.
+function EnTuile({ p, num, setPage, onDevis }) {
   const t = window.useT();
   const tarif = enTarif(p, t);
   return (
-    <a className="en-tuile" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>
+    <article className="en-tuile">
+      {p.photo && (
+        <span className="en-tuile-photo">
+          <EnPhotos p={p} taille="carte" alt={t(p.titre, p.titre_en) + " — South Boat Services, Mandelieu"} />
+        </span>
+      )}
       <span className="en-tuile-haut">
-        <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={24} /></span>
+        {!p.photo && <span className="en-tuile-icone"><Icon name={p.icone || "sparkle"} size={24} /></span>}
         <span className="en-num">{String(num).padStart(2, "0")} · {enCote(p, t)}</span>
       </span>
-      <strong className="en-tuile-titre">{enCourt(p, t)}</strong>
+      <h3 className="en-tuile-titre">
+        <a className="en-tuile-lien" {...lienInterne({ name: "entretien-prestation", id: p.id }, setPage)}>{enCourt(p, t)}</a>
+      </h3>
       <span className="en-tuile-texte">{t(p.intro, p.intro_en)}</span>
+      {/* Sans montant renseigné, pas de « Sur devis » : le bouton Devis le dit déjà. */}
+      {tarif && <span className="en-tuile-prix">{tarif}</span>}
       <span className="en-tuile-pied">
-        <span className="en-tuile-prix">{tarif || t("Sur devis", "On quote")}</span>
-        <span className="en-tuile-voir">{t("Voir le détail", "See details")}<Icon name="arrow" size={15} /></span>
+        <EnBoutonDevis p={p} onDevis={onDevis} />
+        <span className="en-tuile-voir" aria-hidden="true">{t("Voir le détail", "See details")}<Icon name="arrow" size={15} /></span>
       </span>
-    </a>
+    </article>
   );
 }
 
@@ -297,7 +366,7 @@ function EntretienPage({ setPage }) {
   window.useJsonLd("ld-service-entretien", {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: "South Boat Entretien — Entretien et nettoyage de bateaux",
+    name: "South Boat Services — Entretien et nettoyage de bateaux",
     serviceType: "Entretien de bateaux",
     url: "https://south-boat.com/entretien-bateau",
     description: "Nettoyage extérieur, lustrage et rénovation du gelcoat, traitement antifouling, nettoyage intérieur sur demande. Bateaux jusqu'à 42 pieds (environ 13 m), tarifs sur devis, forfaits au mois ou à l'année.",
@@ -321,13 +390,13 @@ function EntretienPage({ setPage }) {
     <main className="about-v2 entretien">
       <Breadcrumb setPage={setPage} trail={[
         { label: "South Boat", page: { name: "accueil" } },
-        { label: t("Entretien", "Maintenance") },
+        { label: t("Services", "Services") },
       ]} />
 
       {/* HERO */}
       <section className="ab-hero en-hero">
         <div className="ab-hero-text">
-          <p className="eyebrow">{t("South Boat Entretien · Mandelieu", "South Boat Maintenance · Mandelieu")}</p>
+          <p className="eyebrow">{t("South Boat Services · Mandelieu", "South Boat Services · Mandelieu")}</p>
           <h1>{t(<>Votre bateau,<br />soigné comme le nôtre.</>, <>Your boat,<br />cared for like our own.</>)}</h1>
           <p className="lead">{t(
             "Nettoyage extérieur, lustrage et rénovation du gelcoat, antifouling : nous entretenons votre bateau avec la même exigence que notre propre flotte. Chaque prestation est établie sur devis, selon votre bateau et vos besoins.",
@@ -391,12 +460,12 @@ function EntretienPage({ setPage }) {
           {tuiles.map((p, i) => (
             p.id === "nettoyage-exterieur" && surDemande.length ? (
               <div key={p.id} className="en-tuile-groupe">
-                <EnTuile p={p} num={i + 1} setPage={setPage} />
-                {surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} />)}
+                <EnTuile p={p} num={i + 1} setPage={setPage} onDevis={devis.allerAuDevis} />
+                {surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} onDevis={devis.allerAuDevis} />)}
               </div>
-            ) : <EnTuile key={p.id} p={p} num={i + 1} setPage={setPage} />
+            ) : <EnTuile key={p.id} p={p} num={i + 1} setPage={setPage} onDevis={devis.allerAuDevis} />
           ))}
-          {!tuiles.some((p) => p.id === "nettoyage-exterieur") && surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} />)}
+          {!tuiles.some((p) => p.id === "nettoyage-exterieur") && surDemande.map((x) => <EnBoutonSurDemande key={x.id} p={x} setPage={setPage} onDevis={devis.allerAuDevis} />)}
           <button type="button" className="en-tuile en-tuile-devis" onClick={() => devis.allerAuDevis()}>
             <span className="en-tuile-haut">
               <span className="en-tuile-icone"><Icon name="mail" size={24} /></span>
@@ -554,14 +623,14 @@ function EnPrestation({ p, setPage }) {
     url: "https://south-boat.com/entretien-bateau/" + p.id,
     provider: { "@id": "https://south-boat.com/#business" },
     areaServed: "Mandelieu-la-Napoule, Cannes, Côte d'Azur",
-    brand: { "@type": "Brand", name: "South Boat Entretien" },
+    brand: { "@type": "Brand", name: "South Boat Services" },
   });
 
   return (
     <main className="about-v2 entretien en-detail">
       <Breadcrumb setPage={setPage} trail={[
         { label: "South Boat", page: { name: "accueil" } },
-        { label: t("Entretien", "Maintenance"), page: { name: "entretien" } },
+        { label: t("Services", "Services"), page: { name: "entretien" } },
         { label: enCourt(p, t) },
       ]} />
 
@@ -583,12 +652,7 @@ function EnPrestation({ p, setPage }) {
         </div>
         <div className={"en-d-visuel" + (p.photo ? " avec-photo" : "")}>
           {p.photo ? (
-            <img
-              src={asset(p.photo)}
-              srcSet={window.srcSetVignette(asset(p.photo)) ? asset(window.photoTaille(p.photo, 800)) + " 800w, " + asset(p.photo) + " 1600w" : undefined}
-              sizes="(max-width: 1024px) 90vw, 45vw"
-              alt={t(p.titre, p.titre_en) + " — South Boat Entretien, Mandelieu"}
-              fetchpriority="high" decoding="async" />
+            <EnPhotos p={p} taille="page" priorite alt={t(p.titre, p.titre_en) + " — South Boat Services, Mandelieu"} />
           ) : (
             <span className="en-d-icone" aria-hidden="true"><Icon name={p.icone || "sparkle"} size={64} /></span>
           )}

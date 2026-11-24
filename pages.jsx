@@ -3098,7 +3098,7 @@ function Footer() {
             <a {...lien({ name: "capsud" })}>Cap Sud</a>
           </div>
           <div className="foot-col-entretien">
-            <h5>South Boat {t("Entretien", "Maintenance")}</h5>
+            <h5>South Boat Services</h5>
             {((window.ENTRETIEN && window.ENTRETIEN.prestations) || []).map((p) =>
               <a key={p.id} {...lien({ name: "entretien-prestation", id: p.id })}>{t(p.court || p.titre, p.court_en || p.titre_en)}</a>
             )}

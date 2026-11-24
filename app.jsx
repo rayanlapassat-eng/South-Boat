@@ -439,7 +439,7 @@ function applyTheme(dark) {
 
 // ============ NAV ============
 // Le logo South Boat (pictogramme voile + nom), avec en dessous le nom de
-// l'univers en cours (« Location » / « Entretien ») dans sa couleur.
+// l'univers en cours (« Location » / « Services ») dans sa couleur.
 function Logo({ univers, taille = 22 }) {
   const t = window.useT();
   return (
@@ -452,7 +452,7 @@ function Logo({ univers, taille = 22 }) {
       <span className="logo-words">
         <span className="logo-text">South Boat<sup>°</sup></span>
         {univers === "location" && <span className="logo-univers">{t("Location", "Rental")}</span>}
-        {univers === "entretien" && <span className="logo-univers">{t("Entretien", "Maintenance")}</span>}
+        {univers === "entretien" && <span className="logo-univers">{t("Services", "Services")}</span>}
       </span>
     </>
   );
@@ -491,7 +491,7 @@ function Nav({ page, setPage, univers }) {
   // Passerelle vers l'autre univers.
   const autre = entretien
     ? { id: "location", page: { name: "home" }, label: t("Location", "Rental"), titre: t("Aller à South Boat Location", "Go to South Boat Rental") }
-    : { id: "entretien", page: { name: "entretien" }, label: t("Entretien", "Maintenance"), titre: t("Aller à South Boat Entretien", "Go to South Boat Maintenance") };
+    : { id: "entretien", page: { name: "entretien" }, label: t("Services", "Services"), titre: t("Aller à South Boat Services", "Go to South Boat Services") };
   const cta = entretien
     ? { page: { name: "entretien", ancre: "devis" }, label: t("Devis", "Quote") }
     : { page: { name: "catalog" }, label: t("Réserver", "Book") };

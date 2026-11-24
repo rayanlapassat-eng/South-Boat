@@ -1416,26 +1416,46 @@ a.nav-link { display: inline-flex; align-items: center; }
 /* Entretien extérieur + bouton « Entretien intérieur (sur demande) » juste dessous */
 .en-tuile-groupe { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .en-tuile-groupe > .en-tuile { flex: 1; }
-.en-tuile-option { display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; line-height: 1.3; text-decoration: none; transition: all .2s; }
+.en-tuile-option { position: relative; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; line-height: 1.3; transition: all .2s; }
 .en-tuile-option .en-tuile-icone { width: 36px; height: 36px; border-radius: 50%; }
 .en-tuile-option-texte { flex: 1; min-width: 0; }
 .en-tuile-option-texte em { font-style: normal; color: var(--ink-muted); }
-.en-tuile-option > svg { color: var(--accent); transition: transform .2s; }
-.en-tuile-option:hover, .en-tuile-option:focus-visible { border-color: var(--accent); box-shadow: 0 12px 28px -14px rgba(var(--accent-rgb), 0.45); outline: none; }
-.en-tuile-option:hover .en-tuile-icone, .en-tuile-option:focus-visible .en-tuile-icone { background: var(--accent); color: #fff; }
-.en-tuile-option:hover > svg { transform: translateX(3px); }
+.en-tuile-option:hover, .en-tuile-option:focus-within { border-color: var(--accent); box-shadow: 0 12px 28px -14px rgba(var(--accent-rgb), 0.45); }
+.en-tuile-option:hover .en-tuile-icone, .en-tuile-option:focus-within .en-tuile-icone { background: var(--accent); color: #fff; }
 .en-tuile { position: relative; width: 100%; min-height: 270px; display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; color: var(--ink); font: inherit; text-decoration: none; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease, border-color .25s; }
-.en-tuile:hover, .en-tuile:focus-visible { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 24px 50px -18px rgba(var(--accent-rgb), 0.38); outline: none; }
+.en-tuile:hover, .en-tuile:focus-visible, .en-tuile:focus-within { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 24px 50px -18px rgba(var(--accent-rgb), 0.38); outline: none; }
 .en-tuile-haut { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
 .en-tuile-icone { flex-shrink: 0; width: 52px; height: 52px; border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); transition: background .25s, color .25s; }
-.en-tuile:hover .en-tuile-icone, .en-tuile:focus-visible .en-tuile-icone { background: var(--accent); color: #fff; }
+.en-tuile:hover .en-tuile-icone, .en-tuile:focus-visible .en-tuile-icone, .en-tuile:focus-within .en-tuile-icone { background: var(--accent); color: #fff; }
 .en-tuile .en-num { margin: 0; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-muted); }
-.en-tuile-titre { margin-bottom: 10px; font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; }
+.en-tuile-titre { margin: 0 0 10px; font-family: 'Fraunces', serif; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; color: inherit; }
 .en-tuile-texte { margin-bottom: 24px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+/* Lien de la carte : posé sur le titre, il couvre toute la carte grâce à ::after
+   (une carte-lien ne peut pas contenir le bouton « Devis »). */
+.en-tuile-lien { color: inherit; text-decoration: none; }
+.en-tuile-lien::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 24px; }
+.en-tuile-option .en-tuile-lien::after { border-radius: 999px; }
+.en-tuile-lien:focus-visible { outline: none; }
 .en-tuile-pied { width: 100%; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.en-tuile-prix { font-size: 13px; font-weight: 500; color: var(--ink-muted); }
+.en-tuile-prix { margin: -10px 0 16px; font-size: 13px; font-weight: 500; color: var(--ink-muted); }
 .en-tuile-voir { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 14px; font-weight: 600; transition: gap .2s; }
 .en-tuile:hover .en-tuile-voir { gap: 10px; }
+/* Photo d'une prestation (champ « photo » d'entretien-prestations.js) :
+   remplace l'icône en haut de la carte. Avec « photoAvant », deux moitiés Avant / Après. */
+.en-tuile-photo { position: relative; display: block; width: 100%; aspect-ratio: 16 / 11; margin-bottom: 18px; border-radius: 16px; overflow: hidden; background: var(--accent-soft); }
+.en-tuile-photo > img, .en-aa-moitie > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.en-tuile:hover .en-tuile-photo img { transform: scale(1.04); }
+.en-tuile-photo + .en-tuile-haut { margin-bottom: 12px; }
+.en-avant-apres { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--surface); }
+.en-aa-moitie { position: relative; overflow: hidden; }
+.en-aa-tag { position: absolute; left: 8px; bottom: 8px; padding: 4px 9px; border-radius: 999px; background: rgba(10,37,64,0.72); color: #fff; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+/* En haut de la page d'une prestation, le prix est en bas à gauche : étiquettes en haut. */
+.en-d-visuel .en-aa-tag { top: 16px; bottom: auto; left: 16px; padding: 6px 12px; font-size: 11px; }
+/* Bouton « Devis » direct sur chaque prestation : au-dessus du lien de la carte. */
+.en-btn-devis { position: relative; z-index: 2; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent); color: #fff; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
+.en-btn-devis:hover { background: #fff; color: var(--accent); box-shadow: 0 8px 20px -10px rgba(var(--accent-rgb), 0.6); }
+.en-btn-devis:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.en-tuile-option .en-btn-devis { padding: 7px 14px; }
 .en-tuile-devis { background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%); border-color: transparent; color: #fff; }
 .en-tuile-devis .en-tuile-titre { color: #fff; }
 .en-tuile-devis .en-tuile-texte { color: rgba(255,255,255,0.75); }

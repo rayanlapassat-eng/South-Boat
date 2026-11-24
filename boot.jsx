@@ -94,10 +94,11 @@ function App() {
   }, [page.name, page.id, page.ancre]);
 
   // SEO : titre + meta description dynamiques par page.
-  // Le nom de l'univers est dans chaque titre (« … | South Boat Entretien ») :
-  // c'est ce qui permet à Google d'associer « south boat entretien » à ces pages.
+  // Le nom de l'univers est dans chaque titre (« … | South Boat Services ») :
+  // c'est ce qui permet à Google d'associer « south boat services » à ces pages
+  // (le mot « entretien » reste dans les titres et descriptions pour la recherche).
   useEffect(() => {
-    const SITE = universPage === "entretien" ? "South Boat Entretien"
+    const SITE = universPage === "entretien" ? "South Boat Services"
       : universPage === "location" ? "South Boat Location"
       : "South Boat";
     const BOATS = window.BOATS || [];
@@ -118,13 +119,13 @@ function App() {
       title = `Feux d'artifice 2026 — Cannes, Antibes, Juan-les-Pins | ${SITE}`;
       desc  = "Calendrier des feux d'artifice 2026 sur la Côte d'Azur. Réservez un bateau pour les vivre depuis la baie, loin de la foule.";
     } else if (page.name === "entretien" || page.name === "entretien-prestation") {
-      title = "South Boat Entretien — Entretien et nettoyage de bateaux à Mandelieu";
-      desc  = "Nettoyage extérieur, lustrage et rénovation du gelcoat, antifouling : South Boat Entretien prend soin de votre bateau jusqu'à 42 pieds (environ 13 m). Tarifs sur devis, forfaits au mois ou à l'année.";
+      title = "South Boat Services — Entretien et nettoyage de bateaux à Mandelieu";
+      desc  = "Nettoyage extérieur, lustrage et rénovation du gelcoat, antifouling : South Boat Services prend soin de votre bateau jusqu'à 42 pieds (environ 13 m). Tarifs sur devis, forfaits au mois ou à l'année.";
       const p = page.name === "entretien-prestation"
         && ((window.ENTRETIEN && window.ENTRETIEN.prestations) || []).find((x) => x.id === page.id);
       if (p) {
         title = `${p.titre} de bateau à Mandelieu | ${SITE}`;
-        desc  = `${p.intro} ${p.titre} par South Boat Entretien à Mandelieu-la-Napoule, sur devis.`;
+        desc  = `${p.intro} ${p.titre} par South Boat Services à Mandelieu-la-Napoule, sur devis.`;
       }
     } else if (page.name === "detail" && page.id) {
       const b = BOATS.find(x => x.id === page.id);
